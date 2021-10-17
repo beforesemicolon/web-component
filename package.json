@@ -9,11 +9,21 @@
     "build": "webpack"
   },
   "keywords": [
-    "web-component"
+    "web-component",
+    "framework",
+    "library",
+    "javascript",
+    "web",
+    "html"
   ],
   "author": "Elson T. Correia",
   "license": "MIT",
+  "repository": {
+    "url": "https://github.com/beforesemicolon/web-component",
+    "type": "git"
+  },
   "devDependencies": {
+    "jest": "^27.2.5",
     "ts-loader": "^9.2.6",
     "typescript": "^4.4.4",
     "webpack": "^5.58.2",
