@@ -1,10 +1,10 @@
 export function setupComponentPropertiesForAutoUpdate(
 	component: WebComponent,
-	trackers: {[key: string]: []},
+	trackers: trackerMap,
 	onUpdate: onUpdateCallback
 ) {
 	for (let property of Object.getOwnPropertyNames(component)) {
-		if (!trackers[property]) {
+		if (!property.startsWith('_') && !trackers[property]) {
 			let value = component[property];
 
 			trackers[property] = [];

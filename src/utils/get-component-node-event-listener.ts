@@ -7,7 +7,7 @@ export function getComponentNodeEventListener(component: WebComponent, name: str
 		if (executable) {
 			executable = `{${executable}}`
 				.replace(/(?<={|\s)(([a-z$])[a-z$_]+)(?=\[|\.|\s|})/ig, (_, m) => {
-					return component.hasOwnProperty(m) ? `component.${m}` : m;
+					return component.hasOwnProperty(m) ? `this.${m}` : m;
 				})
 				.slice(1, -1);
 			const fn = new Function('$event', executable);
