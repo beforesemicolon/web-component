@@ -1,6 +1,6 @@
 {
   "name": "@beforesemicolon/web-component",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Web Component Client Framework",
   "main": "dist/web-component.js",
   "scripts": {
