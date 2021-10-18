@@ -2,11 +2,12 @@
   "name": "@beforesemicolon/web-component",
   "version": "0.0.0",
   "description": "Web Component Client Framework",
-  "private": true,
   "main": "dist/web-component.js",
   "scripts": {
     "test": "test",
-    "build": "tsc --noEmit && rm -rf dist && esbuild src/web-component.ts --bundle --minify --sourcemap --target=chrome58 --outfile=dist/web-component.js",
+    "build:min": "esbuild src/web-component.ts --bundle --minify --sourcemap --target=chrome58 --outfile=dist/web-component.min.js",
+    "build:full": "esbuild src/web-component.ts --bundle --target=es6 --outfile=dist/web-component.js",
+    "build": "tsc --noEmit && rm -rf dist && npm run build:min",
     "local": "nodemon --watch src -e ts --exec npm run build"
   },
   "keywords": [
