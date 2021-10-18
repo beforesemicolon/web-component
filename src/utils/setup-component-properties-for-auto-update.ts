@@ -1,11 +1,11 @@
-import {turnKebabToCamelCasing} from "./turn-kebab-to-camel-casing";
+import {turnCamelToKebabCasing} from "./turn-camel-to-kebab-casing";
 
 export function setupComponentPropertiesForAutoUpdate(component: WebComponent, onUpdate: onUpdateCallback) {
 	for (let property of Object.getOwnPropertyNames(component)) {
-		const prop = turnKebabToCamelCasing(property);
+		const attr = turnCamelToKebabCasing(property);
 
 		// @ts-ignore
-		if (!property.startsWith('_') && !component.constructor.observedAttributes.includes(prop)) {
+		if (!property.startsWith('_') && !component.constructor.observedAttributes.includes(attr)) {
 			let value = component[property];
 
 			delete component[property];
