@@ -44,7 +44,6 @@ export class WebComponent extends HTMLElement {
 
     setComponentPropertiesFromObservedAttributes(this, observedAttributes,
         (prop, oldValue, newValue) => {
-          console.log('-- setComponentPropertiesFromObservedAttributes', prop);
           this._trackers.forEach((track: track) => this._updateTrackValue(track))
           this.onUpdate(prop, oldValue, newValue);
         });
@@ -142,7 +141,6 @@ export class WebComponent extends HTMLElement {
     this._mounted = true;
 
     setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
-      console.log('-- setupComponentPropertiesForAutoUpdate', prop);
       this._trackers.forEach(track => this._updateTrackValue(track))
       this.onUpdate(prop, oldValue, newValue);
     })
@@ -250,7 +248,6 @@ export class WebComponent extends HTMLElement {
   }
 
   private _updateTrackValue(track: track) {
-    console.log('-- _updateTrackValue', track);
     const {node, value, property, isAttribute, match, executable} = track;
 
     const newValue = value.replace(match, bindData(this, executable));

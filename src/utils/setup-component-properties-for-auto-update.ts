@@ -17,7 +17,6 @@ export function setupComponentPropertiesForAutoUpdate(component: WebComponent, o
 				set(newValue) {
 					const oldValue = value;
 					value = newValue;
-					console.log('-- set', property);
 
 					if (newValue !== oldValue) {
 						onUpdate(property, oldValue, newValue);
