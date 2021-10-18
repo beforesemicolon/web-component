@@ -5,14 +5,12 @@ export function getComponentNodeEventListener(component: WebComponent, name: str
 		let [_, fnBody, fnName, fnArgs, executable] = match;
 
 		if (executable) {
-			executable = `{${executable}}`
-				.replace(/(?<={|\s)(([a-z$])[a-z$_]+)(?=\[|\.|\s|})/ig, (_, m) => {
-					return component.hasOwnProperty(m) ? `this.${m}` : m;
-				})
-				.slice(1, -1);
-			const fn = new Function('$event', executable);
+			const props = Object.getOwnPropertyNames(component);
+			const fn = new Function(...['$event', ...props], executable);
 
-			return (event: Event) => fn.call(component, event);
+			return (event: Event) => {
+				fn.apply(component, [event, ...props.map(prop => component[prop])])
+			};
 		} else {
 			const args = (fnArgs || '').split(',').map(arg => arg.trim());
 
