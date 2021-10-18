@@ -1,12 +1,7 @@
 import {turnKebabToCamelCasing} from './turn-kebab-to-camel-casing';
 import boolAttr from './boolean-attributes.json';
 
-export function setComponentPropertiesFromObservedAttributes(
-	component: HTMLElement,
-	observedAttributes: string[],
-	onUpdate: onUpdateCallback,
-	cb: propertyCallback = () => {
-}) {
+export function setComponentPropertiesFromObservedAttributes(component: HTMLElement, observedAttributes: string[], onUpdate: onUpdateCallback) {
 	observedAttributes.forEach(prop => {
 		prop = prop.trim();
 
@@ -18,8 +13,6 @@ export function setComponentPropertiesFromObservedAttributes(
 				value = (boolAttr as booleanAttributes)[prop].value ?? '';
 				prop = (boolAttr as booleanAttributes)[prop].name;
 			}
-
-			cb(prop);
 
 			Object.defineProperty(component, prop, {
 				get() {

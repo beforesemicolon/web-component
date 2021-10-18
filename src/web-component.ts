@@ -15,7 +15,7 @@ import booleanAttr from './utils/boolean-attributes.json';
  * when it comes to creating and working with web components on the browser
  */
 export class WebComponent extends HTMLElement {
-  private _trackers: trackerMap = Object.create(null);
+  private _trackers: track[] = [];
   private _mounted = false;
   private readonly _classes;
   private readonly _root: WebComponent | ShadowRoot;
@@ -44,11 +44,9 @@ export class WebComponent extends HTMLElement {
 
     setComponentPropertiesFromObservedAttributes(this, observedAttributes,
         (prop, oldValue, newValue) => {
-          this._trackers[prop].forEach((track: track) => this._updateTrackValue(track))
+          console.log('-- setComponentPropertiesFromObservedAttributes', prop);
+          this._trackers.forEach((track: track) => this._updateTrackValue(track))
           this.onUpdate(prop, oldValue, newValue);
-        },
-        (prop) => {
-          this._trackers[prop] = [];
         });
   }
 
@@ -143,8 +141,9 @@ export class WebComponent extends HTMLElement {
   connectedCallback() {
     this._mounted = true;
 
-    setupComponentPropertiesForAutoUpdate(this, this._trackers, (prop, oldValue, newValue) => {
-      this._trackers[prop].forEach(track => this._updateTrackValue(track))
+    setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
+      console.log('-- setupComponentPropertiesForAutoUpdate', prop);
+      this._trackers.forEach(track => this._updateTrackValue(track))
       this.onUpdate(prop, oldValue, newValue);
     })
 
@@ -251,6 +250,7 @@ export class WebComponent extends HTMLElement {
   }
 
   private _updateTrackValue(track: track) {
+    console.log('-- _updateTrackValue', track);
     const {node, value, property, isAttribute, match, executable} = track;
 
     const newValue = value.replace(match, bindData(this, executable));
@@ -268,25 +268,18 @@ export class WebComponent extends HTMLElement {
         : (node as any)[property]
 
     extractExecutableSnippetFromString(value.trim())
-        .map(exec => {
-          return {...exec, properties: exec.match.match(/(?<={|\s)(([a-z$])[a-z$_]+)(?=\[|\.|\s|})/ig)};
-        })
-        .forEach(({properties, ...exec}) => {
-          properties?.forEach(prop => {
-            const track: track = {
-              node,
-              property,
-              isAttribute,
-              value,
-              ...exec
-            };
+        .forEach((exec) => {
+          const track: track = {
+            node,
+            property,
+            isAttribute,
+            value,
+            ...exec
+          };
 
-            if (Array.isArray(this._trackers[prop])) {
-              this._trackers[prop].push(track);
-            }
+          this._trackers.push(track);
 
-            this._updateTrackValue(track);
-          });
+          this._updateTrackValue(track);
         });
   }
 }

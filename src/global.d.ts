@@ -10,10 +10,6 @@ export declare global {
 		}
 	}
 
-	export interface trackerMap {
-		[key: string]: Array<track>
-	}
-
 	export interface track {
 		node: HTMLElement | Node | WebComponent;
 		property: string;

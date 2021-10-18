@@ -1,13 +1,12 @@
-export function setupComponentPropertiesForAutoUpdate(
-	component: WebComponent,
-	trackers: trackerMap,
-	onUpdate: onUpdateCallback
-) {
-	for (let property of Object.getOwnPropertyNames(component)) {
-		if (!property.startsWith('_') && !trackers[property]) {
-			let value = component[property];
+import {turnKebabToCamelCasing} from "./turn-kebab-to-camel-casing";
 
-			trackers[property] = [];
+export function setupComponentPropertiesForAutoUpdate(component: WebComponent, onUpdate: onUpdateCallback) {
+	for (let property of Object.getOwnPropertyNames(component)) {
+		const prop = turnKebabToCamelCasing(property);
+
+		// @ts-ignore
+		if (!property.startsWith('_') && !component.constructor.observedAttributes.includes(prop)) {
+			let value = component[property];
 
 			delete component[property];
 
@@ -18,6 +17,7 @@ export function setupComponentPropertiesForAutoUpdate(
 				set(newValue) {
 					const oldValue = value;
 					value = newValue;
+					console.log('-- set', property);
 
 					if (newValue !== oldValue) {
 						onUpdate(property, oldValue, newValue);
