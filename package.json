@@ -2,7 +2,7 @@
   "name": "@beforesemicolon/web-component",
   "version": "0.0.2",
   "description": "Web Component Client Framework",
-  "main": "dist/web-component.js",
+  "main": "dist/web-component.min.js",
   "scripts": {
     "test": "test",
     "build:min": "esbuild src/web-component.ts --bundle --minify --sourcemap --target=chrome58 --outfile=dist/web-component.min.js",
