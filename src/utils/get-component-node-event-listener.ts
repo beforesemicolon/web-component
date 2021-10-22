@@ -1,22 +1,23 @@
 export function getComponentNodeEventListener(component: WebComponent, name: string, value: string) {
-	const match = value.trim().match(/^(?:(([a-z$_][a-z0-9$_]*)\s*\((.*)\))|\{(.*)\})$/i);
+	const match = value.trim().match(/^(?:((?:this\.)?([a-z$_][a-z0-9$_]*)\s*\((.*)\))|\{(.*)\})$/i);
 
 	if (match) {
-		let [_, fnBody, fnName, fnArgs, executable] = match;
+		let [_, fn, fnName, fnArgs, executable] = match;
 
 		if (executable) {
 			const props = Object.getOwnPropertyNames(component);
-			const fn = new Function(...['$event', ...props], executable);
+			const fn = new Function('$event', ...props, executable);
 
 			return (event: Event) => {
-				fn.apply(component, [event, ...props.map(prop => component[prop])])
+				fn.call(component, event, ...props.map(prop => component[prop]))
 			};
 		} else {
-			const args = (fnArgs || '').split(',').map(arg => arg.trim());
+			fn = fn.replace(/^this\./, '');
+			const func = new Function('$event', `return this.${fn}`);
 
 			if (typeof component[fnName] === 'function') {
 				return (event: Event) => {
-					return (component[fnName] as any).apply(component, args.map(arg => arg === '$event' ? event : component[arg]))
+					return func.call(component, event)
 				}
 			} else {
 				throw new Error(`${component.constructor.name}: "${fnName}" is not a function`);
@@ -24,6 +25,6 @@ export function getComponentNodeEventListener(component: WebComponent, name: str
 		}
 	}
 
-	throw new Error(`${component.constructor.name}: Invalid event handler for "${name}" => ${value}.`);
+	throw new Error(`${component.constructor.name}: Invalid event handler for "${name}" >>> "${value}".`);
 
 }

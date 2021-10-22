@@ -1,6 +1,6 @@
 {
   "name": "@beforesemicolon/web-component",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Web Component Client Framework",
   "main": "dist/web-component.min.js",
   "scripts": {
@@ -18,7 +18,7 @@
     "web",
     "html"
   ],
-  "author": "Elson T. Correia",
+  "author": "Elson Correia",
   "license": "MIT",
   "repository": {
     "url": "https://github.com/beforesemicolon/web-component",
