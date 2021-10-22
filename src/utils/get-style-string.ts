@@ -1,6 +1,10 @@
 export function getStyleString(stylesheet: string, tagName: string, hasShadowRoot: boolean) {
 	stylesheet = stylesheet.trim().replace(/\s{2,}/g, ' ');
 
+	if (!stylesheet) {
+	    return '';
+	}
+
 	let style = stylesheet.startsWith('<style')
 		? stylesheet
 		: `<style id="${tagName}">${stylesheet}</style>`

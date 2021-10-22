@@ -109,7 +109,7 @@ export class WebComponent extends HTMLElement {
    * @returns {string | {type: string, content: string}}
    */
   get stylesheet() {
-    return '<style></style>';
+    return '';
   }
 
   /**
@@ -134,7 +134,9 @@ export class WebComponent extends HTMLElement {
 
     this.tagName = tagName;
 
-    customElements.define(tagName, this);
+    if (!customElements.get(tagName)) {
+      customElements.define(tagName, this);
+    }
   }
 
   connectedCallback() {
@@ -155,10 +157,12 @@ export class WebComponent extends HTMLElement {
 
     const style = getStyleString(this.stylesheet, (this.constructor as any).tagName, hasShadowRoot);
 
-    if (hasShadowRoot) {
-      this.root.innerHTML = style;
-    } else if (!document.head.querySelector(`style#${(this.constructor as any).tagName}`)) {
-      document.head.insertAdjacentHTML('beforeend', style);
+    if (style) {
+      if (hasShadowRoot) {
+        this.root.innerHTML = style;
+      } else if (!document.head.querySelector(`style#${(this.constructor as any).tagName}`)) {
+        document.head.insertAdjacentHTML('beforeend', style);
+      }
     }
 
     this.root.appendChild(contentNode);
