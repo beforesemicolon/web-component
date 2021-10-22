@@ -27,19 +27,19 @@ export class WebComponent extends HTMLElement {
     this._classes = createClasses(this);
 
     // @ts-ignore
-    let {name, mode, observedAttributes, delegatesFocus} = (this.constructor as any);
+    let {name, mode, observedAttributes, delegatesFocus} = this.constructor;
 
 
     if (!/open|closed|none/.test(mode)) {
-      throw new Error(`${name}: Invalid mode "${mode}". Must be one of ["open", "closed", "none"].\n\nLearn more => https://web-component.beforesemicolon.com/docs/mode\n`)
+      throw new Error(`${name}: Invalid mode "${mode}". Must be one of ["open", "closed", "none"].`)
     }
 
     if (mode !== 'none') {
-      this._root = this.attachShadow({mode, delegatesFocus});
+      this._root = this.attachShadow({mode: mode as ShadowRootMode, delegatesFocus});
     }
 
     if (!Array.isArray(observedAttributes) || observedAttributes.some(a => typeof a !== 'string')) {
-      throw new Error(`${name}: "observedAttributes" must be an array of attribute strings.\n\nLearn more => https://web-component.beforesemicolon.com/docs/observedAttributes\n`)
+      throw new Error(`${name}: "observedAttributes" must be an array of attribute strings.`)
     }
 
     setComponentPropertiesFromObservedAttributes(this, observedAttributes,
@@ -83,8 +83,8 @@ export class WebComponent extends HTMLElement {
    * the actual element
    * @returns {*}
    */
-  get root() {
-    return this._root;
+  get root(): HTMLElement | ShadowRoot | null {
+    return (this.constructor.constructor as WebComponentConstructor).mode === 'open' ? this._root : null;
   }
 
   /**
@@ -139,6 +139,10 @@ export class WebComponent extends HTMLElement {
     }
   }
 
+  static registerAll(components: Array<WebComponentConstructor>) {
+    components.forEach(comp => comp.register());
+  }
+
   connectedCallback() {
     this._mounted = true;
 
@@ -153,19 +157,19 @@ export class WebComponent extends HTMLElement {
 
     this._render(contentNode);
 
-    const hasShadowRoot = ((this.constructor as any) as any).mode !== 'none';
+    const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
 
-    const style = getStyleString(this.stylesheet, (this.constructor as any).tagName, hasShadowRoot);
+    const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
 
     if (style) {
       if (hasShadowRoot) {
-        this.root.innerHTML = style;
-      } else if (!document.head.querySelector(`style#${(this.constructor as any).tagName}`)) {
+        this._root.innerHTML = style;
+      } else if (!document.head.querySelector(`style#${(this.constructor as WebComponentConstructor).tagName}`)) {
         document.head.insertAdjacentHTML('beforeend', style);
       }
     }
 
-    this.root.appendChild(contentNode);
+    this._root.appendChild(contentNode);
 
     this.onMount();
   }

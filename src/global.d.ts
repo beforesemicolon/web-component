@@ -29,14 +29,16 @@ export declare global {
 		delegatesFocus: boolean;
 	}
 
+	export type ShadowRootModeExtended = "open" | "closed" | "none";
+
 	export class WebComponent extends HTMLElement {
 		static tagName: string;
-		static mode: string;
-		static observedAttributes: string;
+		static mode: ShadowRootModeExtended;
+		static observedAttributes: Array<string>;
 		static delegatesFocus: boolean;
-		static register: (tagName:? string) =>  void
+		static register: (tagName?: string) =>  void
 
-		root: HTMLElement | ShadowRoot;
+		root: HTMLElement | ShadowRoot | null;
 		mounted: boolean;
 		template: string;
 		stylesheet: string;
@@ -48,5 +50,15 @@ export declare global {
 		onUpdate: (name: string, oldValue: string, newValue: string) => void;
 
 		[key: string]: any;
+	}
+
+	export interface WebComponentConstructor {
+		new (): WebComponent;
+
+		tagName: string;
+		mode: ShadowRootModeExtended;
+		observedAttributes: Array<string>;
+		delegatesFocus: boolean;
+		register: (tagName?: string) =>  void
 	}
 }
