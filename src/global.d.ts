@@ -36,7 +36,8 @@ export declare global {
 		static mode: ShadowRootModeExtended;
 		static observedAttributes: Array<string>;
 		static delegatesFocus: boolean;
-		static register: (tagName?: string) =>  void
+		static register: (tagName?: string) => void
+		static registerAll: (components: Array<WebComponentConstructor>) => void
 
 		root: HTMLElement | ShadowRoot | null;
 		mounted: boolean;
@@ -60,5 +61,6 @@ export declare global {
 		observedAttributes: Array<string>;
 		delegatesFocus: boolean;
 		register: (tagName?: string) =>  void
+		registerAll: (components: Array<WebComponentConstructor>) => void
 	}
 }

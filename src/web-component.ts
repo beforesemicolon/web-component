@@ -84,7 +84,7 @@ export class WebComponent extends HTMLElement {
    * @returns {*}
    */
   get root(): HTMLElement | ShadowRoot | null {
-    return (this.constructor.constructor as WebComponentConstructor).mode === 'open' ? this._root : null;
+    return (this.constructor as WebComponentConstructor).mode === 'open' ? this._root : null;
   }
 
   /**
@@ -139,6 +139,10 @@ export class WebComponent extends HTMLElement {
     }
   }
 
+  /**
+   * registers a list of provided web component classes
+   * @param components
+   */
   static registerAll(components: Array<WebComponentConstructor>) {
     components.forEach(comp => comp.register());
   }

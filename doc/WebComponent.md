@@ -137,12 +137,13 @@ class MyButton extends WebComponent {
 
 ***[Learn More about Mode](https://github.com/beforesemicolon/web-component/blob/master/doc/configuration.md#mode)***
 
-the shadow-root element is accessible via the `root` property. It will be null if the mode is other than "open"
+the shadow-root element is accessible via the `root` or `shadowRoot` property. It will be null if the mode is other than "open"
 
 ```js
 class MyButton extends WebComponent {
   onMount() {
     console.log(this.root);
+    console.log(this.shadowRoot);
   }
 }
 ```
