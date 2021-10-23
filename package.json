@@ -4,7 +4,8 @@
   "description": "Web Component Client Framework",
   "main": "dist/web-component.min.js",
   "scripts": {
-    "test": "test",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
     "build:min": "esbuild src/web-component.ts --bundle --minify --sourcemap --target=chrome58 --outfile=dist/web-component.min.js",
     "build:full": "esbuild src/web-component.ts --bundle --target=es6 --outfile=dist/web-component.js",
     "build": "tsc --noEmit && rm -rf dist && npm run build:min",
@@ -25,9 +26,12 @@
     "type": "git"
   },
   "devDependencies": {
+    "@types/jest": "^27.0.2",
     "esbuild": "^0.13.8",
     "jest": "^27.2.5",
+    "jsdom": "^18.0.0",
     "nodemon": "^2.0.13",
+    "ts-jest": "^27.0.7",
     "typescript": "^4.4.4"
   }
 }
