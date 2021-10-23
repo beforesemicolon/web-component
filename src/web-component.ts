@@ -44,8 +44,11 @@ export class WebComponent extends HTMLElement {
 
     setComponentPropertiesFromObservedAttributes(this, observedAttributes,
         (prop, oldValue, newValue) => {
-          this._trackers.forEach((track: track) => this._updateTrackValue(track))
-          this.onUpdate(prop, oldValue, newValue);
+          this._trackers.forEach((track: track) => this._updateTrackValue(track));
+
+          if (this.mounted) {
+            this.onUpdate(prop, oldValue, newValue);
+          }
         });
   }
 
@@ -63,7 +66,7 @@ export class WebComponent extends HTMLElement {
    * the content to be places inside the shadow root but directly under the tag
    * @type {string}
    */
-  static mode = 'open'; // open | closed | none
+  static mode: ShadowRootModeExtended = 'open';
 
   /**
    * shadow root delegate focus option
@@ -77,6 +80,40 @@ export class WebComponent extends HTMLElement {
    * @type {string}
    */
   static tagName = '';
+
+  /**
+   * registers the component with the CustomElementRegistry taking an optional tag name if not
+   * specified as static member of the class as tagName
+   * @param tagName
+   */
+  static register(tagName?: string | undefined) {
+    tagName = typeof tagName === 'string' && tagName
+        ? tagName
+        : typeof this.tagName === 'string' && this.tagName
+            ? this.tagName
+            : turnCamelToKebabCasing(this.name);
+
+    this.tagName = tagName;
+
+    if (!customElements.get(tagName)) {
+      customElements.define(tagName, this);
+    }
+  }
+
+  /**
+   * registers a list of provided web component classes
+   * @param components
+   */
+  static registerAll(components: Array<WebComponentConstructor>) {
+    components.forEach(comp => comp.register());
+  }
+
+  /**
+   * returns whether the component is registered or not
+   */
+  static get isRegistered() {
+    return this.tagName !== '' && customElements.get(this.tagName) !== undefined;
+  }
 
   /**
    * the root element. If shadow root present it will be the shadow root otherwise
@@ -118,33 +155,6 @@ export class WebComponent extends HTMLElement {
    */
   get template() {
     return '';
-  }
-
-  /**
-   * registers the component with the CustomElementRegistry taking an optional tag name if not
-   * specified as static member of the class as tagName
-   * @param tagName
-   */
-  static register(tagName?: string | undefined) {
-    tagName = typeof tagName === 'string' && tagName
-        ? tagName
-        : typeof this.tagName === 'string' && this.tagName
-            ? this.tagName
-            : turnCamelToKebabCasing(this.name);
-
-    this.tagName = tagName;
-
-    if (!customElements.get(tagName)) {
-      customElements.define(tagName, this);
-    }
-  }
-
-  /**
-   * registers a list of provided web component classes
-   * @param components
-   */
-  static registerAll(components: Array<WebComponentConstructor>) {
-    components.forEach(comp => comp.register());
   }
 
   connectedCallback() {
@@ -211,6 +221,7 @@ export class WebComponent extends HTMLElement {
       // @ts-ignore
       this[prop] = newValue;
     } else {
+      this._trackers.forEach((track: track) => this._updateTrackValue(track))
       this.onUpdate(name, oldValue, newValue);
     }
   }
