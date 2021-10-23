@@ -158,8 +158,6 @@ export class WebComponent extends HTMLElement {
   }
 
   connectedCallback() {
-    this._mounted = true;
-
     setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
       this._trackers.forEach(track => this._updateTrackValue(track))
       this.onUpdate(prop, oldValue, newValue);
@@ -185,6 +183,7 @@ export class WebComponent extends HTMLElement {
 
     this._root.appendChild(contentNode);
 
+    this._mounted = true;
     this.onMount();
   }
 
