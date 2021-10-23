@@ -7,7 +7,7 @@ import {turnCamelToKebabCasing} from './utils/turn-camel-to-kebab-casing';
 import {turnKebabToCamelCasing} from './utils/turn-kebab-to-camel-casing';
 import {getStyleString} from './utils/get-style-string';
 import {getComponentNodeEventListener} from './utils/get-component-node-event-listener';
-import {bindData} from './utils/bind-data';
+import {evaluateStringInComponentContext} from './utils/evaluate-string-in-component-context';
 import booleanAttr from './utils/boolean-attributes.json';
 
 /**
@@ -210,6 +210,8 @@ export class WebComponent extends HTMLElement {
 
       // @ts-ignore
       this[prop] = newValue;
+    } else {
+      this.onUpdate(name, oldValue, newValue);
     }
   }
 
@@ -262,7 +264,7 @@ export class WebComponent extends HTMLElement {
   private _updateTrackValue(track: track) {
     const {node, value, property, isAttribute, match, executable} = track;
 
-    const newValue = value.replace(match, bindData(this, executable));
+    const newValue = value.replace(match, evaluateStringInComponentContext(executable, this));
 
     if (isAttribute) {
       (node as HTMLElement).setAttribute(property, newValue);
