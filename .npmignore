@@ -6,3 +6,4 @@ tsconfig.json
 doc
 **.tgz
 coverage
+jest.config.js

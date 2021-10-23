@@ -307,4 +307,7 @@ export class WebComponent extends HTMLElement {
 }
 
 // @ts-ignore
-window.WebComponent = WebComponent;
+if (window) {
+  // @ts-ignore
+  window.WebComponent = WebComponent;
+}
