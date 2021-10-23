@@ -1,4 +1,4 @@
-export function getStyleString(stylesheet: string, tagName: string, hasShadowRoot: boolean) {
+export function getStyleString(stylesheet: string, tagName: string, hasShadowRoot: boolean = true) {
 	stylesheet = stylesheet.trim().replace(/\s{2,}/g, ' ');
 
 	if (!stylesheet) {
@@ -12,7 +12,7 @@ export function getStyleString(stylesheet: string, tagName: string, hasShadowRoo
 	if (!hasShadowRoot) {
 		style = style.replace(/(:host)((\s*\(.*\)|))?/g, (_, h, s) => {
 			if (s) {
-				return tagName + s.slice(1, -1);
+				return tagName + s.trim().slice(1, -1).trim();
 			}
 			return tagName;
 		})
