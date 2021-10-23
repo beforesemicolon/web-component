@@ -1,5 +1,4 @@
 import {getComponentNodeEventListener} from './get-component-node-event-listener';
-import {WebComponent} from "../web-component";
 
 describe('getComponentNodeEventListener', () => {
 	class Button {
@@ -26,7 +25,7 @@ describe('getComponentNodeEventListener', () => {
 		// @ts-ignore
 		btn.onClick.mockClear();
 
-		handler = getComponentNodeEventListener(btn as any, 'click', 'onClick($event, 12, [23, 45])');
+		handler = getComponentNodeEventListener(btn as any, 'click', 'this.onClick($event, 12, [23, 45])');
 
 		expect(handler.toString()).toEqual('(event) => func.call(component, event)')
 
@@ -50,6 +49,16 @@ describe('getComponentNodeEventListener', () => {
 	});
 
 	it('should get listener with executables', () => {
+		let handler = getComponentNodeEventListener(btn as any, 'click', '{this.sampler = [2, 4, 6]}');
 
+		expect(handler.toString()).toEqual('(event) => fn.call(component, event, ...props.map(prop => component[prop]))');
+
+		handler({type: 'click'} as any);
+
+		expect(btn.sampler).toEqual([
+			2,
+			4,
+			6
+		]);
 	});
 });

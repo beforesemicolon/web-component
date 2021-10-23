@@ -29,12 +29,14 @@ describe('setupComponentPropertiesForAutoUpdate', () => {
 
 		comp.testSample = 'changed';
 
+		expect(comp.testSample).toEqual('changed');
 		expect(onUpdate).toHaveBeenCalledWith('testSample', '', 'changed');
 
 		onUpdate.mockClear();
 
 		comp.x = [];
 
+		expect(comp.x).toEqual([]);
 		expect(onUpdate).toHaveBeenCalledWith("x", [12, 45], []);
 
 	});

@@ -8,3 +8,4 @@ global.Node = dom.window.Node;
 global.Comment = dom.window.Comment;
 global.Text = dom.window.Text;
 global.CSSStyleDeclaration = dom.window.CSSStyleDeclaration;
+global.customElements = dom.window.customElements;

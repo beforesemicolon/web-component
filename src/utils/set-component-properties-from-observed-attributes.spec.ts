@@ -3,7 +3,7 @@ import {setComponentPropertiesFromObservedAttributes} from './set-component-prop
 describe('', () => {
 	const observedAttributes = ['sample-test', 'disabled', 'formnovlidate', 'class', 'style', 'data-x'];
 
-	it('should set getters and setters', () => {
+	it('should set getters and setters and call update on changes', () => {
 		const comp = document.createElement('div') as any;
 		const onUpdate = jest.fn();
 
@@ -15,5 +15,16 @@ describe('', () => {
 		expect(comp.class).not.toBeDefined();
 		expect(comp.style).toBeInstanceOf(CSSStyleDeclaration);
 		expect(comp.dataX).not.toBeDefined();
+
+		comp.disabled = false;
+
+		expect(onUpdate).not.toHaveBeenCalled();
+
+		onUpdate.mockClear();
+
+		comp.disabled = true;
+
+		expect(onUpdate).toHaveBeenCalledWith("disabled", false, true);
+
 	});
 });

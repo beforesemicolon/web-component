@@ -5,3 +5,4 @@ webpack.config.js
 tsconfig.json
 doc
 **.tgz
+coverage

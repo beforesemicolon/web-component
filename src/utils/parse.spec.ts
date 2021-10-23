@@ -1,11 +1,15 @@
 import {parse} from './parse';
 
 function stringifyNode(node: any): string {
-  if (node.outerHTML) {
+  if (node) {
+    if (node.outerHTML) {
       return node.outerHTML;
+    }
+
+    return [...(node.childNodes ?? node.children)].map(node => stringifyNode(node)).join('')
   }
 
-  return [...(node.childNodes ?? node.children)].map(node => stringifyNode(node)).join('')
+  return '';
 }
 
 describe('parse', () => {
@@ -208,5 +212,14 @@ describe('parse', () => {
       expect(root.textContent).toBe('some text');
     });
   });
-  
+
+  it('should handle hashed attribute', () => {
+    const root = parse('<p #if="true"></p>');
+    const p = root.children[0];
+
+    expect(stringifyNode(p)).toBe('<p></p>');
+    // @ts-ignore
+    expect(p['#if']).toBe('true');
+  });
+
 })
