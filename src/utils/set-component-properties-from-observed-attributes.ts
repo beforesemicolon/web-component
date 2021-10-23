@@ -10,7 +10,7 @@ export function setComponentPropertiesFromObservedAttributes(component: HTMLElem
 			prop = turnKebabToCamelCasing(prop);
 
 			if ((boolAttr).hasOwnProperty(prop)) {
-				value = (boolAttr as booleanAttributes)[prop].value ?? '';
+				value = (boolAttr as booleanAttributes)[prop].value;
 				prop = (boolAttr as booleanAttributes)[prop].name;
 			}
 

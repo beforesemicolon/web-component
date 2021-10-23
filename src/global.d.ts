@@ -21,14 +21,6 @@ export declare global {
 		to: number;
 	}
 
-	export interface WebComponentConstructor {
-		name: string;
-		tagName: string;
-		mode: string;
-		observedAttributes: string;
-		delegatesFocus: boolean;
-	}
-
 	export type ShadowRootModeExtended = "open" | "closed" | "none";
 
 	export class WebComponent extends HTMLElement {
@@ -37,6 +29,7 @@ export declare global {
 		static observedAttributes: Array<string>;
 		static delegatesFocus: boolean;
 		static register: (tagName?: string) => void
+		static isRegistered: boolean
 		static registerAll: (components: Array<WebComponentConstructor>) => void
 
 		root: HTMLElement | ShadowRoot | null;
@@ -62,5 +55,6 @@ export declare global {
 		delegatesFocus: boolean;
 		register: (tagName?: string) =>  void
 		registerAll: (components: Array<WebComponentConstructor>) => void
+		isRegistered: boolean
 	}
 }

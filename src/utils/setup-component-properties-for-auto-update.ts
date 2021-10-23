@@ -1,6 +1,7 @@
 import {turnCamelToKebabCasing} from "./turn-camel-to-kebab-casing";
 
 export function setupComponentPropertiesForAutoUpdate(component: WebComponent, onUpdate: onUpdateCallback) {
+
 	for (let property of Object.getOwnPropertyNames(component)) {
 		const attr = turnCamelToKebabCasing(property);
 
