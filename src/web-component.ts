@@ -24,7 +24,7 @@ export class WebComponent extends HTMLElement {
     super();
 
     this._root = this;
-    this._classes = createClasses(this);
+    this._classes = createClasses(this, this.onUpdate.bind(this));
 
     // @ts-ignore
     let {name, mode, observedAttributes, delegatesFocus} = this.constructor;
@@ -54,7 +54,7 @@ export class WebComponent extends HTMLElement {
    * https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements#using_the_lifecycle_callbacks
    * @type {[]}
    */
-  static observedAttributes = [];
+  static observedAttributes: Array<string> = [];
 
   /**
    * shadow root mode
