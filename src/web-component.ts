@@ -44,7 +44,7 @@ export class WebComponent extends HTMLElement {
 
     setComponentPropertiesFromObservedAttributes(this, observedAttributes,
         (prop, oldValue, newValue) => {
-          this._trackers.forEach((track: track) => this._updateTrackValue(track));
+          this.forceUpdate();
 
           if (this.mounted) {
             this.onUpdate(prop, oldValue, newValue);
@@ -159,7 +159,7 @@ export class WebComponent extends HTMLElement {
 
   connectedCallback() {
     setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
-      this._trackers.forEach(track => this._updateTrackValue(track))
+      this.forceUpdate();
       this.onUpdate(prop, oldValue, newValue);
     })
 
@@ -220,7 +220,7 @@ export class WebComponent extends HTMLElement {
       // @ts-ignore
       this[prop] = newValue;
     } else {
-      this._trackers.forEach((track: track) => this._updateTrackValue(track))
+      this.forceUpdate();
       this.onUpdate(name, oldValue, newValue);
     }
   }
@@ -229,6 +229,13 @@ export class WebComponent extends HTMLElement {
    * livecycle callback for when the element attributes or class properties are updated
    */
   onUpdate(name: string, oldValue: unknown, newValue: unknown) {
+  }
+
+  /**
+   * updates any DOM node with data bind reference.
+   */
+  forceUpdate() {
+    this._trackers.forEach((track: track) => this._updateTrackValue(track));
   }
 
   adoptedCallback() {
