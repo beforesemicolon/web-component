@@ -4,12 +4,52 @@ automatic properties and attribute watch, template data binding and auto update 
 
 ------- `Web Component As It Should Have Been` -------
 
-#### ⚠️ This is in Beta!!
+```js
+// app.js
 
-This module already includes all the MVP features it needs to be used. Although it has unit tests
-it still needs to be taken through enough test cases to be recommended for production.
+class MyButton extends WebComponent {
+  static observedAttributes = ['label', 'type'];
+  
+  get stylesheet() {
+    return `
+      <style>
+        :host {
+          display: inline-block;
+        }
+        
+        .my-button {
+          background: #222;
+          color: #fff;
+        }
+      </style>
+    `;
+  }
+  
+  get template() {
+    return `
+      <button 
+        class="my-button" 
+        type="{type || 'button'}"
+        onclick="handleClick($event)"
+        >
+        {label}
+      </button>
+    `;
+  }
+  
+  handleClick(event) {
+    this.dispatchEvent(new Event('click'));
+  }
+}
 
-🧪 **Help Test It** 🧪 and open issues when you find something. It will be super appreciated! 😁
+MyButton.register();
+```
+
+In your HTML you can simply use the tag normally.
+
+```html
+<my-button label="click me"></my-button>
+```
 
 ### Install
 
@@ -22,7 +62,7 @@ This module can be used directly in the browsers as well in Node environment
 <script src="https://unpkg.com/@beforesemicolon/web-component/dist/web-component.min.js"></script>
 
 <!-- use a specific version -->
-<script src="https://unpkg.com/@beforesemicolon/web-component@0.0.2/dist/web-component.min.js"></script>
+<script src="https://unpkg.com/@beforesemicolon/web-component@0.0.4/dist/web-component.min.js"></script>
 
 <!-- link you app script after -->
 <script src"app.js"></script>
@@ -70,56 +110,6 @@ require('esbuild').build({
 ```
 
     Check your bundler documentation to see how it handles specific modules exclusions.
-
-### Usage
-
-```js
-// app.js
-
-class MyButton extends WebComponent {
-  static observedAttributes = ['label', 'type', 'disabled'];
-  
-  get stylesheet() {
-    return `
-      <style>
-        :host {
-          display: inline-block;
-        }
-        
-        .my-button {
-          background: #222;
-          color: #fff;
-        }
-      </style>
-    `;
-  }
-  
-  get template() {
-    return `
-      <button 
-        class="my-button" 
-        type="{type || 'button'}"
-        onclick="handleClick($event)"
-        ${this.disabled ? 'disabled' : ''}
-        >
-        {label}
-      </button>
-    `;
-  }
-  
-  handleClick(event) {
-    this.dispatchEvent(new Event('click'));
-  }
-}
-
-MyButton.register();
-```
-
-In your HTML you can simply use the tag normally.
-
-```html
-<my-button label="click me"></my-button>
-```
 
 ### Documentation
 
