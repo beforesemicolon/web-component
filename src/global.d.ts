@@ -42,6 +42,7 @@ export declare global {
 		onDestroy: () => void;
 		onAdoption: () => void;
 		onUpdate: (name: string, oldValue: string, newValue: string) => void;
+		forceUpdate: () => void;
 
 		[key: string]: any;
 	}
