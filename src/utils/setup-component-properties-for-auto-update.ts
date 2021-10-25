@@ -9,8 +9,6 @@ export function setupComponentPropertiesForAutoUpdate(component: WebComponent, o
 		if (!property.startsWith('_') && !component.constructor.observedAttributes.includes(attr)) {
 			let value = component[property];
 
-			delete component[property];
-
 			Object.defineProperty(component, property, {
 				get() {
 					return value;

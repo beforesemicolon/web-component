@@ -1,5 +1,4 @@
 import {parse} from './utils/parse';
-import {createClasses} from './utils/create-classes';
 import {setComponentPropertiesFromObservedAttributes} from './utils/set-component-properties-from-observed-attributes';
 import {setupComponentPropertiesForAutoUpdate} from './utils/setup-component-properties-for-auto-update';
 import {extractExecutableSnippetFromString} from './utils/extract-executable-snippet-from-string';
@@ -8,6 +7,7 @@ import {turnKebabToCamelCasing} from './utils/turn-kebab-to-camel-casing';
 import {getStyleString} from './utils/get-style-string';
 import {getComponentNodeEventListener} from './utils/get-component-node-event-listener';
 import {evaluateStringInComponentContext} from './utils/evaluate-string-in-component-context';
+import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
 import booleanAttr from './utils/boolean-attributes.json';
 
 /**
@@ -15,299 +15,306 @@ import booleanAttr from './utils/boolean-attributes.json';
  * when it comes to creating and working with web components on the browser
  */
 export class WebComponent extends HTMLElement {
-  private _trackers: track[] = [];
-  private _mounted = false;
-  private readonly _classes;
-  private readonly _root: WebComponent | ShadowRoot;
+	private _trackers: track[] = [];
+	private _mounted = false;
+	private readonly _root: WebComponent | ShadowRoot;
 
-  constructor() {
-    super();
+	constructor() {
+		super();
 
-    this._root = this;
-    this._classes = createClasses(this, this.onUpdate.bind(this));
+		this._root = this;
 
-    // @ts-ignore
-    let {name, mode, observedAttributes, delegatesFocus} = this.constructor;
+		// @ts-ignore
+		let {name, mode, observedAttributes, delegatesFocus} = this.constructor;
 
 
-    if (!/open|closed|none/.test(mode)) {
-      throw new Error(`${name}: Invalid mode "${mode}". Must be one of ["open", "closed", "none"].`)
-    }
+		if (!/open|closed|none/.test(mode)) {
+			throw new Error(`${name}: Invalid mode "${mode}". Must be one of ["open", "closed", "none"].`)
+		}
 
-    if (mode !== 'none') {
-      this._root = this.attachShadow({mode: mode as ShadowRootMode, delegatesFocus});
-    }
+		if (mode !== 'none') {
+			this._root = this.attachShadow({mode, delegatesFocus});
+		}
 
-    if (!Array.isArray(observedAttributes) || observedAttributes.some(a => typeof a !== 'string')) {
-      throw new Error(`${name}: "observedAttributes" must be an array of attribute strings.`)
-    }
+		if (!Array.isArray(observedAttributes) || observedAttributes.some(a => typeof a !== 'string')) {
+			throw new Error(`${name}: "observedAttributes" must be an array of attribute strings.`)
+		}
 
-    setComponentPropertiesFromObservedAttributes(this, observedAttributes,
-        (prop, oldValue, newValue) => {
-          this._trackers.forEach((track: track) => this._updateTrackValue(track));
+		setComponentPropertiesFromObservedAttributes(this, observedAttributes,
+			(prop, oldValue, newValue) => {
+				this.forceUpdate();
 
-          if (this.mounted) {
-            this.onUpdate(prop, oldValue, newValue);
-          }
-        });
-  }
+				if (this.mounted) {
+					this.onUpdate(prop, oldValue, newValue);
+				}
+			});
+	}
 
-  /**
-   * an array of attribute names as they will look in the html tag
-   * https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements#using_the_lifecycle_callbacks
-   * @type {[]}
-   */
-  static observedAttributes: Array<string> = [];
+	/**
+	 * an array of attribute names as they will look in the html tag
+	 * https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements#using_the_lifecycle_callbacks
+	 * @type {[]}
+	 */
+	static observedAttributes: Array<string> = [];
 
-  /**
-   * shadow root mode
-   * https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot/mode
-   * plus an additional option of "none" to signal you dont want
-   * the content to be places inside the shadow root but directly under the tag
-   * @type {string}
-   */
-  static mode: ShadowRootModeExtended = 'open';
+	/**
+	 * shadow root mode
+	 * https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot/mode
+	 * plus an additional option of "none" to signal you dont want
+	 * the content to be places inside the shadow root but directly under the tag
+	 * @type {string}
+	 */
+	static mode = ShadowRootModeExtended.OPEN;
 
-  /**
-   * shadow root delegate focus option
-   * https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot/delegatesFocus
-   * @type {boolean}
-   */
-  static delegatesFocus = false;
+	/**
+	 * shadow root delegate focus option
+	 * https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot/delegatesFocus
+	 * @type {boolean}
+	 */
+	static delegatesFocus = false;
 
-  /**
-   * a valid name of the html tag
-   * @type {string}
-   */
-  static tagName = '';
+	/**
+	 * a valid name of the html tag
+	 * @type {string}
+	 */
+	static tagName = '';
 
-  /**
-   * registers the component with the CustomElementRegistry taking an optional tag name if not
-   * specified as static member of the class as tagName
-   * @param tagName
-   */
-  static register(tagName?: string | undefined) {
-    tagName = typeof tagName === 'string' && tagName
-        ? tagName
-        : typeof this.tagName === 'string' && this.tagName
-            ? this.tagName
-            : turnCamelToKebabCasing(this.name);
+	/**
+	 * registers the component with the CustomElementRegistry taking an optional tag name if not
+	 * specified as static member of the class as tagName
+	 * @param tagName
+	 */
+	static register(tagName?: string | undefined) {
+		tagName = typeof tagName === 'string' && tagName
+			? tagName
+			: typeof this.tagName === 'string' && this.tagName
+				? this.tagName
+				: turnCamelToKebabCasing(this.name);
 
-    this.tagName = tagName;
+		this.tagName = tagName;
 
-    if (!customElements.get(tagName)) {
-      customElements.define(tagName, this);
-    }
-  }
+		if (!customElements.get(tagName)) {
+			customElements.define(tagName, this);
+		}
+	}
 
-  /**
-   * registers a list of provided web component classes
-   * @param components
-   */
-  static registerAll(components: Array<WebComponentConstructor>) {
-    components.forEach(comp => comp.register());
-  }
+	/**
+	 * registers a list of provided web component classes
+	 * @param components
+	 */
+	static registerAll(components: Array<WebComponentConstructor>) {
+		components.forEach(comp => comp.register());
+	}
 
-  /**
-   * returns whether the component is registered or not
-   */
-  static get isRegistered() {
-    return this.tagName !== '' && customElements.get(this.tagName) !== undefined;
-  }
+	/**
+	 * returns whether the component is registered or not
+	 */
+	static get isRegistered() {
+		return this.tagName !== '' && customElements.get(this.tagName) !== undefined;
+	}
 
-  /**
-   * the root element. If shadow root present it will be the shadow root otherwise
-   * the actual element
-   * @returns {*}
-   */
-  get root(): HTMLElement | ShadowRoot | null {
-    return (this.constructor as WebComponentConstructor).mode === 'open' ? this._root : null;
-  }
+	/**
+	 * the root element. If shadow root present it will be the shadow root otherwise
+	 * the actual element
+	 * @returns {*}
+	 */
+	get root(): HTMLElement | ShadowRoot | null {
+		return (this.constructor as WebComponentConstructor).mode === 'open' ? this._root : null;
+	}
 
-  /**
-   * whether or not the element is attached to the DOM and works differently than Element.isConnected
-   * @returns {boolean}
-   */
-  get mounted() {
-    return this._mounted;
-  }
+	/**
+	 * whether or not the element is attached to the DOM and works differently than Element.isConnected
+	 * @returns {boolean}
+	 */
+	get mounted() {
+		return this._mounted;
+	}
 
-  /**
-   * read-write object which keys are individual class names with boolean values
-   * indicating if they are present or not
-   * @returns {*}
-   */
-  get classes() {
-    return this._classes;
-  }
+	/**
+	 * style for the component whether inside the style tag, as object or straight CSS string
+	 * @returns {string | {type: string, content: string}}
+	 */
+	get stylesheet() {
+		return '';
+	}
 
-  /**
-   * style for the component whether inside the style tag, as object or straight CSS string
-   * @returns {string | {type: string, content: string}}
-   */
-  get stylesheet() {
-    return '';
-  }
+	/**
+	 * template for the element HTML content
+	 * @returns {string}
+	 */
+	get template() {
+		return '';
+	}
 
-  /**
-   * template for the element HTML content
-   * @returns {string}
-   */
-  get template() {
-    return '';
-  }
+	connectedCallback() {
+		setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
+			this.forceUpdate();
 
-  connectedCallback() {
-    this._mounted = true;
+			if (this.mounted) {
+				this.onUpdate(prop, oldValue, newValue);
+			}
+		})
 
-    setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
-      this._trackers.forEach(track => this._updateTrackValue(track))
-      this.onUpdate(prop, oldValue, newValue);
-    })
+		let contentNode;
 
-    let contentNode;
+		contentNode = parse(this.template);
 
-    contentNode = parse(this.template);
+		this._render(contentNode);
 
-    this._render(contentNode);
+		const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
 
-    const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
+		const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
 
-    const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
+		if (style) {
+			if (hasShadowRoot) {
+				this._root.innerHTML = style;
+			} else if (!document.head.querySelector(`style#${(this.constructor as WebComponentConstructor).tagName}`)) {
+				document.head.insertAdjacentHTML('beforeend', style);
+			}
+		}
 
-    if (style) {
-      if (hasShadowRoot) {
-        this._root.innerHTML = style;
-      } else if (!document.head.querySelector(`style#${(this.constructor as WebComponentConstructor).tagName}`)) {
-        document.head.insertAdjacentHTML('beforeend', style);
-      }
-    }
+		this._root.appendChild(contentNode);
 
-    this._root.appendChild(contentNode);
+		this._mounted = true;
+		this.onMount();
+	}
 
-    this.onMount();
-  }
+	/**
+	 * livecycle callback for when the element is attached to the DOM
+	 */
+	onMount() {
+	}
 
-  /**
-   * livecycle callback for when the element is attached to the DOM
-   */
-  onMount() {
-  }
+	disconnectedCallback() {
+		this._mounted = false;
+		this.onDestroy();
+	}
 
-  disconnectedCallback() {
-    this._mounted = false;
-    this.onDestroy();
-  }
+	/**
+	 * livecycle callback for when the element is removed from the DOM
+	 */
+	onDestroy() {
+	}
 
-  /**
-   * livecycle callback for when the element is removed from the DOM
-   */
-  onDestroy() {
-  }
+	attributeChangedCallback(name: string, oldValue: any, newValue: any) {
+		if (!(name.startsWith('data-') || name === 'class' || name === 'style')) {
+			const prop: any = turnKebabToCamelCasing(name);
 
-  attributeChangedCallback(name: string, oldValue: any, newValue: any) {
-    if (!(name.startsWith('data-') || name === 'class' || name === 'style')) {
-      const prop: any = turnKebabToCamelCasing(name);
+			if (booleanAttr.hasOwnProperty(prop)) {
+				newValue = this.hasAttribute(name);
+			} else if (typeof newValue === 'string') {
+				try {
+					newValue = JSON.parse(newValue);
+				} catch (e) {
+				}
+			}
 
-      if (booleanAttr.hasOwnProperty(prop)) {
-        newValue = this.hasAttribute(name);
-      } else if (typeof newValue === 'string') {
-        try {
-          newValue = JSON.parse(newValue);
-        } catch (e) {
-        }
-      }
+			// @ts-ignore
+			this[prop] = newValue;
+		} else {
+			this.forceUpdate();
 
-      // @ts-ignore
-      this[prop] = newValue;
-    } else {
-      this._trackers.forEach((track: track) => this._updateTrackValue(track))
-      this.onUpdate(name, oldValue, newValue);
-    }
-  }
+			if (this.mounted) {
+				this.onUpdate(name, oldValue, newValue);
+			}
+		}
+	}
 
-  /**
-   * livecycle callback for when the element attributes or class properties are updated
-   */
-  onUpdate(name: string, oldValue: unknown, newValue: unknown) {
-  }
+	/**
+	 * livecycle callback for when the element attributes or class properties are updated
+	 */
+	onUpdate(name: string, oldValue: unknown, newValue: unknown) {
+	}
 
-  adoptedCallback() {
-    this.onAdoption();
-  }
+	/**
+	 * updates any DOM node with data bind reference.
+	 */
+	forceUpdate() {
+		this._trackers.forEach((track: track) => this._updateTrackValue(track));
+	}
 
-  /**
-   * livecycle callback for when element is moved into a new document
-   */
-  onAdoption() {
-  }
+	adoptedCallback() {
+		this.onAdoption();
+	}
 
-  private _render(node: Node | HTMLElement | DocumentFragment | WebComponent) {
-    if (node.nodeName === '#text') {
-      this._trackNode(node as Node, 'nodeValue');
-    } else if (node.nodeType === 1) {
-      const handlers = [];
+	/**
+	 * livecycle callback for when element is moved into a new document
+	 */
+	onAdoption() {
+	}
 
-      // @ts-ignore
-      for (let attribute of node.attributes) {
-        if (attribute.name.startsWith('on')) {
-          const eventName = attribute.name.slice(2).toLowerCase().replace(/^on/, '');
-          handlers.push({
-            eventName,
-            attribute: attribute.name,
-            handler: getComponentNodeEventListener(this, attribute.name, attribute.value)
-          });
-        } else {
-          this._trackNode(node, attribute.name, true);
-        }
-      }
+	private _render(node: Node | HTMLElement | DocumentFragment | WebComponent) {
+		if (node.nodeName === '#text') {
+			this._trackNode(node as Node, 'nodeValue');
+		} else if (node.nodeType === 1) {
+			const handlers = [];
 
-      handlers.forEach(({eventName, handler, attribute}) => {
-        (node as HTMLElement).removeAttribute(attribute);
-        node.addEventListener(eventName, handler)
-      })
+			// @ts-ignore
+			for (let attribute of node.attributes) {
+				if (attribute.name.startsWith('on')) {
+					const eventName = attribute.name.slice(2).toLowerCase().replace(/^on/, '');
+					handlers.push({
+						eventName,
+						attribute: attribute.name,
+						handler: getComponentNodeEventListener(this, attribute.name, attribute.value)
+					});
+				} else {
+					this._trackNode(node, attribute.name, true);
+				}
+			}
 
-    }
+			handlers.forEach(({eventName, handler, attribute}) => {
+				(node as HTMLElement).removeAttribute(attribute);
+				node.addEventListener(eventName, handler)
+			})
 
-    node.childNodes.forEach(node => this._render(node));
-  }
+		}
 
-  private _updateTrackValue(track: track) {
-    const {node, value, property, isAttribute, match, executable} = track;
+		node.childNodes.forEach(node => this._render(node));
+	}
 
-    const newValue = value.replace(match, evaluateStringInComponentContext(executable, this));
+	private _updateTrackValue(track: track) {
+		const {node, value, property, isAttribute, executables} = track;
 
-    if (isAttribute) {
-      (node as HTMLElement).setAttribute(property, newValue);
-    } else {
-      (node as any)[property] = newValue;
-    }
-  }
+		let newValue = value;
 
-  private _trackNode(node: HTMLElement | Node, property: string, isAttribute = false) {
-    let value = isAttribute
-        ? (node as HTMLElement).getAttribute(property)
-        : (node as any)[property]
+		executables.forEach(({match, executable}) => {
+			newValue = newValue.replace(match, evaluateStringInComponentContext(executable, this));
+		})
 
-    extractExecutableSnippetFromString(value.trim())
-        .forEach((exec) => {
-          const track: track = {
-            node,
-            property,
-            isAttribute,
-            value,
-            ...exec
-          };
+		if (isAttribute) {
+			(node as HTMLElement).setAttribute(property, newValue);
+		} else {
+			(node as any)[property] = newValue;
+		}
 
-          this._trackers.push(track);
+	}
 
-          this._updateTrackValue(track);
-        });
-  }
+	private _trackNode(node: HTMLElement | Node, property: string, isAttribute = false) {
+		let value = isAttribute
+			? (node as HTMLElement).getAttribute(property)
+			: (node as any)[property]
+
+		const executables = extractExecutableSnippetFromString(value.trim());
+
+		if (executables.length) {
+			const track: track = {
+				node,
+				property,
+				isAttribute,
+				value,
+				executables
+			};
+
+			this._trackers.push(track);
+
+			this._updateTrackValue(track);
+		}
+	}
 }
 
 // @ts-ignore
 if (window) {
-  // @ts-ignore
-  window.WebComponent = WebComponent;
+	// @ts-ignore
+	window.WebComponent = WebComponent;
 }
