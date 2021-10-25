@@ -33,7 +33,18 @@ class MyButton extends WebComponent {
 MyButton.register();
 ```
 
-You may also regi
+You may also register multiple components at once using the `registerAll` method.
+
+```js
+class MyButton extends WebComponent {}
+class FlatList extends WebComponent {}
+class SiteMenu extends WebComponent {}
+
+WebComponent.registerAll([MyButton, FlatList, SiteMenu])
+```
+
+This is perfect if you want to keep the components in their own separate files and import them into
+the app entry file to register them there.
 
 ### Component Naming
 By default, the WebComponent uses the class name to change into a html tag.
