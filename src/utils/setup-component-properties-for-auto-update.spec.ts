@@ -21,7 +21,14 @@ describe('setupComponentPropertiesForAutoUpdate', () => {
 
 		setupComponentPropertiesForAutoUpdate(comp as any, onUpdate)
 
-		expect(comp).toEqual({"sampleTest": 12});
+		expect(comp).toEqual({
+			"sampleTest": 12,
+			"testSample": "",
+			"x": [
+				12,
+				45
+			]
+		});
 
 		comp.sampleTest = 30;
 
