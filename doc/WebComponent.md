@@ -82,7 +82,7 @@ be considered a valid tag name. This is actually a native component name convent
 - InputField or input-field
 - SmallTitle or small-title
 
-***[Learn More about Tag Naming](https://github.com/beforesemicolon/web-component/blob/master/doc/configuration.md#tagname)***
+***[Learn More about Tag Naming](https://github.com/beforesemicolon/web-component/blob/master/doc/configurations.md#tagname)***
 
 ### Initialization
 The WebComponent also takes care of attaching shadow root and all the setup needed to prepare
@@ -148,7 +148,7 @@ class MyButton extends WebComponent {
 
 ***Note***: The `none` mode is not natively supported. It is a unique mode specific to the WebComponent class.
 
-***[Learn More about Mode](https://github.com/beforesemicolon/web-component/blob/master/doc/configuration.md#mode)***
+***[Learn More about Mode](https://github.com/beforesemicolon/web-component/blob/master/doc/configurations.md#mode)***
 
 the shadow-root element is accessible via the `root` or `shadowRoot` property. It will be null if the mode is other than "open"
 
