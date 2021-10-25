@@ -74,6 +74,29 @@ class TodoItem extends WebComponent {
 }
 ```
 
+### the "this" keyword
+There will situations that you must use the `this` keyword in order to put data in the template.
+
+Any explicit public properties declared or observed attributes defined can be referenced in the template
+without the need to use the `this` keyword.
+
+```js
+class SampleComp extends WebComponent {
+    static observedAttributes = ['sample', 'style', 'class', 'data-x'];
+    numb = 12;
+    #priv = 'yes'
+
+    get template() {
+        return '{this.#priv}<strong class="{this.className}" style="{this.style.}" data-x="{this.dataset.x}">{numb} {sample}</strong>'
+    }
+}
+```
+
+If the property is something that exists in the HTMLElement or any of its ancestors, you must explicitly
+reach them using the `this` keyword.
+
+The same is true for any private property
+
 ### Javascript Template Literal
 There is a huge difference between the [Javascript template literal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) 
 curly braces and `WebComponent` template data binding curly braces.
