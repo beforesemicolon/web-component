@@ -9,3 +9,6 @@ global.Comment = dom.window.Comment;
 global.Text = dom.window.Text;
 global.CSSStyleDeclaration = dom.window.CSSStyleDeclaration;
 global.customElements = dom.window.customElements;
+global.ShadowRoot = dom.window.ShadowRoot;
+global.requestAnimationFrame = dom.window.requestAnimationFrame;
+global.Event = dom.window.Event;
