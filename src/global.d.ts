@@ -1,8 +1,6 @@
 export declare global {
 	export type onUpdateCallback = (property: string, oldValue: unknown, newValue: unknown) => void;
 
-	export type propertyCallback = (property: string) => void;
-
 	export interface booleanAttributes {
 		[key: string]: {
 			value: boolean;
@@ -15,13 +13,13 @@ export declare global {
 		property: string;
 		isAttribute: boolean;
 		value: string;
-		match: string;
-		executable: string;
-		from: number;
-		to: number;
+		executables: Array<{
+			match: string;
+			executable: string;
+			from: number;
+			to: number;
+		}>
 	}
-
-	export type ShadowRootModeExtended = "open" | "closed" | "none";
 
 	export class WebComponent extends HTMLElement {
 		static tagName: string;
@@ -36,7 +34,6 @@ export declare global {
 		mounted: boolean;
 		template: string;
 		stylesheet: string;
-		classes: WindowProxy;
 
 		onMount: () => void;
 		onDestroy: () => void;
