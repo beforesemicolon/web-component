@@ -9,6 +9,13 @@ export function setComponentPropertiesFromObservedAttributes(component: HTMLElem
 			let value: string | boolean = component.getAttribute(prop) ?? '';
 			prop = turnKebabToCamelCasing(prop);
 
+			if (value) {
+				try {
+					value = JSON.parse(value);
+				} catch (e) {
+				}
+			}
+
 			if ((boolAttr).hasOwnProperty(prop)) {
 				value = (boolAttr as booleanAttributes)[prop].value;
 				prop = (boolAttr as booleanAttributes)[prop].name;
