@@ -17,6 +17,7 @@ import booleanAttr from './utils/boolean-attributes.json';
 export class WebComponent extends HTMLElement {
 	private _trackers: track[] = [];
 	private _mounted = false;
+	private _context: ObjectLiteral = {};
 	private readonly _root: WebComponent | ShadowRoot;
 
 	constructor() {
@@ -146,6 +147,21 @@ export class WebComponent extends HTMLElement {
 		return '';
 	}
 
+	get context(): ObjectLiteral {
+		const contextSource = this._getClosestWebComponentAncestor();
+		return {...contextSource?.context, ...this._context};
+	}
+
+	setContext(keyOrObject: string | ObjectLiteral, value: unknown = null) {
+		if (typeof keyOrObject === 'string') {
+			this._context[keyOrObject] = value ?? null;
+			this.forceUpdate();
+		} else if (keyOrObject.toString() === '[object Object]') {
+			this._context = {...this._context, ...keyOrObject};
+			this.forceUpdate();
+		}
+	}
+
 	connectedCallback() {
 		setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
 			this.forceUpdate();
@@ -177,6 +193,13 @@ export class WebComponent extends HTMLElement {
 
 		this._mounted = true;
 		this.onMount();
+
+		// report current attribute on the element
+		for (let i = 0; i < this.attributes.length; i++) {
+			const attr = this.attributes[i];
+			// @ts-ignore
+			this.onUpdate(attr.name, null, this[attr.name])
+		}
 	}
 
 	/**
@@ -310,6 +333,24 @@ export class WebComponent extends HTMLElement {
 
 			this._updateTrackValue(track);
 		}
+	}
+
+	private _getClosestWebComponentAncestor(): WebComponent | null {
+		let parent = this.parentNode;
+
+		if (parent instanceof ShadowRoot) {
+			parent = parent.host;
+		}
+
+		while (parent && !(parent instanceof WebComponent)) {
+			if (parent instanceof ShadowRoot) {
+				parent = parent.host;
+			} else {
+				parent = parent.parentNode;
+			}
+		}
+
+		return parent instanceof WebComponent ? parent : null;
 	}
 }
 

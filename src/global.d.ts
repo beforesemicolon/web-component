@@ -1,3 +1,5 @@
+import {ShadowRootModeExtended} from './enums/ShadowRootModeExtended.enum';
+
 export declare global {
 	export type onUpdateCallback = (property: string, oldValue: unknown, newValue: unknown) => void;
 
@@ -21,6 +23,8 @@ export declare global {
 		}>
 	}
 
+	export type ObjectLiteral = {[key: string]: unknown};
+
 	export class WebComponent extends HTMLElement {
 		static tagName: string;
 		static mode: ShadowRootModeExtended;
@@ -34,6 +38,9 @@ export declare global {
 		mounted: boolean;
 		template: string;
 		stylesheet: string;
+		context: ObjectLiteral;
+
+		setContext: (key: string | ObjectLiteral, value: unknown) => void;
 
 		onMount: () => void;
 		onDestroy: () => void;
