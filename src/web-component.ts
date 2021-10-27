@@ -302,15 +302,26 @@ export class WebComponent extends HTMLElement {
 		let newValue = value;
 
 		executables.forEach(({match, executable}) => {
-			newValue = newValue.replace(match, evaluateStringInComponentContext(executable, this));
+			let res = evaluateStringInComponentContext(executable, this);
+
+			if (res && typeof res === 'object') {
+			    try {
+			        res = JSON.stringify(res)
+			    } catch(e) {}
+			}
+
+			newValue = newValue.replace(match, res);
 		})
 
 		if (isAttribute) {
 			(node as HTMLElement).setAttribute(property, newValue);
 		} else {
+			try {
+				newValue = JSON.parse(newValue)
+			} catch(e) {}
+
 			(node as any)[property] = newValue;
 		}
-
 	}
 
 	private _trackNode(node: HTMLElement | Node, property: string, isAttribute = false) {
