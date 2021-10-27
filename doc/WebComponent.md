@@ -43,8 +43,21 @@ class SiteMenu extends WebComponent {}
 WebComponent.registerAll([MyButton, FlatList, SiteMenu])
 ```
 
-This is perfect if you want to keep the components in their own separate files and import them into
-the app entry file to register them there.
+⚠️ When using `registerAll`, know that the order you specify the components really matter.
+If a component depends on another, make sure that its dependencies get registered first (comes before in the list).
+
+The best strategy is to register the component soon after definition to avoid dependency issues.
+
+```js
+class MyButton extends WebComponent {}
+MyButton.register()
+
+class FlatList extends WebComponent {}
+FlatList.register()
+
+class SiteMenu extends WebComponent {}
+SiteMenu.register()
+```
 
 ### Component Naming
 By default, the WebComponent uses the class name to change into a html tag.
