@@ -40,7 +40,7 @@ export declare global {
 		stylesheet: string;
 		context: ObjectLiteral;
 
-		setContext: (key: string | ObjectLiteral, value: unknown) => void;
+		updateContext: (ctx: ObjectLiteral) => void;
 
 		onMount: () => void;
 		onDestroy: () => void;

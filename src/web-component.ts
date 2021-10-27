@@ -19,6 +19,7 @@ export class WebComponent extends HTMLElement {
 	private _mounted = false;
 	private _context: ObjectLiteral = {};
 	private readonly _root: WebComponent | ShadowRoot;
+	private _contextSource: WebComponent | null = null;
 
 	constructor() {
 		super();
@@ -148,21 +149,22 @@ export class WebComponent extends HTMLElement {
 	}
 
 	get context(): ObjectLiteral {
-		const contextSource = this._getClosestWebComponentAncestor();
-		return {...contextSource?.context, ...this._context};
+		return {...this._contextSource?.context, ...this._context};
 	}
 
-	setContext(keyOrObject: string | ObjectLiteral, value: unknown = null) {
-		if (typeof keyOrObject === 'string') {
-			this._context[keyOrObject] = value ?? null;
-			this.forceUpdate();
-		} else if (keyOrObject.toString() === '[object Object]') {
-			this._context = {...this._context, ...keyOrObject};
+	updateContext(ctx: ObjectLiteral) {
+		this._context = {...this._context, ...ctx};
+
+		if (this.mounted) {
 			this.forceUpdate();
 		}
 	}
 
 	connectedCallback() {
+		this._contextSource = this._getClosestWebComponentAncestor();
+		this._mounted = true;
+		this.onMount();
+
 		setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
 			this.forceUpdate();
 
@@ -191,9 +193,6 @@ export class WebComponent extends HTMLElement {
 
 		this._root.appendChild(contentNode);
 
-		this._mounted = true;
-		this.onMount();
-
 		// report current attribute on the element
 		for (let i = 0; i < this.attributes.length; i++) {
 			const attr = this.attributes[i];
@@ -209,6 +208,7 @@ export class WebComponent extends HTMLElement {
 	}
 
 	disconnectedCallback() {
+		this._contextSource = null;
 		this._mounted = false;
 		this.onDestroy();
 	}
