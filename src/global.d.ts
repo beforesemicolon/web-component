@@ -23,7 +23,9 @@ export declare global {
 		}>
 	}
 
-	export type ObjectLiteral = {[key: string]: unknown};
+	export type ObjectLiteral = {[key: string]: any};
+
+	export type ObserverCallback = (ctx: ObjectLiteral) => void
 
 	export class WebComponent extends HTMLElement {
 		static tagName: string;
@@ -38,7 +40,7 @@ export declare global {
 		mounted: boolean;
 		template: string;
 		stylesheet: string;
-		context: ObjectLiteral;
+		$context: ObjectLiteral;
 
 		updateContext: (ctx: ObjectLiteral) => void;
 

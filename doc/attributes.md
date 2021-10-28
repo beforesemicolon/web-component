@@ -109,4 +109,4 @@ You should prefer attributes whenever you are expecting data to be set directly 
 <flat-list list="{items}"></flat-list>
 ```
 
-#### Recommended next => [LiveCycles](https://github.com/beforesemicolon/web-component/blob/master/doc/livecycles.md)
+#### Recommended next: [LiveCycles](https://github.com/beforesemicolon/web-component/blob/master/doc/livecycles.md)

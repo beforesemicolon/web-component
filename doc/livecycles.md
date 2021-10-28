@@ -94,4 +94,4 @@ This livecycle function is called when the component element is moved from one d
 if the element is removed from a iFrame document to the current window document.
 
 
-#### Recommended next => [Styling](https://github.com/beforesemicolon/web-component/blob/master/doc/stylesheet.md)
+#### Recommended next: [Styling](https://github.com/beforesemicolon/web-component/blob/master/doc/stylesheet.md)

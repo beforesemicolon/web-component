@@ -174,4 +174,4 @@ class MyButton extends WebComponent {
 }
 ```
 
-#### Recommended next => [Configurations](https://github.com/beforesemicolon/web-component/blob/master/doc/configurations.md)
+#### Recommended next: [Configurations](https://github.com/beforesemicolon/web-component/blob/master/doc/configurations.md)
