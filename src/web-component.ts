@@ -15,11 +15,15 @@ import booleanAttr from './utils/boolean-attributes.json';
  * when it comes to creating and working with web components on the browser
  */
 export class WebComponent extends HTMLElement {
+	private readonly _root: WebComponent | ShadowRoot;
 	private _trackers: track[] = [];
 	private _mounted = false;
+	private _parsed = false;
 	private _context: ObjectLiteral = {};
-	private readonly _root: WebComponent | ShadowRoot;
 	private _contextSource: WebComponent | null = null;
+	private _contextSubscribers: Array<ObserverCallback> = [];
+	private _unsubscribeCtx: () => void = () => {
+	};
 
 	constructor() {
 		super();
@@ -148,8 +152,12 @@ export class WebComponent extends HTMLElement {
 		return '';
 	}
 
-	get context(): ObjectLiteral {
-		return {...this._contextSource?.context, ...this._context};
+	get $context(): ObjectLiteral {
+		// make sure the subscribe method is part of the prototype
+		// so it is hidden unless the prototype is checked
+		return Object.setPrototypeOf({...this._contextSource?.$context, ...this._context}, {
+			subscribe: this._ctxSubscriberHandler.bind(this),
+		});
 	}
 
 	updateContext(ctx: ObjectLiteral) {
@@ -157,41 +165,66 @@ export class WebComponent extends HTMLElement {
 
 		if (this.mounted) {
 			this.forceUpdate();
+			this._contextSubscribers.forEach(cb => cb(this._context));
 		}
 	}
 
 	connectedCallback() {
 		this._contextSource = this._getClosestWebComponentAncestor();
 		this._mounted = true;
-		this.onMount();
 
-		setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
-			this.forceUpdate();
+		if (this._contextSource) {
+			// force update the component if the ancestor context gets updated as well
+			this._unsubscribeCtx = this._contextSource.$context.subscribe((newContext: ObjectLiteral) => {
+				this.forceUpdate();
 
-			if (this.mounted) {
-				this.onUpdate(prop, oldValue, newValue);
-			}
-		})
-
-		let contentNode;
-
-		contentNode = parse(this.template);
-
-		this._render(contentNode);
-
-		const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
-
-		const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
-
-		if (style) {
-			if (hasShadowRoot) {
-				this._root.innerHTML = style;
-			} else if (!document.head.querySelector(`style#${(this.constructor as WebComponentConstructor).tagName}`)) {
-				document.head.insertAdjacentHTML('beforeend', style);
-			}
+				if (this.mounted) {
+					this.onUpdate('$context', this._context, newContext)
+				}
+			})
 		}
 
-		this._root.appendChild(contentNode);
+		this.onMount();
+
+		/*
+		only need to parse the element the very first time it gets mounted
+
+		this will make sure that if the element is removed from the dom and mounted again
+		all that needs to be done if update the DOM to grab the possible new context and updated data
+		 */
+		if (this._parsed) {
+			this.forceUpdate();
+		} else {
+			setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
+				this.forceUpdate();
+
+				if (this.mounted) {
+					this.onUpdate(prop, oldValue, newValue);
+				}
+			})
+
+			let contentNode;
+
+			contentNode = parse(this.template);
+
+			this._render(contentNode);
+
+			const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
+
+			const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
+
+			if (style) {
+				if (hasShadowRoot) {
+					this._root.innerHTML = style;
+				} else if (!document.head.querySelector(`style#${(this.constructor as WebComponentConstructor).tagName}`)) {
+					document.head.insertAdjacentHTML('beforeend', style);
+				}
+			}
+
+			this._parsed = true;
+
+			this._root.appendChild(contentNode);
+		}
 
 		// report current attribute on the element
 		for (let i = 0; i < this.attributes.length; i++) {
@@ -210,6 +243,7 @@ export class WebComponent extends HTMLElement {
 	disconnectedCallback() {
 		this._contextSource = null;
 		this._mounted = false;
+		this._unsubscribeCtx();
 		this.onDestroy();
 	}
 
@@ -302,23 +336,27 @@ export class WebComponent extends HTMLElement {
 		let newValue = value;
 
 		executables.forEach(({match, executable}) => {
-			let res = evaluateStringInComponentContext(executable, this);
+			const keys = Object.getOwnPropertyNames(this).filter(n => !n.startsWith('_'));
+			keys.push('$context')
+			let res = evaluateStringInComponentContext(executable, this, keys);
 
 			if (res && typeof res === 'object') {
-			    try {
-			        res = JSON.stringify(res)
-			    } catch(e) {}
+				try {
+					res = JSON.stringify(res)
+				} catch (e) {
+				}
 			}
 
 			newValue = newValue.replace(match, res);
-		})
+		});
 
 		if (isAttribute) {
 			(node as HTMLElement).setAttribute(property, newValue);
 		} else {
 			try {
 				newValue = JSON.parse(newValue)
-			} catch(e) {}
+			} catch (e) {
+			}
 
 			(node as any)[property] = newValue;
 		}
@@ -329,7 +367,7 @@ export class WebComponent extends HTMLElement {
 			? (node as HTMLElement).getAttribute(property)
 			: (node as any)[property]
 
-		const executables = extractExecutableSnippetFromString(value.trim());
+		const executables = extractExecutableSnippetFromString(value);
 
 		if (executables.length) {
 			const track: track = {
@@ -362,6 +400,13 @@ export class WebComponent extends HTMLElement {
 		}
 
 		return parent instanceof WebComponent ? parent : null;
+	}
+
+	private _ctxSubscriberHandler(cb: ObserverCallback) {
+		this._contextSubscribers.push(cb);
+		return () => {
+			this._contextSubscribers = this._contextSubscribers.filter(c => c !== cb);
+		}
 	}
 }
 
