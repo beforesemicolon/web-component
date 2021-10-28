@@ -50,4 +50,4 @@ The above example style will look like the following the head tag.
 </head>
 ```
 
-#### Recommended next => [Template](https://github.com/beforesemicolon/web-component/blob/master/doc/template.md)
+#### Recommended next: [Template](https://github.com/beforesemicolon/web-component/blob/master/doc/template.md)

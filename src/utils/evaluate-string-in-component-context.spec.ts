@@ -10,11 +10,11 @@ describe('bindData', () => {
 	});
 
 	it('should eval string', () => {
-		expect(evaluateStringInComponentContext('str.toUpperCase() + " test"', {str: 'simple'} as any)).toEqual('SIMPLE test')
-		expect(evaluateStringInComponentContext('(numb + 100).toFixed(2)', {numb: 23} as any)).toEqual('123.00')
-		expect(evaluateStringInComponentContext('bool.valueOf()', {bool: new Boolean(null)} as any)).toEqual(false)
-		expect(evaluateStringInComponentContext('arr.length', {arr: [2, 4, 6]} as any)).toEqual(3)
-		expect(evaluateStringInComponentContext('obj.x - 50', {obj: {x: 100}} as any)).toEqual(50)
-		expect(evaluateStringInComponentContext('set.has(2)', {set: new Set([2, 6])} as any)).toEqual(true)
+		expect(evaluateStringInComponentContext('str.toUpperCase() + " test"', {str: 'simple'} as any, ['str'])).toEqual('SIMPLE test')
+		expect(evaluateStringInComponentContext('(numb + 100).toFixed(2)', {numb: 23} as any, ['numb'])).toEqual('123.00')
+		expect(evaluateStringInComponentContext('bool.valueOf()', {bool: new Boolean(null)} as any, ['bool'])).toEqual(false)
+		expect(evaluateStringInComponentContext('arr.length', {arr: [2, 4, 6]} as any, ['arr'])).toEqual(3)
+		expect(evaluateStringInComponentContext('obj.x - 50', {obj: {x: 100}} as any, ['obj'])).toEqual(50)
+		expect(evaluateStringInComponentContext('set.has(2)', {set: new Set([2, 6])} as any, ['set'])).toEqual(true)
 	});
 });

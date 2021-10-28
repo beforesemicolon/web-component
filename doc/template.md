@@ -168,4 +168,4 @@ class SideMenu extends WebComponent {
 SideMenu.register();
 ```
 
-#### Recommended next => [Events](https://github.com/beforesemicolon/web-component/blob/master/doc/events.md)
+#### Recommended next: [Events](https://github.com/beforesemicolon/web-component/blob/master/doc/events.md)

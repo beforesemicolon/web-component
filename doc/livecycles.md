@@ -9,7 +9,8 @@ methods:
 `WebComponent` simply rename them and fix couple of things about some of them.
 
 ### onMount
-This livecycle function is called when the component is inserted in the document.
+This livecycle function is called when the component is inserted in the document even before
+the first render.
 
 ```js
 class BFSButton extends WebComponent {
@@ -52,9 +53,12 @@ btn.remove() // will trigger onDestroy call
 ```
 
 ### onUpdate
-This livecycle function is called right after a 
+This livecycle function is called right after the DOM gets updated by 
 [property](https://github.com/beforesemicolon/web-component/blob/master/doc/properties.md) or an 
 observed [attribute](https://github.com/beforesemicolon/web-component/blob/master/doc/attributes.md) is updated.
+
+It will also get called soon after the first render if there are some observed attributes placed on the 
+component tag.
 
 Differently than the `attributeChangedCallback`, the `onUpdate` will only get called if the component is in the DOM.
 
@@ -90,4 +94,4 @@ This livecycle function is called when the component element is moved from one d
 if the element is removed from a iFrame document to the current window document.
 
 
-#### Recommended next => [Styling](https://github.com/beforesemicolon/web-component/blob/master/doc/stylesheet.md)
+#### Recommended next: [Styling](https://github.com/beforesemicolon/web-component/blob/master/doc/stylesheet.md)

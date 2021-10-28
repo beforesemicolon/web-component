@@ -134,4 +134,4 @@ One thing to know is that they do not trigger DOM update when they are updated.
   - try to re-assign rather than making deep updates 
   - split your component into even smaller components to handle the data snippets 
 
-#### Recommended next => [Template](https://github.com/beforesemicolon/web-component/blob/master/doc/template.md)
+#### Recommended next: [Context](https://github.com/beforesemicolon/web-component/blob/master/doc/context.md)

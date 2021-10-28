@@ -257,12 +257,11 @@ describe('WebComponent', () => {
 		const k = new MComp();
 
 		beforeEach(() => {
+			k.remove();
 			mountFn.mockClear()
 			destroyFn.mockClear()
 			updateFn.mockClear()
 			adoptionFn.mockClear()
-
-			k.remove();
 		})
 
 		it('should trigger onMount when added and onDestroy when removed from the DOM', () => {
@@ -285,9 +284,17 @@ describe('WebComponent', () => {
 			expect(adoptionFn).toHaveBeenCalledTimes(1);
 		});
 
-		it('should trigger onUpdate when properties and observed attributes update only if mounted', () => {
-			updateFn.mockClear();
+		it('should trigger onUpdate when with observed attributes on and added to the DOM', () => {
+			k.setAttribute('sample', 'diff');
 
+			expect(updateFn).toHaveBeenCalledTimes(0);
+
+			document.body.appendChild(k);
+
+			expect(updateFn).toHaveBeenCalledTimes(1);
+		});
+
+		it('should trigger onUpdate when properties and observed attributes update only if mounted', () => {
 			k.numb = 1000;
 			// @ts-ignore
 			k.sample = 'unique';
@@ -296,6 +303,8 @@ describe('WebComponent', () => {
 			expect(updateFn).toHaveBeenCalledTimes(0);
 
 			document.body.appendChild(k);
+
+			updateFn.mockClear(); // clear the call when appended to the DOM
 
 			k.numb = 2000;
 			// @ts-ignore
@@ -308,6 +317,8 @@ describe('WebComponent', () => {
 		it('should trigger onUpdate when class gets updated through classes property or setAttribute', () => {
 			document.body.appendChild(k);
 
+			updateFn.mockClear(); // clear the call when appended to the DOM
+
 			k.className = 'sample';
 			k.classList.add('cls');
 			k.setAttribute('class', 'cls elem');
@@ -318,6 +329,8 @@ describe('WebComponent', () => {
 		it('should trigger onUpdate when style gets updated', () => {
 			document.body.appendChild(k);
 
+			updateFn.mockClear(); // clear the call when appended to the DOM
+
 			k.setAttribute('style', 'display: none;');
 
 			expect(updateFn).toHaveBeenCalledTimes(1);
@@ -325,6 +338,8 @@ describe('WebComponent', () => {
 
 		it('should trigger onUpdate when data attributes gets updated', () => {
 			document.body.appendChild(k);
+
+			updateFn.mockClear(); // clear the call when appended to the DOM
 
 			k.dataset.x = 'something'
 
@@ -360,13 +375,13 @@ describe('WebComponent', () => {
 		})
 
 		it('should render', () => {
-			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">12 </strong>')
+			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">12</strong>')
 		});
 
 		it('should update DOM when properties update', () => {
 			n.numb = 100;
 
-			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">100 </strong>')
+			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">100</strong>')
 		});
 
 		it('should update DOM when observed attributes update', () => {
@@ -379,18 +394,18 @@ describe('WebComponent', () => {
 		it('should update DOM when forceUpdate is called', () => {
 			n.obj.value = 15;
 
-			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">12 </strong>')
+			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">12</strong>')
 
 			n.forceUpdate();
 
-			expect(n.root?.innerHTML).toBe('15<strong class="" style="" data-x="">12 </strong>')
+			expect(n.root?.innerHTML).toBe('15<strong class="" style="" data-x="">12</strong>')
 		});
 
 		it('should update DOM when class gets updated', () => {
 			n.className = 'my-items';
 			n.classList.add('unique')
 
-			expect(n.root?.innerHTML).toBe('300<strong class="my-items unique" style="" data-x="">12 </strong>')
+			expect(n.root?.innerHTML).toBe('300<strong class="my-items unique" style="" data-x="">12</strong>')
 		});
 
 		it('should update DOM when style gets updated', (done) => {
@@ -398,7 +413,7 @@ describe('WebComponent', () => {
 			n.style.display = 'block';
 
 			setTimeout(() => {
-				expect(n.root?.innerHTML).toBe('300<strong class="" style="background: red; display: block;" data-x="">12 </strong>');
+				expect(n.root?.innerHTML).toBe('300<strong class="" style="background: red; display: block;" data-x="">12</strong>');
 				done()
 			})
 		});
@@ -406,7 +421,7 @@ describe('WebComponent', () => {
 		it('should update DOM when data attributes gets updated', () => {
 			n.dataset.x = 'test';
 
-			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="test">12 </strong>');
+			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="test">12</strong>');
 		});
 	})
 
@@ -538,4 +553,64 @@ describe('WebComponent', () => {
 			expect(s.root?.innerHTML).toBe('<button></button>')
 		});
 	})
+
+	describe('context', () => {
+		class TargetComp extends WebComponent {
+			get template() {
+				return '{$context.title}'
+			}
+		}
+
+		class AppComp extends WebComponent {
+			get template() {
+				return '<div><target-comp></target-comp></div>'
+			}
+		}
+
+		WebComponent.registerAll([TargetComp, AppComp]);
+
+		const app = new AppComp();
+
+		document.body.appendChild(app);
+
+		it('should update app context and be inherited', () => {
+			const forceUpdateSpy = jest.spyOn(app, 'forceUpdate');
+
+			expect(app.root?.innerHTML).toBe('<div><target-comp></target-comp></div>')
+			expect(app.$context).toBeDefined()
+
+			forceUpdateSpy.mockClear();
+
+			app.updateContext({
+				title: 'Text App'
+			});
+
+			expect(forceUpdateSpy).toHaveBeenCalled();
+			expect(app.$context).toEqual({
+				title: 'Text App'
+			})
+
+			const target = app.root?.querySelector('target-comp') as WebComponent;
+
+			expect(target).toBeDefined();
+			expect(target.$context).toEqual({
+				title: "Text App"
+			})
+			expect(target?.root?.innerHTML).toBe('Text App');
+
+			// should unsubscribe from context and not get updates
+			target.remove();
+
+			app.updateContext({
+				title: 'Updated Text App'
+			});
+
+			expect(target?.root?.innerHTML).toBe('Text App');
+
+			// should update the DOM to grab new context and data
+			app.root?.appendChild(target);
+
+			expect(target?.root?.innerHTML).toBe('Updated Text App');
+		});
+	});
 });
