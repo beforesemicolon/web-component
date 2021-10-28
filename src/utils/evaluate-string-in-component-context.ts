@@ -1,9 +1,7 @@
-export function evaluateStringInComponentContext(executableString: string, src: WebComponent) {
-	const keys = Object.getOwnPropertyNames(src).filter(n => !n.startsWith('_'));
-	keys.push('context')
-	const values = keys.map(key => src[key]);
+export function evaluateStringInComponentContext(executableString: string, src: WebComponent, propertyNames: Array<string> = []) {
+	const values = propertyNames.map(key => src[key]);
 
-	const fn = new Function(...keys, `return ${executableString}`);
+	const fn = new Function(...propertyNames, `return ${executableString}`);
 
 	return fn.apply(src, values) ?? '';
 }
