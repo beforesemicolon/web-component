@@ -15,17 +15,20 @@ export declare global {
 		property: string;
 		isAttribute: boolean;
 		value: string;
+		customAttrs: Array<string>;
 		executables: Array<{
 			match: string;
 			executable: string;
 			from: number;
 			to: number;
-		}>
+		}>;
 	}
 
 	export type ObjectLiteral = {[key: string]: any};
 
-	export type ObserverCallback = (ctx: ObjectLiteral) => void
+	export type ObserverCallback = (ctx: ObjectLiteral) => void;
+
+	export type Refs = {[key: string]: HTMLElement};
 
 	export class WebComponent extends HTMLElement {
 		static tagName: string;
@@ -41,6 +44,7 @@ export declare global {
 		template: string;
 		stylesheet: string;
 		$context: ObjectLiteral;
+		refs: Refs;
 
 		updateContext: (ctx: ObjectLiteral) => void;
 

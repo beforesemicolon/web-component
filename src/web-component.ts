@@ -177,7 +177,6 @@ export class WebComponent extends HTMLElement {
 
 	connectedCallback() {
 		this._contextSource = this._getClosestWebComponentAncestor();
-		this._mounted = true;
 
 		if (this._contextSource) {
 			// force update the component if the ancestor context gets updated as well
@@ -189,8 +188,6 @@ export class WebComponent extends HTMLElement {
 				}
 			})
 		}
-
-		this.onMount();
 
 		/*
 		only need to parse the element the very first time it gets mounted
@@ -232,12 +229,8 @@ export class WebComponent extends HTMLElement {
 			this._root.appendChild(contentNode);
 		}
 
-		// report current attribute on the element
-		for (let i = 0; i < this.attributes.length; i++) {
-			const attr = this.attributes[i];
-			// @ts-ignore
-			this.onUpdate(attr.name, null, this[attr.name])
-		}
+		this._mounted = true;
+		this.onMount();
 	}
 
 	/**
@@ -311,6 +304,13 @@ export class WebComponent extends HTMLElement {
 			this._trackNode(node as Node, 'nodeValue');
 		} else if (node.nodeType === 1) {
 			const handlers = [];
+			const customAttrs = [];
+
+			for (let customAttr of this._customAttrs) {
+				if (node.hasOwnProperty(customAttr)) {
+					customAttrs.push(customAttr);
+				}
+			}
 
 			// @ts-ignore
 			for (let attribute of node.attributes) {
@@ -322,7 +322,7 @@ export class WebComponent extends HTMLElement {
 						handler: getComponentNodeEventListener(this, attribute.name, attribute.value)
 					});
 				} else {
-					this._trackNode(node, attribute.name, true);
+					this._trackNode(node, attribute.name, customAttrs, true);
 				}
 			}
 
@@ -336,14 +336,45 @@ export class WebComponent extends HTMLElement {
 		node.childNodes.forEach(node => this._render(node));
 	}
 
+	private _trackNode(node: HTMLElement | Node, property: string, customAttrs: Array<string> = [], isAttribute = false) {
+		let value = isAttribute
+			? (node as HTMLElement).getAttribute(property)
+			: (node as any)[property]
+
+		const executables = extractExecutableSnippetFromString(value);
+
+		if (executables.length) {
+			const track: track = {
+				node,
+				property,
+				isAttribute,
+				value,
+				executables,
+				customAttrs
+			};
+
+			this._trackers.push(track);
+
+			this._updateTrackValue(track);
+		}
+	}
+
 	private _updateTrackValue(track: track) {
-		const {node, value, property, isAttribute, executables} = track;
+		const {node, value, property, isAttribute, executables, customAttrs} = track;
+
+		for (let customAttr of customAttrs) {
+			const resNode = this._handleCustomAttr(node as WebComponent, customAttr);
+
+			if (!resNode) {
+				return;
+			}
+		}
 
 		let newValue = value;
 
 		executables.forEach(({match, executable}) => {
 			const keys = Object.getOwnPropertyNames(this).filter(n => !n.startsWith('_'));
-			keys.push('$context')
+			keys.push('$context');
 			let res = evaluateStringInComponentContext(executable, this, keys);
 
 			if (res && typeof res === 'object') {
@@ -365,28 +396,6 @@ export class WebComponent extends HTMLElement {
 			}
 
 			(node as any)[property] = newValue;
-		}
-	}
-
-	private _trackNode(node: HTMLElement | Node, property: string, isAttribute = false) {
-		let value = isAttribute
-			? (node as HTMLElement).getAttribute(property)
-			: (node as any)[property]
-
-		const executables = extractExecutableSnippetFromString(value);
-
-		if (executables.length) {
-			const track: track = {
-				node,
-				property,
-				isAttribute,
-				value,
-				executables
-			};
-
-			this._trackers.push(track);
-
-			this._updateTrackValue(track);
 		}
 	}
 
@@ -412,6 +421,26 @@ export class WebComponent extends HTMLElement {
 		this._contextSubscribers.push(cb);
 		return () => {
 			this._contextSubscribers = this._contextSubscribers.filter(c => c !== cb);
+		}
+	}
+
+	private _handleCustomAttr(node: HTMLElement | WebComponent, attr: string) {
+		switch (attr) {
+			case '#ref':
+				const {value: name} = Reflect.get(node, attr);
+
+				if (/^[a-z$_][a-z0-9$_]*$/i.test(name)) {
+					Object.defineProperty(this.refs, name, {
+						get() {
+							return node;
+						}
+					})
+					return node;
+				}
+
+				throw new Error(`Invalid #ref property name "${name}"`)
+			default:
+				return node;
 		}
 	}
 }

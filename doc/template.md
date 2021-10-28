@@ -87,7 +87,7 @@ class SampleComp extends WebComponent {
     #priv = 'yes'
 
     get template() {
-        return '{this.#priv}<strong class="{this.className}" style="{this.style.}" data-x="{this.dataset.x}">{numb} {sample}</strong>'
+        return '{this.#priv}<strong class="{this.className}" style="{this.style.cssText}" data-x="{this.dataset.x}">{numb} {sample}</strong>'
     }
 }
 ```
