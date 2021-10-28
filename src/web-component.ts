@@ -24,6 +24,8 @@ export class WebComponent extends HTMLElement {
 	private _contextSubscribers: Array<ObserverCallback> = [];
 	private _unsubscribeCtx: () => void = () => {
 	};
+	private _customAttrs = ['#if', '#repeat', '#ref', '#attr'];
+	private _refs: Refs = {};
 
 	constructor() {
 		super();
@@ -158,6 +160,10 @@ export class WebComponent extends HTMLElement {
 		return Object.setPrototypeOf({...this._contextSource?.$context, ...this._context}, {
 			subscribe: this._ctxSubscriberHandler.bind(this),
 		});
+	}
+
+	get refs(): Refs {
+		return this._refs;
 	}
 
 	updateContext(ctx: ObjectLiteral) {
