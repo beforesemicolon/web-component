@@ -10,18 +10,19 @@ export declare global {
 		}
 	}
 
-	export interface track {
+	export interface NodeTrack {
 		node: HTMLElement | Node | WebComponent;
-		property: string;
-		isAttribute: boolean;
-		value: string;
-		customAttrs: Array<string>;
-		executables: Array<{
-			match: string;
-			executable: string;
-			from: number;
-			to: number;
+		attributes: Array<{
+			name: string;
+			value: string;
+			executables: Array<Executable>;
 		}>;
+		hashedAttrs: Array<string>;
+		property: null | {
+			name: string;
+			value: string;
+			executables: Array<Executable>;
+		};
 	}
 
 	export type ObjectLiteral = {[key: string]: any};
@@ -30,7 +31,15 @@ export declare global {
 
 	export type Refs = {[key: string]: HTMLElement};
 
+	export type Executable = {
+		from: number;
+		to: number;
+		match: string;
+		executable: string;
+	}
+
 	export class WebComponent extends HTMLElement {
+		[key: string]: any;
 		static tagName: string;
 		static mode: ShadowRootModeExtended;
 		static observedAttributes: Array<string>;
@@ -53,8 +62,6 @@ export declare global {
 		onAdoption: () => void;
 		onUpdate: (name: string, oldValue: string, newValue: string) => void;
 		forceUpdate: () => void;
-
-		[key: string]: any;
 	}
 
 	export interface WebComponentConstructor {
