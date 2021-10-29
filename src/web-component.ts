@@ -16,7 +16,7 @@ import booleanAttr from './utils/boolean-attributes.json';
  */
 export class WebComponent extends HTMLElement {
 	private readonly _root: WebComponent | ShadowRoot;
-	private _trackers: track[] = [];
+	private _trackers: NodeTrack[] = [];
 	private _mounted = false;
 	private _parsed = false;
 	private _context: ObjectLiteral = {};
@@ -24,7 +24,7 @@ export class WebComponent extends HTMLElement {
 	private _contextSubscribers: Array<ObserverCallback> = [];
 	private _unsubscribeCtx: () => void = () => {
 	};
-	private _customAttrs = ['#if', '#repeat', '#ref', '#attr'];
+	private _hashedAttrs = ['#if', '#repeat', '#ref', '#attr'];
 	private _refs: Refs = {};
 
 	constructor() {
@@ -212,6 +212,8 @@ export class WebComponent extends HTMLElement {
 
 			this._render(contentNode);
 
+			console.log('-- _trackers', this.constructor.name, this._trackers);
+
 			const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
 
 			const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
@@ -286,7 +288,7 @@ export class WebComponent extends HTMLElement {
 	 * updates any DOM node with data bind reference.
 	 */
 	forceUpdate() {
-		this._trackers.forEach((track: track) => this._updateTrackValue(track));
+		this._trackers.forEach((track: NodeTrack) => this._updateTrackValue(track));
 	}
 
 	adoptedCallback() {
@@ -301,28 +303,38 @@ export class WebComponent extends HTMLElement {
 
 	private _render(node: Node | HTMLElement | DocumentFragment | WebComponent) {
 		if (node.nodeName === '#text') {
-			this._trackNode(node as Node, 'nodeValue');
+			if (node.nodeValue?.trim()) {
+				this._trackNode(node as Node, [], [], {
+					name: 'nodeValue',
+					value: node.nodeValue,
+					executables: []
+				});
+			}
 		} else if (node.nodeType === 1) {
 			const handlers = [];
-			const customAttrs = [];
+			const hashedAttrs = [];
+			const attributes = [];
 
-			for (let customAttr of this._customAttrs) {
-				if (node.hasOwnProperty(customAttr)) {
-					customAttrs.push(customAttr);
+			for (let hashAttr of this._hashedAttrs) {
+				if (node.hasOwnProperty(hashAttr)) {
+					hashedAttrs.push(hashAttr);
 				}
 			}
 
 			// @ts-ignore
-			for (let attribute of node.attributes) {
-				if (attribute.name.startsWith('on')) {
-					const eventName = attribute.name.slice(2).toLowerCase().replace(/^on/, '');
-					handlers.push({
-						eventName,
-						attribute: attribute.name,
-						handler: getComponentNodeEventListener(this, attribute.name, attribute.value)
-					});
-				} else {
-					this._trackNode(node, attribute.name, customAttrs, true);
+			if (node.attributes.length) {
+				// @ts-ignore
+				for (let attribute of node.attributes) {
+					if (attribute.name.startsWith('on')) {
+						const eventName = attribute.name.slice(2).toLowerCase().replace(/^on/, '');
+						handlers.push({
+							eventName,
+							attribute: attribute.name,
+							handler: getComponentNodeEventListener(this, attribute.name, attribute.value)
+						});
+					} else {
+						attributes.push(attribute)
+					}
 				}
 			}
 
@@ -331,51 +343,50 @@ export class WebComponent extends HTMLElement {
 				node.addEventListener(eventName, handler)
 			})
 
+			this._trackNode(node, attributes, hashedAttrs);
 		}
 
 		node.childNodes.forEach(node => this._render(node));
 	}
 
-	private _trackNode(node: HTMLElement | Node, property: string, customAttrs: Array<string> = [], isAttribute = false) {
-		let value = isAttribute
-			? (node as HTMLElement).getAttribute(property)
-			: (node as any)[property]
+	private _trackNode(node: HTMLElement | Node, attributes: Array<Attr>, hashedAttrs: Array<string>, property: NodeTrack['property'] | null = null) {
+		const track: NodeTrack = {
+			node,
+			attributes: [],
+			hashedAttrs,
+			property
+		};
 
-		const executables = extractExecutableSnippetFromString(value);
-
-		if (executables.length) {
-			const track: track = {
-				node,
-				property,
-				isAttribute,
-				value,
-				executables,
-				customAttrs
-			};
-
-			this._trackers.push(track);
-
-			this._updateTrackValue(track);
+		if (property?.value.trim()) {
+			property.executables = extractExecutableSnippetFromString(property.value)
 		}
+
+		for (let attr of attributes) {
+			track.attributes.push({
+				name: attr.name,
+				value: attr.value,
+				executables: attr.value.trim()
+					? extractExecutableSnippetFromString(attr.value)
+					: []
+			})
+		}
+
+		this._trackers.push(track);
+
+		this._updateTrackValue(track);
 	}
 
-	private _updateTrackValue(track: track) {
-		const {node, value, property, isAttribute, executables, customAttrs} = track;
+	private _execString(executable: string) {
+		const keys = Object.getOwnPropertyNames(this).filter(n => !n.startsWith('_'));
+		keys.push('$context');
+		return evaluateStringInComponentContext(executable, this, keys);
+	}
 
-		for (let customAttr of customAttrs) {
-			const resNode = this._handleCustomAttr(node as WebComponent, customAttr);
+	private _updateTrackValue(track: NodeTrack) {
+		const {node, attributes, hashedAttrs, property} = track;
 
-			if (!resNode) {
-				return;
-			}
-		}
-
-		let newValue = value;
-
-		executables.forEach(({match, executable}) => {
-			const keys = Object.getOwnPropertyNames(this).filter(n => !n.startsWith('_'));
-			keys.push('$context');
-			let res = evaluateStringInComponentContext(executable, this, keys);
+		const execute = ({match, executable}: Executable, newValue: string) => {
+			let res = this._execString(executable);
 
 			if (res && typeof res === 'object') {
 				try {
@@ -384,27 +395,45 @@ export class WebComponent extends HTMLElement {
 				}
 			}
 
-			newValue = newValue.replace(match, res);
-		});
+			return newValue.replace(match, res);
+		}
 
-		if (isAttribute) {
-			(node as HTMLElement).setAttribute(property, newValue);
-		} else {
+		for (let hashAttr of hashedAttrs) {
+			const res = this._handleHashedAttr(node as WebComponent, hashAttr);
+
+			if(!res) return;
+		}
+
+		if (property?.executables.length) {
+			let newValue = property.value;
+
+			property.executables.forEach((exc) => {
+				newValue = execute(exc, newValue);
+			});
+
 			try {
 				newValue = JSON.parse(newValue)
 			} catch (e) {
 			}
 
-			(node as any)[property] = newValue;
+			(node as any)[property.name] = newValue;
+		}
+
+		for (let {name, value, executables} of attributes) {
+			if (executables.length) {
+				let newValue = value;
+
+				executables.forEach((exc) => {
+					newValue = execute(exc, newValue);
+				});
+
+				(node as HTMLElement).setAttribute(name, newValue);
+			}
 		}
 	}
 
 	private _getClosestWebComponentAncestor(): WebComponent | null {
 		let parent = this.parentNode;
-
-		if (parent instanceof ShadowRoot) {
-			parent = parent.host;
-		}
 
 		while (parent && !(parent instanceof WebComponent)) {
 			if (parent instanceof ShadowRoot) {
@@ -424,21 +453,49 @@ export class WebComponent extends HTMLElement {
 		}
 	}
 
-	private _handleCustomAttr(node: HTMLElement | WebComponent, attr: string) {
+	private _handleHashedAttr(node: HTMLElement | WebComponent, attr: string) {
 		switch (attr) {
 			case '#ref':
 				const {value: name} = Reflect.get(node, attr);
 
-				if (/^[a-z$_][a-z0-9$_]*$/i.test(name)) {
-					Object.defineProperty(this.refs, name, {
-						get() {
-							return node;
-						}
-					})
+				if (this.refs[name] === undefined) {
+					if (/^[a-z$_][a-z0-9$_]*$/i.test(name)) {
+						Object.defineProperty(this.refs, name, {
+							get() {
+								return node;
+							}
+						})
+						return node;
+					}
+
+					throw new Error(`Invalid #ref property name "${name}"`)
+				}
+
+				break;
+			case '#if':
+				// @ts-ignore
+				const {value, placeholderNode} = node[attr];
+				const shouldRender = this._execString(value);
+
+				if (shouldRender) {
+					if (placeholderNode) {
+						placeholderNode.parentNode?.replaceChild(node, placeholderNode);
+					}
+
 					return node;
 				}
 
-				throw new Error(`Invalid #ref property name "${name}"`)
+				let anchor = placeholderNode;
+
+				if (!anchor) {
+					anchor = document.createComment(`#if: ${value}`);
+					// @ts-ignore
+					node[attr].placeholderNode = anchor;
+				}
+
+				node.parentNode?.replaceChild(anchor, node);
+
+				return null;
 			default:
 				return node;
 		}
