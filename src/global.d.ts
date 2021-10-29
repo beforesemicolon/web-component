@@ -44,9 +44,10 @@ export declare global {
 		static mode: ShadowRootModeExtended;
 		static observedAttributes: Array<string>;
 		static delegatesFocus: boolean;
-		static register: (tagName?: string) => void
-		static isRegistered: boolean
-		static registerAll: (components: Array<WebComponentConstructor>) => void
+		static register: (tagName?: string) => void;
+		static isRegistered: boolean;
+		static initialContext: ObjectLiteral;
+		static registerAll: (components: Array<WebComponentConstructor>) => void;
 
 		root: HTMLElement | ShadowRoot | null;
 		mounted: boolean;
@@ -71,8 +72,9 @@ export declare global {
 		mode: ShadowRootModeExtended;
 		observedAttributes: Array<string>;
 		delegatesFocus: boolean;
-		register: (tagName?: string) =>  void
-		registerAll: (components: Array<WebComponentConstructor>) => void
-		isRegistered: boolean
+		register: (tagName?: string) =>  void;
+		registerAll: (components: Array<WebComponentConstructor>) => void;
+		isRegistered: boolean;
+		initialContext: ObjectLiteral;
 	}
 }

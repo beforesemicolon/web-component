@@ -33,8 +33,7 @@ export class WebComponent extends HTMLElement {
 		this._root = this;
 
 		// @ts-ignore
-		let {name, mode, observedAttributes, delegatesFocus} = this.constructor;
-
+		let {name, mode, observedAttributes, delegatesFocus, initialContext} = this.constructor;
 
 		if (!/open|closed|none/.test(mode)) {
 			throw new Error(`${name}: Invalid mode "${mode}". Must be one of ["open", "closed", "none"].`)
@@ -47,6 +46,8 @@ export class WebComponent extends HTMLElement {
 		if (!Array.isArray(observedAttributes) || observedAttributes.some(a => typeof a !== 'string')) {
 			throw new Error(`${name}: "observedAttributes" must be an array of attribute strings.`)
 		}
+
+		this._context = initialContext;
 
 		setComponentPropertiesFromObservedAttributes(this, observedAttributes,
 			(prop, oldValue, newValue) => {
@@ -86,6 +87,11 @@ export class WebComponent extends HTMLElement {
 	 * @type {string}
 	 */
 	static tagName = '';
+
+	/**
+	 * the initial context data for the component
+	 */
+	static initialContext = {};
 
 	/**
 	 * registers the component with the CustomElementRegistry taking an optional tag name if not
@@ -212,7 +218,7 @@ export class WebComponent extends HTMLElement {
 
 			this._render(contentNode);
 
-			console.log('-- _trackers', this.constructor.name, this._trackers);
+			// console.log('-- _trackers', this.constructor.name, this._trackers);
 
 			const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
 
