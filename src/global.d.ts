@@ -17,12 +17,20 @@ export declare global {
 			value: string;
 			executables: Array<Executable>;
 		}>;
-		hashedAttrs: Array<string>;
+		hashedAttrs: Array<HashedAttribute>;
 		property: null | {
 			name: string;
 			value: string;
 			executables: Array<Executable>;
 		};
+	}
+
+	export type HashedAttribute = '#attr' | '#ref' | '#repeat' | '#if';
+
+	export interface HashedAttributeValue {
+		value: string;
+		prop: string;
+		placeholderNode?: Comment;
 	}
 
 	export type ObjectLiteral = {[key: string]: any};
@@ -39,7 +47,6 @@ export declare global {
 	}
 
 	export class WebComponent extends HTMLElement {
-		[key: string]: any;
 		static tagName: string;
 		static mode: ShadowRootModeExtended;
 		static observedAttributes: Array<string>;
@@ -63,6 +70,14 @@ export declare global {
 		onAdoption: () => void;
 		onUpdate: (name: string, oldValue: string, newValue: string) => void;
 		forceUpdate: () => void;
+
+		#ref?: HashedAttribute;
+		#repeat?: HashedAttribute;
+		#repeat_id?: HashedAttribute;
+		#if?: HashedAttribute;
+		#attr?: HashedAttribute;
+
+		[key: string]: any;
 	}
 
 	export interface WebComponentConstructor {

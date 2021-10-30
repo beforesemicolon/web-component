@@ -24,7 +24,7 @@ export class WebComponent extends HTMLElement {
 	private _contextSubscribers: Array<ObserverCallback> = [];
 	private _unsubscribeCtx: () => void = () => {
 	};
-	private _hashedAttrs = ['#if', '#repeat', '#ref', '#attr'];
+	private _hashedAttrs: Array<HashedAttribute> = ['#if', '#repeat', '#ref', '#attr'];
 	private _refs: Refs = {};
 
 	constructor() {
@@ -318,7 +318,7 @@ export class WebComponent extends HTMLElement {
 			}
 		} else if (node.nodeType === 1) {
 			const handlers = [];
-			const hashedAttrs = [];
+			const hashedAttrs: Array<HashedAttribute> = [];
 			const attributes = [];
 
 			for (let hashAttr of this._hashedAttrs) {
@@ -355,7 +355,7 @@ export class WebComponent extends HTMLElement {
 		node.childNodes.forEach(node => this._render(node));
 	}
 
-	private _trackNode(node: HTMLElement | Node, attributes: Array<Attr>, hashedAttrs: Array<string>, property: NodeTrack['property'] | null = null) {
+	private _trackNode(node: HTMLElement | Node, attributes: Array<Attr>, hashedAttrs: Array<HashedAttribute>, property: NodeTrack['property'] | null = null) {
 		const track: NodeTrack = {
 			node,
 			attributes: [],
@@ -407,7 +407,11 @@ export class WebComponent extends HTMLElement {
 		for (let hashAttr of hashedAttrs) {
 			const res = this._handleHashedAttr(node as WebComponent, hashAttr);
 
-			if(!res) return;
+			if (!res) return;
+			if (Array.isArray(res)) {
+			    res.forEach(n => this._updateTrackValue({...track, node: n}));
+				return;
+			}
 		}
 
 		if (property?.executables.length) {
@@ -459,52 +463,151 @@ export class WebComponent extends HTMLElement {
 		}
 	}
 
-	private _handleHashedAttr(node: HTMLElement | WebComponent, attr: string) {
+	private _handleHashedAttr(node: WebComponent, attr: HashedAttribute) {
 		switch (attr) {
 			case '#ref':
-				const {value: name} = Reflect.get(node, attr);
-
-				if (this.refs[name] === undefined) {
-					if (/^[a-z$_][a-z0-9$_]*$/i.test(name)) {
-						Object.defineProperty(this.refs, name, {
-							get() {
-								return node;
-							}
-						})
-						return node;
-					}
-
-					throw new Error(`Invalid #ref property name "${name}"`)
-				}
-
-				break;
+				return this._handleRefAttribute(node);
 			case '#if':
-				// @ts-ignore
-				const {value, placeholderNode} = node[attr];
-				const shouldRender = this._execString(value);
-
-				if (shouldRender) {
-					if (placeholderNode) {
-						placeholderNode.parentNode?.replaceChild(node, placeholderNode);
-					}
-
-					return node;
-				}
-
-				let anchor = placeholderNode;
-
-				if (!anchor) {
-					anchor = document.createComment(`#if: ${value}`);
-					// @ts-ignore
-					node[attr].placeholderNode = anchor;
-				}
-
-				node.parentNode?.replaceChild(anchor, node);
-
-				return null;
+				return this._handleIfAttribute(node);
+			case '#repeat':
+				return this._handleRepeatAttribute(node);
 			default:
 				return node;
 		}
+	}
+
+	private _handleIfAttribute(node: WebComponent) {
+		const attr = '#if';
+		const {value, placeholderNode}: HashedAttributeValue = (node as any)[attr];
+
+		const shouldRender = this._execString(value);
+
+		if (shouldRender) {
+			if (placeholderNode) {
+				placeholderNode.parentNode?.replaceChild(node, placeholderNode);
+			}
+
+			return node;
+		}
+
+		if (!placeholderNode) {
+			(node as any)['#if'].placeholderNode = document.createComment(`#if: ${value}`);
+		}
+
+		// @ts-ignore
+		node.parentNode?.replaceChild(node[attr].placeholderNode, node);
+
+		return null;
+	}
+
+	private _handleRepeatAttribute(node: WebComponent) {
+		const attr = '#repeat';
+		const repeatAttr = '#repeat_id';
+		const {value, placeholderNode}: HashedAttributeValue = (node as any)['#repeat'];
+		const nodes: Array<WebComponent> = [];
+
+		const repeat = this._execString(value);
+
+		if (!(node as any)[repeatAttr]) {
+			(node as any)[repeatAttr] = Math.floor(Math.random() * 10000000);
+		}
+
+		if (!placeholderNode) {
+			(node as any)[attr].placeholderNode = document.createComment(`#repeat: ${value}`);
+		}
+
+		const createNodeClone = (count: number): WebComponent | Node => {
+			const clone = node.cloneNode(true);
+			// @ts-ignore
+			clone['$index'] = count;
+			// @ts-ignore
+			clone['$item'] = count + 1;
+
+			for (let hAttr of ['#repeat_id', '#if', '#ref', '#attr']) {
+				if ((node as any)[hAttr]) {
+					// @ts-ignore
+					clone[hAttr] = node[hAttr];
+				}
+			}
+
+			return clone;
+		}
+
+		if (!isNaN(repeat)) {
+			const anchor = (node as any)[attr].placeholderNode;
+
+			if (!anchor.isConnected) {
+				node.parentNode?.replaceChild(anchor, node);
+			}
+
+			try {
+				let count = 0;
+				let nextEl = anchor.nextElementSibling;
+				const repeat_id = (node as any)[repeatAttr];
+
+				while (count < repeat) {
+					// console.log('--', count, nextEl === null, anchor.parentNode?.innerHTML);
+					if (nextEl) {
+						if ( nextEl[repeatAttr] === repeat_id) {
+							nodes.push(nextEl);
+							nextEl = nextEl.nextElementSibling;
+							count += 1;
+							continue;
+						}
+
+						nextEl.before(createNodeClone(count));
+						count += 1;
+					} else {
+						const nodeClone = createNodeClone(count);
+						nodes.push(nodeClone as WebComponent);
+
+						if (count === 0) {
+							anchor.after(nodeClone);
+						} else {
+							anchor.parentNode?.lastElementChild?.after(nodeClone);
+						}
+
+						nextEl = (nodeClone as WebComponent).nextElementSibling;
+						count += 1;
+					}
+				}
+
+				// console.log('-- AFTER', nextEl === null, anchor.parentNode?.innerHTML);
+
+				while(nextEl && nextEl[repeatAttr] === repeat_id) {
+					const next = nextEl.nextElementSibling;
+					nextEl.remove();
+					nextEl = next;
+				}
+
+				// console.log('-- AFTER CLEANED', nextEl === null, anchor.parentNode?.innerHTML);
+
+			} catch (e) {
+				console.error('e', e);
+			}
+		}
+
+		return nodes;
+	}
+
+	private _handleRefAttribute(node: WebComponent) {
+		const attr = '#ref';
+		const {value}: HashedAttributeValue = (node as any)[attr];
+
+		if (this.refs[value] === undefined) {
+			if (/^[a-z$_][a-z0-9$_]*$/i.test(value)) {
+				Object.defineProperty(this.refs, value, {
+					get() {
+						return node;
+					}
+				})
+				return node;
+			}
+
+			throw new Error(`Invalid #ref property name "${value}"`)
+		}
+
+		return node;
 	}
 }
 
