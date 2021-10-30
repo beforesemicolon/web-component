@@ -383,7 +383,7 @@ export class WebComponent extends HTMLElement {
 	}
 
 	private _execString(executable: string) {
-		const keys = Object.getOwnPropertyNames(this).filter(n => !n.startsWith('_'));
+		const keys = Object.getOwnPropertyNames(this).filter(n => !n.startsWith('_') && !n.startsWith('#'));
 		keys.push('$context');
 		return evaluateStringInComponentContext(executable, this, keys);
 	}
