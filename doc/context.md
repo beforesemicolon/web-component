@@ -76,8 +76,8 @@ class TodoApp extends WebComponent {
 TodoApp.register();
 ```
 
-The `updateContext` only update the properties that you provide, but it does not do a deep update. The example above will
-keep the `lang` and `theme` when updating the `todos`, `loading` and `errorMessage`.
+The `updateContext` only update the properties that you provide, but it does not do a deep update. The example above
+will keep the `lang` and `theme` when updating the `todos`, `loading` and `errorMessage`.
 
 Whenever you do an update the DOM updates as well as any descendent element. This happens regardless if you update the
 context with the same data. It does not do any checks whether the data has changed or not.
@@ -143,6 +143,45 @@ TodoItem.register();
 
 The `TodoItem` has a loose dependency on the theme which is set in the app. This is okay as `TodoItem`
 is a very specific component to the place it must be used so the dependency is fine.
+
+### Accessing Context
+The `$context` can be used to read context from anywhere including from outside the component. From the template
+you don't need to reference `$context`, you can simply grab the property directly and in doing so you need to know that
+if there are any class property or attribute with the same name they will override the context property with the same
+name.
+
+The example below reads the `searchTerm` directly instead of referencing `$context`. If the form had a `searchTerm`
+attribute it would grab the attribute instead and, you might have to reference context directly to make the difference.
+
+```js
+class SearchForm extends WebComponent {
+  static initialContext = {
+    searchTerm: '',
+  };
+  
+  get template() {
+    return `
+        <form onsubmit="handleSubmit()">
+          <input value="{searchTerm}" oninput="onInput($event)"></input>
+          <button>search</button>
+        </form>
+    `
+  }
+
+  onInput(event) {
+    this.updateContext({
+      searchTerm: event.target.value
+    })
+  }
+
+  handleSubmit() {
+    // submit logic
+  }
+}
+
+
+SearchForm.register();
+```
 
 ### Best Practice
 

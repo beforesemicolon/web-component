@@ -16,7 +16,7 @@ import booleanAttr from './utils/boolean-attributes.json';
  */
 export class WebComponent extends HTMLElement {
 	private readonly _root: WebComponent | ShadowRoot;
-	private _trackers: NodeTrack[] = [];
+	private _trackers: Map<HTMLElement | Node | WebComponent, NodeTrack> = new Map();
 	private _mounted = false;
 	private _parsed = false;
 	private _context: ObjectLiteral = {};
@@ -356,36 +356,55 @@ export class WebComponent extends HTMLElement {
 	}
 
 	private _trackNode(node: HTMLElement | Node, attributes: Array<Attr>, hashedAttrs: Array<HashedAttribute>, property: NodeTrack['property'] | null = null) {
-		const track: NodeTrack = {
-			node,
-			attributes: [],
-			hashedAttrs,
-			property
-		};
+		if (this._trackers.has(node)) {
+			this._updateTrackValue(this._trackers.get(node) as NodeTrack);
+		} else {
+			const track: NodeTrack = {
+				node,
+				attributes: [],
+				hashedAttrs,
+				property
+			};
 
-		if (property?.value.trim()) {
-			property.executables = extractExecutableSnippetFromString(property.value)
+			if (property?.value.trim()) {
+				property.executables = extractExecutableSnippetFromString(property.value)
+			}
+
+			for (let attr of attributes) {
+				track.attributes.push({
+					name: attr.name,
+					value: attr.value,
+					executables: attr.value.trim()
+						? extractExecutableSnippetFromString(attr.value)
+						: []
+				})
+			}
+
+			this._trackers.set(node, track);
+
+			this._updateTrackValue(track);
 		}
-
-		for (let attr of attributes) {
-			track.attributes.push({
-				name: attr.name,
-				value: attr.value,
-				executables: attr.value.trim()
-					? extractExecutableSnippetFromString(attr.value)
-					: []
-			})
-		}
-
-		this._trackers.push(track);
-
-		this._updateTrackValue(track);
 	}
 
 	private _execString(executable: string) {
-		const keys = Object.getOwnPropertyNames(this).filter(n => !n.startsWith('_') && !n.startsWith('#'));
-		keys.push('$context');
-		return evaluateStringInComponentContext(executable, this, keys);
+		const keys = new Set(Object.getOwnPropertyNames(this).filter(n => !n.startsWith('_') && !n.startsWith('#')));
+		const ctx = this.$context;
+		keys.add('$context');
+
+		Object.getOwnPropertyNames(ctx).forEach(n => {
+			keys.add(n);
+		})
+
+		const keysArray = Array.from(keys);
+
+		const values = keysArray.map(key => {
+			return key === '$context'
+				? ctx
+				// @ts-ignore
+				: this[key] ?? ctx[key];
+		});
+
+		return evaluateStringInComponentContext(executable, this, keysArray, values);
 	}
 
 	private _updateTrackValue(track: NodeTrack) {
@@ -408,13 +427,10 @@ export class WebComponent extends HTMLElement {
 			const res = this._handleHashedAttr(node as WebComponent, hashAttr);
 
 			if (!res) return;
-			if (Array.isArray(res)) {
-			    res.forEach(n => this._updateTrackValue({...track, node: n}));
-				return;
-			}
 		}
 
 		if (property?.executables.length) {
+			console.log('-- property', property);
 			let newValue = property.value;
 
 			property.executables.forEach((exc) => {
@@ -504,8 +520,6 @@ export class WebComponent extends HTMLElement {
 		const attr = '#repeat';
 		const repeatAttr = '#repeat_id';
 		const {value, placeholderNode}: HashedAttributeValue = (node as any)['#repeat'];
-		const nodes: Array<WebComponent> = [];
-
 		const repeat = this._execString(value);
 
 		if (!(node as any)[repeatAttr]) {
@@ -518,10 +532,6 @@ export class WebComponent extends HTMLElement {
 
 		const createNodeClone = (count: number): WebComponent | Node => {
 			const clone = node.cloneNode(true);
-			// @ts-ignore
-			clone['$index'] = count;
-			// @ts-ignore
-			clone['$item'] = count + 1;
 
 			for (let hAttr of ['#repeat_id', '#if', '#ref', '#attr']) {
 				if ((node as any)[hAttr]) {
@@ -530,6 +540,7 @@ export class WebComponent extends HTMLElement {
 				}
 			}
 
+			this._render(clone);
 			return clone;
 		}
 
@@ -540,54 +551,49 @@ export class WebComponent extends HTMLElement {
 				node.parentNode?.replaceChild(anchor, node);
 			}
 
-			try {
-				let count = 0;
-				let nextEl = anchor.nextElementSibling;
-				const repeat_id = (node as any)[repeatAttr];
+			let count = 0;
+			let nextEl = anchor.nextElementSibling;
+			const repeat_id = (node as any)[repeatAttr];
 
-				while (count < repeat) {
-					// console.log('--', count, nextEl === null, anchor.parentNode?.innerHTML);
-					if (nextEl) {
-						if ( nextEl[repeatAttr] === repeat_id) {
-							nodes.push(nextEl);
-							nextEl = nextEl.nextElementSibling;
-							count += 1;
-							continue;
-						}
-
-						nextEl.before(createNodeClone(count));
+			while (count < repeat) {
+				// console.log('--', count, nextEl === null, anchor.parentNode?.innerHTML);
+				if (nextEl) {
+					if (nextEl[repeatAttr] === repeat_id) {
+						this._render(nextEl);
+						nextEl = nextEl.nextElementSibling;
 						count += 1;
-					} else {
-						const nodeClone = createNodeClone(count);
-						nodes.push(nodeClone as WebComponent);
-
-						if (count === 0) {
-							anchor.after(nodeClone);
-						} else {
-							anchor.parentNode?.lastElementChild?.after(nodeClone);
-						}
-
-						nextEl = (nodeClone as WebComponent).nextElementSibling;
-						count += 1;
+						continue;
 					}
+
+					nextEl.before(createNodeClone(count));
+					count += 1;
+				} else {
+					const nodeClone = createNodeClone(count);
+
+					if (count === 0) {
+						anchor.after(nodeClone);
+					} else {
+						anchor.parentNode?.lastElementChild?.after(nodeClone);
+					}
+
+					nextEl = (nodeClone as WebComponent).nextElementSibling;
+					count += 1;
 				}
-
-				// console.log('-- AFTER', nextEl === null, anchor.parentNode?.innerHTML);
-
-				while(nextEl && nextEl[repeatAttr] === repeat_id) {
-					const next = nextEl.nextElementSibling;
-					nextEl.remove();
-					nextEl = next;
-				}
-
-				// console.log('-- AFTER CLEANED', nextEl === null, anchor.parentNode?.innerHTML);
-
-			} catch (e) {
-				console.error('e', e);
 			}
+
+			// console.log('-- AFTER', nextEl === null, anchor.parentNode?.innerHTML);
+
+			while (nextEl && nextEl[repeatAttr] === repeat_id) {
+				this._trackers.delete(nextEl);
+				const next = nextEl.nextElementSibling;
+				nextEl.remove();
+				nextEl = next;
+			}
+
+			// console.log('-- AFTER CLEANED', nextEl === null, anchor.parentNode?.innerHTML);
 		}
 
-		return nodes;
+		return null;
 	}
 
 	private _handleRefAttribute(node: WebComponent) {
