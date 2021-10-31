@@ -386,13 +386,12 @@ export class WebComponent extends HTMLElement {
 		}
 	}
 
-	private _execString(executable: string, [$item, $key, $index]: any[] = []) {
+	private _execString(executable: string, [$item, $key]: any[] = []) {
 		const keys = new Set(Object.getOwnPropertyNames(this).filter(n => !n.startsWith('_') && !n.startsWith('#')));
 		const ctx = this.$context;
 		keys.add('$context');
 		keys.add('$item');
 		keys.add('$key');
-		keys.add('$index');
 
 		Object.getOwnPropertyNames(ctx).forEach(n => {
 			keys.add(n);
@@ -408,8 +407,6 @@ export class WebComponent extends HTMLElement {
 					return $item;
 				case '$key':
 					return $key;
-				case '$index':
-					return $index;
 			}
 
 			// @ts-ignore
@@ -421,7 +418,7 @@ export class WebComponent extends HTMLElement {
 
 	private _resolveExecutable(node: Node, {match, executable}: Executable, newValue: string) {
 		// @ts-ignore
-		let {$item, $key, $index} = node;
+		let {$item, $key} = node;
 
 		if (/(?:^|\W)\$(index|key|item)(?:$|\W)/.test(executable) && $item === undefined) {
 			let parent: any = node.parentNode;
@@ -430,7 +427,6 @@ export class WebComponent extends HTMLElement {
 				if (parent['$item']) {
 					$item = parent['$item'];
 					$key = parent['$key'];
-					$index = parent['$index'];
 					break;
 				}
 
@@ -438,7 +434,7 @@ export class WebComponent extends HTMLElement {
 			}
 		}
 
-		let res = this._execString(executable, [$item, $key, $index]);
+		let res = this._execString(executable, [$item, $key]);
 
 		if (res && typeof res === 'object') {
 			try {
@@ -559,20 +555,10 @@ export class WebComponent extends HTMLElement {
 
 		const [key, value] = list[index] ?? [index, index + 1];
 
-		if (clone instanceof WebComponent) {
-			clone.updateContext({
-				'$item': value,
-				'$key': key,
-				'$index': key,
-			})
-		} else {
-			// @ts-ignore
-			clone['$item'] = value;
-			// @ts-ignore
-			clone['$key'] = key;
-			// @ts-ignore
-			clone['$index'] = key;
-		}
+		// @ts-ignore
+		clone['$item'] = value;
+		// @ts-ignore
+		clone['$key'] = key;
 
 		this._render(clone);
 		return clone;
