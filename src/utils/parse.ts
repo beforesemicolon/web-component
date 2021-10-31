@@ -8,7 +8,9 @@ export function parse(markup: string) {
 	let lastIndex = 0;
 
 	while ((match = tagCommentPattern.exec(markup)) !== null) {
-		const [fullMatch, comment, closeOrBangSymbol, tagName, attributes, selfCloseSlash] = match;
+		let [fullMatch, comment, closeOrBangSymbol, tagName, attributes, selfCloseSlash] = match;
+
+		tagName = tagName.toUpperCase();
 
 		if (closeOrBangSymbol === '!') {
 			continue;
