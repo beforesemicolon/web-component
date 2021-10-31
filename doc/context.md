@@ -194,4 +194,4 @@ The context is not meant to replace `attributes` and `properties` in any way. It
 - Global data belongs to the `context`.
 - Use context components to manage context.
 
-#### Recommended next: [Template](https://github.com/beforesemicolon/web-component/blob/master/doc/template.md)
+#### Recommended next: [Directives](https://github.com/beforesemicolon/web-component/blob/master/doc/directives.md)

@@ -120,5 +120,6 @@ require('esbuild').build({
 - [Attributes](https://github.com/beforesemicolon/web-component/blob/master/doc/attributes.md)
 - [Properties](https://github.com/beforesemicolon/web-component/blob/master/doc/properties.md)
 - [Context](https://github.com/beforesemicolon/web-component/blob/master/doc/context.md)
+- [Directives](https://github.com/beforesemicolon/web-component/blob/master/doc/directives.md)
 - [LiveCycles](https://github.com/beforesemicolon/web-component/blob/master/doc/livecycles.md)
 - [Styling](https://github.com/beforesemicolon/web-component/blob/master/doc/stylesheet.md)
