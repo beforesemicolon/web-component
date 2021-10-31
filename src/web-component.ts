@@ -515,7 +515,7 @@ export class WebComponent extends HTMLElement {
 		return null;
 	}
 
-	private _cloneRepeatedNode(node: WebComponent | HTMLElement, index: number) {
+	private _cloneRepeatedNode(node: WebComponent | HTMLElement, index: number, list: Array<any> = [], asName = '') {
 		const clone = node.cloneNode();
 		// @ts-ignore
 		clone.innerHTML = node.__oginner__;
@@ -535,7 +535,10 @@ export class WebComponent extends HTMLElement {
 		const attr = '#repeat';
 		const repeatAttr = '#repeat_id';
 		const {value, placeholderNode}: HashedAttributeValue = (node as any)['#repeat'];
-		const repeatData = this._execString(value);
+		let asName = value.includes(' as ')
+			? value.split(' as ')[1].trim()
+			: '$item';
+		let repeatData = this._execString(value);
 		let index = 0;
 
 		if (!(node as any)[repeatAttr]) {
@@ -561,9 +564,16 @@ export class WebComponent extends HTMLElement {
 
 		let nextEl = anchor.nextElementSibling;
 		const repeat_id = (node as any)[repeatAttr];
-		const times = !isNaN(repeatData)
-			? repeatData
-			: repeatData.length ?? repeatData.size;
+		let times = 0;
+
+		if (Number.isInteger(repeatData)) {
+			times = repeatData;
+		} else {
+			repeatData = repeatData instanceof Set ? Object.entries(Array.from(repeatData))
+				: repeatData instanceof Map ? Array.from(repeatData.entries())
+					: Object.entries(repeatData);
+			times = repeatData.length;
+		}
 
 		while (index < times) {
 			if (nextEl) {
@@ -574,10 +584,10 @@ export class WebComponent extends HTMLElement {
 					continue;
 				}
 
-				nextEl.before(this._cloneRepeatedNode(node, index));
+				nextEl.before(this._cloneRepeatedNode(node, index, repeatData, asName));
 				index += 1;
 			} else {
-				const nodeClone = this._cloneRepeatedNode(node, index);
+				const nodeClone = this._cloneRepeatedNode(node, index, repeatData, asName);
 
 				if (index === 0) {
 					anchor.after(nodeClone);
