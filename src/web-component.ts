@@ -535,11 +535,13 @@ export class WebComponent extends HTMLElement {
 		const attr = '#repeat';
 		const repeatAttr = '#repeat_id';
 		const {value, placeholderNode}: HashedAttributeValue = (node as any)['#repeat'];
-		let asName = value.includes(' as ')
-			? value.split(' as ')[1].trim()
-			: '$item';
-		let repeatData = this._execString(value);
+		let [val, asName] = value.includes(' as ')
+			? value.split(' as ')
+			: [value, '$item'];
+		let repeatData = this._execString(val);
 		let index = 0;
+
+		asName = asName.trim();
 
 		if (!(node as any)[repeatAttr]) {
 			(node as any)[repeatAttr] = Math.floor(Math.random() * 10000000);
