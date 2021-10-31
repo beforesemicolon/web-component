@@ -386,10 +386,13 @@ export class WebComponent extends HTMLElement {
 		}
 	}
 
-	private _execString(executable: string) {
+	private _execString(executable: string, [$item, $key, $index]: any[] = []) {
 		const keys = new Set(Object.getOwnPropertyNames(this).filter(n => !n.startsWith('_') && !n.startsWith('#')));
 		const ctx = this.$context;
 		keys.add('$context');
+		keys.add('$item');
+		keys.add('$key');
+		keys.add('$index');
 
 		Object.getOwnPropertyNames(ctx).forEach(n => {
 			keys.add(n);
@@ -398,30 +401,57 @@ export class WebComponent extends HTMLElement {
 		const keysArray = Array.from(keys);
 
 		const values = keysArray.map(key => {
-			return key === '$context'
-				? ctx
-				// @ts-ignore
-				: this[key] ?? ctx[key];
+			switch (key) {
+				case '$context':
+					return ctx;
+				case '$item':
+					return $item;
+				case '$key':
+					return $key;
+				case '$index':
+					return $index;
+			}
+
+			// @ts-ignore
+			return this[key] ?? ctx[key];
 		});
 
 		return evaluateStringInComponentContext(executable, this, keysArray, values);
 	}
 
+	private _resolveExecutable(node: Node, {match, executable}: Executable, newValue: string) {
+		// @ts-ignore
+		let {$item, $key, $index} = node;
+
+		if (/(?:^|\W)\$(index|key|item)(?:$|\W)/.test(executable) && $item === undefined) {
+			let parent: any = node.parentNode;
+
+			while (parent && !(parent instanceof ShadowRoot) && parent !== this) {
+				if (parent['$item']) {
+					$item = parent['$item'];
+					$key = parent['$key'];
+					$index = parent['$index'];
+					break;
+				}
+
+				parent = parent.parentNode;
+			}
+		}
+
+		let res = this._execString(executable, [$item, $key, $index]);
+
+		if (res && typeof res === 'object') {
+			try {
+				res = JSON.stringify(res)
+			} catch (e) {
+			}
+		}
+
+		return newValue.replace(match, res);
+	}
+
 	private _updateTrackValue(track: NodeTrack) {
 		const {node, attributes, hashedAttrs, property} = track;
-
-		const execute = ({match, executable}: Executable, newValue: string) => {
-			let res = this._execString(executable);
-
-			if (res && typeof res === 'object') {
-				try {
-					res = JSON.stringify(res)
-				} catch (e) {
-				}
-			}
-
-			return newValue.replace(match, res);
-		}
 
 		for (let hashAttr of hashedAttrs) {
 			const res = this._handleHashedAttr(node as WebComponent, hashAttr);
@@ -433,7 +463,7 @@ export class WebComponent extends HTMLElement {
 			let newValue = property.value;
 
 			property.executables.forEach((exc) => {
-				newValue = execute(exc, newValue);
+				newValue = this._resolveExecutable(node, exc, newValue);
 			});
 
 			try {
@@ -449,7 +479,7 @@ export class WebComponent extends HTMLElement {
 				let newValue = value;
 
 				executables.forEach((exc) => {
-					newValue = execute(exc, newValue);
+					newValue = this._resolveExecutable(node, exc, newValue);
 				});
 
 				(node as HTMLElement).setAttribute(name, newValue);
@@ -515,7 +545,7 @@ export class WebComponent extends HTMLElement {
 		return null;
 	}
 
-	private _cloneRepeatedNode(node: WebComponent | HTMLElement, index: number, list: Array<any> = [], asName = '') {
+	private _cloneRepeatedNode(node: WebComponent | HTMLElement, index: number, list: Array<any> = []) {
 		const clone = node.cloneNode();
 		// @ts-ignore
 		clone.innerHTML = node.__oginner__;
@@ -527,6 +557,23 @@ export class WebComponent extends HTMLElement {
 			}
 		}
 
+		const [key, value] = list[index] ?? [index, index + 1];
+
+		if (clone instanceof WebComponent) {
+			clone.updateContext({
+				'$item': value,
+				'$key': key,
+				'$index': key,
+			})
+		} else {
+			// @ts-ignore
+			clone['$item'] = value;
+			// @ts-ignore
+			clone['$key'] = key;
+			// @ts-ignore
+			clone['$index'] = key;
+		}
+
 		this._render(clone);
 		return clone;
 	}
@@ -535,13 +582,8 @@ export class WebComponent extends HTMLElement {
 		const attr = '#repeat';
 		const repeatAttr = '#repeat_id';
 		const {value, placeholderNode}: HashedAttributeValue = (node as any)['#repeat'];
-		let [val, asName] = value.includes(' as ')
-			? value.split(' as ')
-			: [value, '$item'];
-		let repeatData = this._execString(val);
+		let repeatData = this._execString(value);
 		let index = 0;
-
-		asName = asName.trim();
 
 		if (!(node as any)[repeatAttr]) {
 			(node as any)[repeatAttr] = Math.floor(Math.random() * 10000000);
@@ -586,10 +628,10 @@ export class WebComponent extends HTMLElement {
 					continue;
 				}
 
-				nextEl.before(this._cloneRepeatedNode(node, index, repeatData, asName));
+				nextEl.before(this._cloneRepeatedNode(node, index, repeatData));
 				index += 1;
 			} else {
-				const nodeClone = this._cloneRepeatedNode(node, index, repeatData, asName);
+				const nodeClone = this._cloneRepeatedNode(node, index, repeatData);
 
 				if (index === 0) {
 					anchor.after(nodeClone);
