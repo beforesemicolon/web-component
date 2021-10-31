@@ -430,7 +430,6 @@ export class WebComponent extends HTMLElement {
 		}
 
 		if (property?.executables.length) {
-			console.log('-- property', property);
 			let newValue = property.value;
 
 			property.executables.forEach((exc) => {
@@ -516,11 +515,28 @@ export class WebComponent extends HTMLElement {
 		return null;
 	}
 
-	private _handleRepeatAttribute(node: WebComponent) {
+	private _cloneRepeatedNode(node: WebComponent | HTMLElement, index: number) {
+		const clone = node.cloneNode();
+		// @ts-ignore
+		clone.innerHTML = node.__oginner__;
+
+		for (let hAttr of ['#repeat_id', '#if', '#ref', '#attr']) {
+			if ((node as any)[hAttr]) {
+				// @ts-ignore
+				clone[hAttr] = node[hAttr];
+			}
+		}
+
+		this._render(clone);
+		return clone;
+	}
+
+	private _handleRepeatAttribute(node: WebComponent | HTMLElement) {
 		const attr = '#repeat';
 		const repeatAttr = '#repeat_id';
 		const {value, placeholderNode}: HashedAttributeValue = (node as any)['#repeat'];
-		const repeat = this._execString(value);
+		const repeatData = this._execString(value);
+		let index = 0;
 
 		if (!(node as any)[repeatAttr]) {
 			(node as any)[repeatAttr] = Math.floor(Math.random() * 10000000);
@@ -530,67 +546,55 @@ export class WebComponent extends HTMLElement {
 			(node as any)[attr].placeholderNode = document.createComment(`#repeat: ${value}`);
 		}
 
-		const createNodeClone = (count: number): WebComponent | Node => {
-			const clone = node.cloneNode(true);
-
-			for (let hAttr of ['#repeat_id', '#if', '#ref', '#attr']) {
-				if ((node as any)[hAttr]) {
-					// @ts-ignore
-					clone[hAttr] = node[hAttr];
-				}
-			}
-
-			this._render(clone);
-			return clone;
+		// @ts-ignore
+		if (!node.__oginner__) {
+			// @ts-ignore
+			node.__oginner__ = node.innerHTML;
 		}
 
-		if (!isNaN(repeat)) {
-			const anchor = (node as any)[attr].placeholderNode;
+		const anchor = (node as any)[attr].placeholderNode;
 
-			if (!anchor.isConnected) {
-				node.parentNode?.replaceChild(anchor, node);
-			}
+		if (!anchor.isConnected) {
+			node.parentNode?.replaceChild(anchor, node);
+		}
 
-			let count = 0;
-			let nextEl = anchor.nextElementSibling;
-			const repeat_id = (node as any)[repeatAttr];
 
-			while (count < repeat) {
-				// console.log('--', count, nextEl === null, anchor.parentNode?.innerHTML);
-				if (nextEl) {
-					if (nextEl[repeatAttr] === repeat_id) {
-						this._render(nextEl);
-						nextEl = nextEl.nextElementSibling;
-						count += 1;
-						continue;
-					}
+		let nextEl = anchor.nextElementSibling;
+		const repeat_id = (node as any)[repeatAttr];
+		const times = !isNaN(repeatData)
+			? repeatData
+			: repeatData.length ?? repeatData.size;
 
-					nextEl.before(createNodeClone(count));
-					count += 1;
-				} else {
-					const nodeClone = createNodeClone(count);
-
-					if (count === 0) {
-						anchor.after(nodeClone);
-					} else {
-						anchor.parentNode?.lastElementChild?.after(nodeClone);
-					}
-
-					nextEl = (nodeClone as WebComponent).nextElementSibling;
-					count += 1;
+		while (index < times) {
+			if (nextEl) {
+				if (nextEl[repeatAttr] === repeat_id) {
+					this._updateTrackValue(this._trackers.get(nextEl) as NodeTrack);
+					nextEl = nextEl.nextElementSibling;
+					index += 1;
+					continue;
 				}
+
+				nextEl.before(this._cloneRepeatedNode(node, index));
+				index += 1;
+			} else {
+				const nodeClone = this._cloneRepeatedNode(node, index);
+
+				if (index === 0) {
+					anchor.after(nodeClone);
+				} else {
+					anchor.parentNode?.lastElementChild?.after(nodeClone);
+				}
+
+				nextEl = (nodeClone as WebComponent).nextElementSibling;
+				index += 1;
 			}
+		}
 
-			// console.log('-- AFTER', nextEl === null, anchor.parentNode?.innerHTML);
-
-			while (nextEl && nextEl[repeatAttr] === repeat_id) {
-				this._trackers.delete(nextEl);
-				const next = nextEl.nextElementSibling;
-				nextEl.remove();
-				nextEl = next;
-			}
-
-			// console.log('-- AFTER CLEANED', nextEl === null, anchor.parentNode?.innerHTML);
+		while (nextEl && nextEl[repeatAttr] === repeat_id) {
+			this._trackers.delete(nextEl);
+			const next = nextEl.nextElementSibling;
+			nextEl.remove();
+			nextEl = next;
 		}
 
 		return null;
