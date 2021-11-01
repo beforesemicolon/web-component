@@ -667,7 +667,7 @@ export class WebComponent extends HTMLElement {
 		let parts = prop.split('.');
 		let property = '';
 		const commaIdx = value.indexOf(',');
-		const val = commaIdx >= 0 ? value.slice(0, commaIdx) : '';
+		const val = commaIdx >= 0 ? value.slice(0, commaIdx).trim() : '';
 		const shouldAdd = this._execString(commaIdx >= 0 ? value.slice(commaIdx + 1).trim() : value);
 
 		switch (parts[0]) {
@@ -736,7 +736,8 @@ export class WebComponent extends HTMLElement {
 				if (property) {
 					if (shouldAdd) {
 						if ((node as ObjectLiteral)[property] !== undefined) {
-							(node as ObjectLiteral)[property] = val || shouldAdd;
+							(node as ObjectLiteral)[property] = booleanAttr.hasOwnProperty(property)
+								|| (val || `${shouldAdd}`);
 						} else {
 							node.setAttribute(kebabProp, val);
 						}
