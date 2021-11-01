@@ -450,7 +450,7 @@ export class WebComponent extends HTMLElement {
 		const {node, attributes, hashedAttrs, property} = track;
 
 		for (let hashAttr of hashedAttrs) {
-			const res = this._handleHashedAttr(node as WebComponent, hashAttr);
+			const res = this._hashedAttrHandlers[hashAttr](node as WebComponent);
 
 			if (!res) return;
 		}
@@ -462,12 +462,7 @@ export class WebComponent extends HTMLElement {
 				newValue = this._resolveExecutable(node, exc, newValue);
 			});
 
-			try {
-				newValue = JSON.parse(newValue)
-			} catch (e) {
-			}
-
-			(node as any)[property.name] = newValue;
+			(node as ObjectLiteral)[property.name] = newValue;
 		}
 
 		for (let {name, value, executables} of attributes) {
@@ -478,7 +473,18 @@ export class WebComponent extends HTMLElement {
 					newValue = this._resolveExecutable(node, exc, newValue);
 				});
 
-				(node as HTMLElement).setAttribute(name, newValue);
+				const camelName = turnKebabToCamelCasing(name);
+
+				if ((node as ObjectLiteral)[camelName] !== undefined) {
+					try {
+						newValue = JSON.parse(newValue)
+					} catch (e) {
+					}
+
+					(node as ObjectLiteral)[camelName] = newValue;
+				} else {
+					(node as HTMLElement).setAttribute(name, newValue);
+				}
 			}
 		}
 	}
@@ -504,22 +510,16 @@ export class WebComponent extends HTMLElement {
 		}
 	}
 
-	private _handleHashedAttr(node: WebComponent, attr: HashedAttribute) {
-		switch (attr) {
-			case '#ref':
-				return this._handleRefAttribute(node);
-			case '#if':
-				return this._handleIfAttribute(node);
-			case '#repeat':
-				return this._handleRepeatAttribute(node);
-			default:
-				return node;
-		}
+	private _hashedAttrHandlers: { [attr: string]: (node: WebComponent) => null | WebComponent } = {
+		'#ref': this._handleRefAttribute.bind(this),
+		'#if': this._handleIfAttribute.bind(this),
+		'#repeat': this._handleRepeatAttribute.bind(this),
+		'#attr': this._handleAttrAttribute.bind(this),
 	}
 
 	private _handleIfAttribute(node: WebComponent) {
 		const attr = '#if';
-		const {value, placeholderNode}: HashedAttributeValue = (node as any)[attr];
+		const {value, placeholderNode}: HashedAttributeValue = (node as ObjectLiteral)[attr];
 
 		const shouldRender = this._execString(value);
 
@@ -532,7 +532,7 @@ export class WebComponent extends HTMLElement {
 		}
 
 		if (!placeholderNode) {
-			(node as any)['#if'].placeholderNode = document.createComment(`#if: ${value}`);
+			(node as ObjectLiteral)['#if'].placeholderNode = document.createComment(`#if: ${value}`);
 		}
 
 		// @ts-ignore
@@ -547,7 +547,7 @@ export class WebComponent extends HTMLElement {
 		clone.innerHTML = node.__oginner__;
 
 		for (let hAttr of ['#repeat_id', '#if', '#ref', '#attr']) {
-			if ((node as any)[hAttr]) {
+			if ((node as ObjectLiteral)[hAttr]) {
 				// @ts-ignore
 				clone[hAttr] = node[hAttr];
 			}
@@ -567,16 +567,16 @@ export class WebComponent extends HTMLElement {
 	private _handleRepeatAttribute(node: WebComponent | HTMLElement) {
 		const attr = '#repeat';
 		const repeatAttr = '#repeat_id';
-		const {value, placeholderNode}: HashedAttributeValue = (node as any)['#repeat'];
+		const {value, placeholderNode}: HashedAttributeValue = (node as ObjectLiteral)['#repeat'];
 		let repeatData = this._execString(value);
 		let index = 0;
 
-		if (!(node as any)[repeatAttr]) {
-			(node as any)[repeatAttr] = Math.floor(Math.random() * 10000000);
+		if (!(node as ObjectLiteral)[repeatAttr]) {
+			(node as ObjectLiteral)[repeatAttr] = Math.floor(Math.random() * 10000000);
 		}
 
 		if (!placeholderNode) {
-			(node as any)[attr].placeholderNode = document.createComment(`#repeat: ${value}`);
+			(node as ObjectLiteral)[attr].placeholderNode = document.createComment(`#repeat: ${value}`);
 		}
 
 		// @ts-ignore
@@ -585,7 +585,7 @@ export class WebComponent extends HTMLElement {
 			node.__oginner__ = node.innerHTML;
 		}
 
-		const anchor = (node as any)[attr].placeholderNode;
+		const anchor = (node as ObjectLiteral)[attr].placeholderNode;
 
 		if (!anchor.isConnected) {
 			node.parentNode?.replaceChild(anchor, node);
@@ -593,7 +593,7 @@ export class WebComponent extends HTMLElement {
 
 
 		let nextEl = anchor.nextElementSibling;
-		const repeat_id = (node as any)[repeatAttr];
+		const repeat_id = (node as ObjectLiteral)[repeatAttr];
 		let times = 0;
 
 		if (Number.isInteger(repeatData)) {
@@ -642,7 +642,7 @@ export class WebComponent extends HTMLElement {
 
 	private _handleRefAttribute(node: WebComponent) {
 		const attr = '#ref';
-		const {value}: HashedAttributeValue = (node as any)[attr];
+		const {value}: HashedAttributeValue = (node as ObjectLiteral)[attr];
 
 		if (this.refs[value] === undefined) {
 			if (/^[a-z$_][a-z0-9$_]*$/i.test(value)) {
@@ -655,6 +655,95 @@ export class WebComponent extends HTMLElement {
 			}
 
 			throw new Error(`Invalid #ref property name "${value}"`)
+		}
+
+		return node;
+	}
+
+	private _handleAttrAttribute(node: WebComponent) {
+		const attr = '#attr';
+		const {value, prop}: HashedAttributeValue = (node as ObjectLiteral)[attr];
+
+		let parts = prop.split('.');
+		let property = '';
+		const commaIdx = value.indexOf(',');
+		const val = commaIdx >= 0 ? value.slice(0, commaIdx) : '';
+		const shouldAdd = this._execString(commaIdx >= 0 ? value.slice(commaIdx + 1).trim() : value);
+
+		switch (parts[0]) {
+			case 'style':
+				property = parts.length ? parts[1] : '';
+
+				if (property) {
+					if (shouldAdd) {
+						(node as ObjectLiteral).style[property] = val;
+					} else {
+						(node as ObjectLiteral).style[property] = '';
+					}
+				} else {
+					val
+						.match(/([a-z][a-z-]+)(?=:):([^;]+)/g)
+						?.forEach(style => {
+							let [name, styleValue] = style.split(':');
+
+							if (shouldAdd) {
+								node.style.setProperty(name, styleValue);
+							} else {
+								const pattern = new RegExp(`${name}\\s*:\\s*${styleValue};?`, 'g');
+								node.setAttribute(
+									'style',
+									node.style.cssText.replace(pattern, ''))
+							}
+
+						})
+				}
+
+				break;
+			case 'class':
+				property = parts.length ? parts[1] : '';
+
+				if (property) {
+					if (shouldAdd) {
+						node.classList.add(property);
+					} else {
+						node.classList.remove(property);
+					}
+				} else {
+					const classes = val.split(/\s+/g);
+
+					if (shouldAdd) {
+						classes.forEach(cls => node.classList.add(cls));
+					} else {
+						classes.forEach(cls => node.classList.remove(cls));
+					}
+				}
+				break;
+			case 'data':
+				property = parts.length ? parts[1] : '';
+
+				if (property) {
+					if (shouldAdd) {
+						node.dataset[property] = val;
+					} else {
+						node.removeAttribute(`data-${turnCamelToKebabCasing(property)}`)
+					}
+				}
+				break;
+			default:
+				property = parts.length ? parts[0] : '';
+				const kebabProp = turnCamelToKebabCasing(property);
+
+				if (property) {
+					if (shouldAdd) {
+						if ((node as ObjectLiteral)[property] !== undefined) {
+							(node as ObjectLiteral)[property] = val || shouldAdd;
+						} else {
+							node.setAttribute(kebabProp, val);
+						}
+					} else {
+						node.removeAttribute(kebabProp);
+					}
+				}
 		}
 
 		return node;
