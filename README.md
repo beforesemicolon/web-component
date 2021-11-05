@@ -7,8 +7,8 @@ automatic properties and attribute watch, template data binding and auto update 
 ```js
 // app.js
 
-class MyButton extends WebComponent {
-  static observedAttributes = ['label', 'type'];
+class ActionButton extends WebComponent {
+  static observedAttributes = ['label', 'type', 'disabled', 'autofocus', 'name'];
   
   get stylesheet() {
     return `
@@ -17,7 +17,7 @@ class MyButton extends WebComponent {
           display: inline-block;
         }
         
-        .my-button {
+        :host .my-button {
           background: #222;
           color: #fff;
         }
@@ -30,9 +30,12 @@ class MyButton extends WebComponent {
       <button 
         class="my-button" 
         type="{type || 'button'}"
+        #attr.disabled="disabled"
+        #attr.autofocus="autofocus"
+        #attr.name="name"
         onclick="handleClick($event)"
         >
-        {label}
+        <slot>{label}</slot>
       </button>
     `;
   }
@@ -42,13 +45,37 @@ class MyButton extends WebComponent {
   }
 }
 
-MyButton.register();
+class PaginatedList extends WebComponent {
+  static observedAttributes = ['tag-name', 'loading', 'items'];
+  
+  get template() {
+    return `
+      <p #if="loading">
+        <slot name="loading">loading...</slot>
+      </p>
+      <p #if="!loading && !items.length">
+        <slot name="empty">List is Empty</slot>
+      </p>
+      <div #if="!loading && items.length" class="paginated-list">
+        <${this.tagName || 'div'} #repeat="items" details="{$item}">{$item}</${this.tagName || 'div'}>
+        <action-button onclick="loadMore()">load more</action-button>
+      </div>
+    `;
+  }
+  
+  loadMore() {
+    this.dispatchEvent(new Event('loadmore'));
+  }
+}
+
+PaginatedList.register();
+ActionButton.register();
 ```
 
 In your HTML you can simply use the tag normally.
 
 ```html
-<my-button label="click me"></my-button>
+<paginated-list items="['one', 'two', 'three']" tag-name="p"></paginated-list>
 ```
 
 ### Install
