@@ -4,10 +4,10 @@ A lightweight and powerful web component framework intended to remove the tediou
 
 "`Web Component API As It Should Have Been`"
 
-🥇 Build ✅**Flexible, ✅ Extensible, and ✅Contextful Components** with **✅ Reactive Template**, 🥳**Directives**, **✅Data and Event Binding**
-with a **✅Simple and Lightweight** API right in Your Browser.
+🥇 Build **✅ Flexible, ✅ Extensible, and ✅ Contextful Components** with **✅ Reactive Template**, **🥳 Directives**, **✅ Data and Event Binding**
+with a **✅ Simple and Lightweight** API right in Your Browser.
 
-🚫No JSX! 🚫No Tedious State Management and DOM Manipulation! 🚫No Robust Data Store and Context Setup! 🚫No Verbose API.
+🚫 No JSX! 🚫 No Tedious State Management and DOM Manipulation! 🚫 No Robust Data Store and Context Setup! 🚫 No Verbose API.
 
 ### Example
 Declare a simple action button component
