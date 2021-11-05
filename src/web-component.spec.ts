@@ -338,6 +338,8 @@ describe('WebComponent', () => {
 	});
 
 	describe('update DOM', () => {
+		let n: any;
+
 		class NComp extends WebComponent {
 			static observedAttributes = ['sample', 'style', 'class', 'data-x'];
 			numb = 12;
@@ -351,10 +353,12 @@ describe('WebComponent', () => {
 		}
 
 		NComp.register();
-		const n = new NComp();
-		document.body.appendChild(n);
 
 		beforeEach(() => {
+			n?.remove();
+			n = new NComp();
+			document.body.appendChild(n);
+
 			n.numb = 12;
 			// @ts-ignore
 			n.sample = '';
@@ -365,13 +369,13 @@ describe('WebComponent', () => {
 		})
 
 		it('should render', () => {
-			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">12</strong>')
+			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">12 </strong>')
 		});
 
 		it('should update DOM when properties update', () => {
 			n.numb = 100;
 
-			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">100</strong>')
+			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">100 </strong>')
 		});
 
 		it('should update DOM when observed attributes update', () => {
@@ -384,18 +388,18 @@ describe('WebComponent', () => {
 		it('should update DOM when forceUpdate is called', () => {
 			n.obj.value = 15;
 
-			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">12</strong>')
+			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">12 </strong>')
 
 			n.forceUpdate();
 
-			expect(n.root?.innerHTML).toBe('15<strong class="" style="" data-x="">12</strong>')
+			expect(n.root?.innerHTML).toBe('15<strong class="" style="" data-x="">12 </strong>')
 		});
 
 		it('should update DOM when class gets updated', () => {
 			n.className = 'my-items';
 			n.classList.add('unique')
 
-			expect(n.root?.innerHTML).toBe('300<strong class="my-items unique" style="" data-x="">12</strong>')
+			expect(n.root?.innerHTML).toBe('300<strong class="my-items unique" style="" data-x="">12 </strong>')
 		});
 
 		it('should update DOM when style gets updated', (done) => {
@@ -403,7 +407,7 @@ describe('WebComponent', () => {
 			n.style.display = 'block';
 
 			setTimeout(() => {
-				expect(n.root?.innerHTML).toBe('300<strong class="" style="background: red; display: block;" data-x="">12</strong>');
+				expect(n.root?.innerHTML).toBe('300<strong class="" style="background: red; display: block;" data-x="">12 </strong>');
 				done()
 			})
 		});
@@ -411,7 +415,7 @@ describe('WebComponent', () => {
 		it('should update DOM when data attributes gets updated', () => {
 			n.dataset.x = 'test';
 
-			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="test">12</strong>');
+			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="test">12 </strong>');
 		});
 	})
 
@@ -561,7 +565,10 @@ describe('WebComponent', () => {
 
 		const app = new AppComp();
 
-		document.body.appendChild(app);
+		beforeEach(() => {
+			app?.remove();
+			document.body.appendChild(app);
+		})
 
 		it('should update app context and be inherited', () => {
 			const forceUpdateSpy = jest.spyOn(app, 'forceUpdate');
@@ -678,6 +685,10 @@ describe('WebComponent', () => {
 				s.check1 = false;
 
 				expect(s.root?.innerHTML).toBe('<div class="sample"></div>')
+
+				s.check1 = true;
+
+				expect(s.root?.innerHTML).toBe('<div class="sample test"></div>')
 			});
 
 			it('should handle style attribute', () => {
@@ -686,7 +697,7 @@ describe('WebComponent', () => {
 					check2 = true;
 
 					get template() {
-						return '<div #attr.style="color: white, check2">'
+						return '<div #attr.style="color: white, check1" #attr.style.background-color="red, check2">'
 					}
 				}
 
@@ -695,50 +706,221 @@ describe('WebComponent', () => {
 
 				document.body.appendChild(s);
 
-				expect(s.root?.innerHTML).toBe('<div></div>')
+				expect(s.root?.innerHTML).toBe('<div style="color: white; background-color: red;"></div>');
+
+				s.check1 = false;
+
+				expect(s.root?.innerHTML).toBe('<div style="background-color: red;"></div>');
+
+				s.check1 = true;
+
+				expect(s.root?.innerHTML).toBe('<div style="background-color: red; color: white;"></div>');
 			});
 
-			it('should handle data attribute', () => {});
+			it('should handle data attribute', () => {
+				class AttrC extends WebComponent {
+					check1 = true;
+					check2 = true;
 
-			it('should handle boolean attribute', () => {});
+					get template() {
+						return '<div #attr.data.sampleTest="good, check1" #attr.data.dashed-sample="great, check2">'
+					}
+				}
 
-			it('should handle other attributes', () => {});
+				AttrC.register();
+				const s = new AttrC();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<div data-sample-test="good" data-dashed-sample="great"></div>');
+
+				s.check1 = false;
+
+				expect(s.root?.innerHTML).toBe('<div data-dashed-sample="great"></div>');
+
+				s.check1 = true;
+
+				expect(s.root?.innerHTML).toBe('<div data-dashed-sample="great" data-sample-test="good"></div>');
+			});
+
+			it('should handle boolean attribute', () => {
+				class AttrD extends WebComponent {
+					check1 = true;
+					check2 = true;
+
+					get template() {
+						return '<button #attr.disabled="check1" #attr.hidden="check2"></button>'
+					}
+				}
+
+				AttrD.register();
+				const s = new AttrD();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<button disabled="" hidden=""></button>');
+
+				s.check1 = false;
+
+				expect(s.root?.innerHTML).toBe('<button hidden=""></button>');
+
+				s.check1 = true;
+
+				expect(s.root?.innerHTML).toBe('<button hidden="" disabled=""></button>');
+			});
+
+			it('should handle other attributes', () => {
+				class AttrE extends WebComponent {
+					check1 = true;
+					check2 = true;
+
+					get template() {
+						return '<button #attr.autocomplete="check1" #attr.autofocus="check2" #attr.name="sample, check2"></button>'
+					}
+				}
+
+				AttrE.register();
+				const s = new AttrE();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<button autocomplete="true" autofocus="" name="sample"></button>');
+
+				s.check2 = false;
+
+				expect(s.root?.innerHTML).toBe('<button autocomplete="true"></button>');
+
+				s.check2 = true;
+
+				expect(s.root?.innerHTML).toBe('<button autocomplete="true" autofocus="" name="sample"></button>');
+			});
 		});
 
 		describe('should handle #if', () => {
-			it('should render element if truthy', () => {});
+			it('should render element if truthy', () => {
+				class IfA extends WebComponent {
+					check = true;
 
-			it('should remove element if truthy', () => {});
+					get template() {
+						return '<button #if="check">click me</button>'
+					}
+				}
+
+				IfA.register();
+				const s = new IfA();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<button>click me</button>');
+
+				s.check = false;
+
+				expect(s.root?.innerHTML).toBe('<!--#if: check-->');
+
+				s.check = true;
+
+				expect(s.root?.innerHTML).toBe('<button>click me</button>');
+			});
 		});
 
 		describe('should handle #repeat', () => {
-			it('should repeat element based on number', () => {});
+			it('should repeat element based on number', () => {
+				class RepeatA extends WebComponent {
+					count: any = 3;
 
-			it('should repeat element based on array', () => {});
+					get template() {
+						return '<li #repeat="count" class="item-{$key}">item {$item}</li>'
+					}
+				}
 
-			it('should repeat element based on object literal', () => {});
+				RepeatA.register();
+				const s = new RepeatA();
 
-			it('should repeat element based on Map', () => {});
+				document.body.appendChild(s);
 
-			it('should repeat element based on Set', () => {});
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-0">item 1</li><li class="item-1">item 2</li><li class="item-2">item 3</li>');
 
-			it('should repeat element based on string', () => {});
+				s.count = 1;
 
-			it('should repeat element based on iterable object', () => {});
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-0">item 1</li>');
+
+				s.count = Array.from({length: 3}, (_, i) => i+1);
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-0">item 1</li><li class="item-1">item 2</li><li class="item-2">item 3</li>');
+
+				s.count = new Set([2, 4, 6]);
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-0">item 2</li><li class="item-1">item 4</li><li class="item-2">item 6</li>');
+
+				s.count = new Map([['one', 1], ['two', 2], ['three', 3]]);
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-one">item 1</li><li class="item-two">item 2</li><li class="item-three">item 3</li>');
+
+				s.count = {one: 100, two: 200, three: 300};
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-one">item 100</li><li class="item-two">item 200</li><li class="item-three">item 300</li>');
+
+				s.count = 'two';
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-0">item t</li><li class="item-1">item w</li><li class="item-2">item o</li>');
+
+				s.count = {
+					*[Symbol.iterator]() {
+						yield 500;
+						yield 250;
+						yield 50;
+					}
+				}
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-0">item 500</li><li class="item-1">item 250</li><li class="item-2">item 50</li>');
+
+			});
 		});
 
 		describe('should allow mix of hashed attributes', () => {
-			it('#if and #repeat', () => {});
+			it('#if and #repeat', () => {
+				class ComboA extends WebComponent {
+					condition = false;
+					count = 3;
 
-			it('#if and #ref', () => {});
+					get template() {
+						return '<li #repeat="count" #if="condition" class="item-{$key}">item {$item}</li>'
+					}
+				}
 
-			it('#if and #attr', () => {});
+				ComboA.register();
+				const s = new ComboA();
 
-			it('#repeat and #ref', () => {});
+				document.body.appendChild(s);
 
-			it('#repeat and #attr', () => {});
+				expect(s.root?.innerHTML).toBe('<!--#if: condition-->');
 
-			it('#attr and #ref', () => {});
+				s.condition = true;
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-0">item 1</li><li class="item-1">item 2</li><li class="item-2">item 3</li>');
+
+				s.condition = false;
+
+				expect(s.root?.innerHTML).toBe('<!--#if: condition-->');
+
+				s.count = 2;
+
+				expect(s.root?.innerHTML).toBe('<!--#if: condition-->');
+
+				s.condition = true;
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-0">item 1</li><li class="item-1">item 2</li>');
+			});
+
+			// it('#if and #ref', () => {});
+			//
+			// it('#if and #attr', () => {});
+			//
+			// it('#repeat and #ref', () => {});
+			//
+			// it('#repeat and #attr', () => {});
+			//
+			// it('#attr and #ref', () => {});
 		});
 	});
 });

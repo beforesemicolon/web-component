@@ -24,8 +24,8 @@ export class WebComponent extends HTMLElement {
 	private _contextSubscribers: Array<ObserverCallback> = [];
 	private _unsubscribeCtx: () => void = () => {
 	};
-	private _hashedAttrs: Array<HashedAttribute> = ['#if', '#repeat', '#ref', '#attr'];
-	refs: Refs = Object.create(null);
+	private _hashedAttrs: Array<HashedAttribute> = ['#ref', '#if', '#repeat', '#attr'];
+	readonly refs: Refs = Object.create(null);
 
 	constructor() {
 		super();
@@ -458,49 +458,51 @@ export class WebComponent extends HTMLElement {
 	}
 
 	private _updateTrackValue(track: NodeTrack) {
-		try {
-			const {node, attributes, hashedAttrs, property} = track;
+		if (track) {
+			try {
+				const {node, attributes, hashedAttrs, property} = track;
 
-			for (let hashAttr of hashedAttrs) {
-				const res = this._hashedAttrHandlers[hashAttr](node as WebComponent);
+				for (let hashAttr of hashedAttrs) {
+					const res = this._hashedAttrHandlers[hashAttr](node as WebComponent);
 
-				if (!res) return;
-			}
+					if (!res) return;
+				}
 
-			if (property?.executables.length) {
-				let newValue = property.value;
+				if (property?.executables.length) {
+					let newValue = property.value;
 
-				property.executables.forEach((exc) => {
-					newValue = this._resolveExecutable(node, exc, newValue);
-				});
-
-				(node as ObjectLiteral)[property.name] = newValue;
-			}
-
-			for (let {name, value, executables} of attributes) {
-				if (executables.length) {
-					let newValue = value;
-
-					executables.forEach((exc) => {
+					property.executables.forEach((exc) => {
 						newValue = this._resolveExecutable(node, exc, newValue);
 					});
 
-					const camelName = turnKebabToCamelCasing(name);
+					(node as ObjectLiteral)[property.name] = newValue;
+				}
 
-					if ((node as ObjectLiteral)[camelName] !== undefined) {
-						try {
-							newValue = JSON.parse(newValue)
-						} catch (e) {
+				for (let {name, value, executables} of attributes) {
+					if (executables.length) {
+						let newValue = value;
+
+						executables.forEach((exc) => {
+							newValue = this._resolveExecutable(node, exc, newValue);
+						});
+
+						const camelName = turnKebabToCamelCasing(name);
+
+						if ((node as ObjectLiteral)[camelName] !== undefined) {
+							try {
+								newValue = JSON.parse(newValue)
+							} catch (e) {
+							}
+
+							(node as ObjectLiteral)[camelName] = newValue;
+						} else {
+							(node as HTMLElement).setAttribute(name, newValue);
 						}
-
-						(node as ObjectLiteral)[camelName] = newValue;
-					} else {
-						(node as HTMLElement).setAttribute(name, newValue);
 					}
 				}
+			} catch(e) {
+				this.onError(e as ErrorEvent)
 			}
-		} catch(e) {
-		    this.onError(e as ErrorEvent)
 		}
 	}
 
@@ -533,27 +535,42 @@ export class WebComponent extends HTMLElement {
 	}
 
 	private _handleIfAttribute(node: WebComponent) {
+		// console.log('-- _handleIfAttribute');
 		const attr = '#if';
-		const {value, placeholderNode}: HashedAttributeValue = (node as ObjectLiteral)[attr][0];
+		let {value, placeholderNode}: HashedAttributeValue = (node as ObjectLiteral)[attr][0];
 
 		const shouldRender = this._execString(value);
 
+		if (!placeholderNode) {
+			(node as ObjectLiteral)[attr][0].placeholderNode = document.createComment(`${attr}: ${value}`);
+			placeholderNode = (node as ObjectLiteral)[attr][0].placeholderNode;
+		}
+
+		if (!(node as ObjectLiteral).__oginner__) {
+			(node as ObjectLiteral).__oginner__ = node.innerHTML;
+		}
+
 		if (shouldRender) {
-			if (placeholderNode) {
-				placeholderNode.parentNode?.replaceChild(node, placeholderNode);
-			}
+			placeholderNode?.parentNode?.replaceChild(node, placeholderNode);
 
 			return node;
 		}
 
-		if (!placeholderNode) {
-			(node as ObjectLiteral)['#if'].placeholderNode = document.createComment(`#if: ${value}`);
+		node.parentNode?.replaceChild((node as ObjectLiteral)[attr][0].placeholderNode, node);
+
+		if ((node as ObjectLiteral)['#repeat']) {
+			this._handleRepeatAttribute(node, true);
 		}
 
-		// @ts-ignore
-		node.parentNode?.replaceChild(node[attr].placeholderNode, node);
-
 		return null;
+	}
+
+	private _updateNodeRepeatKeyAndItem(node: WebComponent | HTMLElement, index: number, list: Array<any> = []) {
+		const [key, value] = list[index] ?? [index, index + 1];
+		// @ts-ignore
+		node['$item'] = value;
+		// @ts-ignore
+		node['$key'] = key;
 	}
 
 	private _cloneRepeatedNode(node: WebComponent | HTMLElement, index: number, list: Array<any> = []) {
@@ -568,21 +585,17 @@ export class WebComponent extends HTMLElement {
 			}
 		}
 
-		const [key, value] = list[index] ?? [index, index + 1];
-
-		// @ts-ignore
-		clone['$item'] = value;
-		// @ts-ignore
-		clone['$key'] = key;
+		this._updateNodeRepeatKeyAndItem(clone as HTMLElement, index, list)
 
 		this._render(clone);
 		return clone;
 	}
 
-	private _handleRepeatAttribute(node: WebComponent | HTMLElement) {
+	private _handleRepeatAttribute(node: WebComponent | HTMLElement, clear = false) {
+		// console.log('-- _handleRepeatAttribute');
 		const attr = '#repeat';
 		const repeatAttr = '#repeat_id';
-		const {value, placeholderNode}: HashedAttributeValue = (node as ObjectLiteral)['#repeat'][0];
+		let {value, placeholderNode}: HashedAttributeValue = (node as ObjectLiteral)[attr][0];
 		let repeatData = this._execString(value);
 		let index = 0;
 
@@ -591,21 +604,18 @@ export class WebComponent extends HTMLElement {
 		}
 
 		if (!placeholderNode) {
-			(node as ObjectLiteral)[attr].placeholderNode = document.createComment(`#repeat: ${value}`);
+			(node as ObjectLiteral)[attr][0].placeholderNode = document.createComment(`#repeat: ${value}`);
 		}
 
-		// @ts-ignore
-		if (!node.__oginner__) {
-			// @ts-ignore
-			node.__oginner__ = node.innerHTML;
+		if (!(node as ObjectLiteral).__oginner__) {
+			(node as ObjectLiteral).__oginner__ = node.innerHTML;
 		}
 
-		const anchor = (node as ObjectLiteral)[attr].placeholderNode;
+		const anchor = (node as ObjectLiteral)[attr][0].placeholderNode;
 
 		if (!anchor.isConnected) {
 			node.parentNode?.replaceChild(anchor, node);
 		}
-
 
 		let nextEl = anchor.nextElementSibling;
 		const repeat_id = (node as ObjectLiteral)[repeatAttr];
@@ -615,16 +625,18 @@ export class WebComponent extends HTMLElement {
 			times = repeatData;
 		} else {
 			repeatData = repeatData instanceof Set ? Object.entries(Array.from(repeatData))
-				: repeatData instanceof Map ? Array.from(repeatData.entries())
-					: Object.entries(repeatData);
+					: repeatData instanceof Map ? Array.from(repeatData.entries())
+						: repeatData[Symbol.iterator] ? Object.entries([...repeatData])
+							: Object.entries(repeatData);
 			times = repeatData.length;
 		}
 
 		while (index < times) {
 			if (nextEl) {
 				if (nextEl[repeatAttr] === repeat_id) {
-					this._updateTrackValue(this._trackers.get(nextEl) as NodeTrack);
+					this._updateNodeRepeatKeyAndItem(nextEl, index, repeatData);
 					nextEl = nextEl.nextElementSibling;
+					this._updateTrackValue(this._trackers.get(nextEl) as NodeTrack);
 					index += 1;
 					continue;
 				}
@@ -650,6 +662,10 @@ export class WebComponent extends HTMLElement {
 			const next = nextEl.nextElementSibling;
 			nextEl.remove();
 			nextEl = next;
+		}
+
+		if (clear && anchor.isConnected) {
+			anchor.parentNode.removeChild(anchor)
 		}
 
 		return null;
@@ -690,6 +706,8 @@ export class WebComponent extends HTMLElement {
 					property = parts.length ? parts[1] : '';
 
 					if (property) {
+						property = turnKebabToCamelCasing(property);
+
 						if (shouldAdd) {
 							(node as ObjectLiteral).style[property] = val;
 						} else {
@@ -740,7 +758,7 @@ export class WebComponent extends HTMLElement {
 
 					if (property) {
 						if (shouldAdd) {
-							node.dataset[property] = val;
+							node.dataset[turnKebabToCamelCasing(property)] = val;
 						} else {
 							node.removeAttribute(`data-${turnCamelToKebabCasing(property)}`)
 						}
@@ -752,11 +770,12 @@ export class WebComponent extends HTMLElement {
 
 					if (property) {
 						if (shouldAdd) {
+							const idealVal = booleanAttr.hasOwnProperty(property) || val || `${shouldAdd}`;
+
 							if ((node as ObjectLiteral)[property] !== undefined) {
-								(node as ObjectLiteral)[property] = booleanAttr.hasOwnProperty(property)
-									|| (val || `${shouldAdd}`);
+								(node as ObjectLiteral)[property] = idealVal;
 							} else {
-								node.setAttribute(kebabProp, val);
+								node.setAttribute(kebabProp, idealVal.toString());
 							}
 						} else {
 							node.removeAttribute(kebabProp);

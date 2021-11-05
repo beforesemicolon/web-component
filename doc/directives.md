@@ -54,20 +54,28 @@ class FlatList extends WebComponent {
 ```
 
 #### repeat based of data
-You can also provide list-like objects and object literal as value, and it will repeat the element based on number of
+You can also provide iterable objects and object literal as value, and it will repeat the element based on number of
 entries in the object. 
 
 It supports the following objects:
 - Set
 - Map
 - Array
+- String
+- Iterable Object created with Symbol.iterator
 - Object Literal
 
-The below example will repeat the `.list-item` div based on the number of items in the `item` array.
+The below example will repeat the `.list-item` div based on the items yield by the iterator.
 
 ```js
 class FlatList extends WebComponent {
-  items = [2, 4, 6];
+  items = {
+    *[Symbol.iterator]() {
+      yield 10;
+      yield 20;
+      yield 30;
+    }
+  };
   
   get template() {
     return `
