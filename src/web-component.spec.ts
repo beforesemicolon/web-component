@@ -284,16 +284,6 @@ describe('WebComponent', () => {
 			expect(adoptionFn).toHaveBeenCalledTimes(1);
 		});
 
-		it('should trigger onUpdate when with observed attributes on and added to the DOM', () => {
-			k.setAttribute('sample', 'diff');
-
-			expect(updateFn).toHaveBeenCalledTimes(0);
-
-			document.body.appendChild(k);
-
-			expect(updateFn).toHaveBeenCalledTimes(1);
-		});
-
 		it('should trigger onUpdate when properties and observed attributes update only if mounted', () => {
 			k.numb = 1000;
 			// @ts-ignore
@@ -348,6 +338,8 @@ describe('WebComponent', () => {
 	});
 
 	describe('update DOM', () => {
+		let n: any;
+
 		class NComp extends WebComponent {
 			static observedAttributes = ['sample', 'style', 'class', 'data-x'];
 			numb = 12;
@@ -361,10 +353,12 @@ describe('WebComponent', () => {
 		}
 
 		NComp.register();
-		const n = new NComp();
-		document.body.appendChild(n);
 
 		beforeEach(() => {
+			n?.remove();
+			n = new NComp();
+			document.body.appendChild(n);
+
 			n.numb = 12;
 			// @ts-ignore
 			n.sample = '';
@@ -375,13 +369,13 @@ describe('WebComponent', () => {
 		})
 
 		it('should render', () => {
-			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">12</strong>')
+			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">12 </strong>')
 		});
 
 		it('should update DOM when properties update', () => {
 			n.numb = 100;
 
-			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">100</strong>')
+			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">100 </strong>')
 		});
 
 		it('should update DOM when observed attributes update', () => {
@@ -394,18 +388,18 @@ describe('WebComponent', () => {
 		it('should update DOM when forceUpdate is called', () => {
 			n.obj.value = 15;
 
-			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">12</strong>')
+			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">12 </strong>')
 
 			n.forceUpdate();
 
-			expect(n.root?.innerHTML).toBe('15<strong class="" style="" data-x="">12</strong>')
+			expect(n.root?.innerHTML).toBe('15<strong class="" style="" data-x="">12 </strong>')
 		});
 
 		it('should update DOM when class gets updated', () => {
 			n.className = 'my-items';
 			n.classList.add('unique')
 
-			expect(n.root?.innerHTML).toBe('300<strong class="my-items unique" style="" data-x="">12</strong>')
+			expect(n.root?.innerHTML).toBe('300<strong class="my-items unique" style="" data-x="">12 </strong>')
 		});
 
 		it('should update DOM when style gets updated', (done) => {
@@ -413,7 +407,7 @@ describe('WebComponent', () => {
 			n.style.display = 'block';
 
 			setTimeout(() => {
-				expect(n.root?.innerHTML).toBe('300<strong class="" style="background: red; display: block;" data-x="">12</strong>');
+				expect(n.root?.innerHTML).toBe('300<strong class="" style="background: red; display: block;" data-x="">12 </strong>');
 				done()
 			})
 		});
@@ -421,7 +415,7 @@ describe('WebComponent', () => {
 		it('should update DOM when data attributes gets updated', () => {
 			n.dataset.x = 'test';
 
-			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="test">12</strong>');
+			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="test">12 </strong>');
 		});
 	})
 
@@ -571,7 +565,10 @@ describe('WebComponent', () => {
 
 		const app = new AppComp();
 
-		document.body.appendChild(app);
+		beforeEach(() => {
+			app?.remove();
+			document.body.appendChild(app);
+		})
 
 		it('should update app context and be inherited', () => {
 			const forceUpdateSpy = jest.spyOn(app, 'forceUpdate');
@@ -611,6 +608,406 @@ describe('WebComponent', () => {
 			app.root?.appendChild(target);
 
 			expect(target?.root?.innerHTML).toBe('Updated Text App');
+		});
+	});
+
+	describe('hashed attributes', () => {
+		describe('#ref', () => {
+			it('should set ref attribute', () => {
+                class RefA extends WebComponent {
+                    get template() {
+                        return '<div #ref="myRef"></div>'
+                    }
+                }
+
+                RefA.register();
+                const s = new RefA();
+
+                document.body.appendChild(s);
+
+                expect(s.root?.innerHTML).toBe('<div></div>')
+                expect(s.$refs.myRef).toBeDefined()
+            });
+
+			it('should allow to be used in template', () => {
+				class RefB extends WebComponent {
+					get template() {
+						return '<div #ref="myRef">{$refs.myRef.nodeName}</div>{$refs.myRef.childNodes.length}'
+					}
+				}
+
+				RefB.register();
+				const s = new RefB();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<div>DIV</div>1')
+				expect(s.$refs.myRef).toBeDefined()
+			});
+
+			it('should crashed if used before create in the template', (done) => {
+				class RefC extends WebComponent {
+					get template() {
+						return '{$refs.myRef.nodeName}<div #ref="myRef"></div>'
+					}
+
+					onError(error: ErrorEvent) {
+						expect(error.message).toEqual('Cannot read property \'nodeName\' of undefined');
+						done();
+					}
+				}
+
+				RefC.register();
+				const s = new RefC();
+
+				document.body.appendChild(s);
+			});
+		});
+
+		describe('should handle #attr', () => {
+			it('should handle class attribute', () => {
+				class AttrA extends WebComponent {
+					check1 = true;
+					check2 = true;
+
+					get template() {
+						return '<div #attr.class.test="check1" #attr.class="sample, check2">'
+					}
+				}
+
+				AttrA.register();
+				const s = new AttrA();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<div class="test sample"></div>')
+
+				s.check1 = false;
+
+				expect(s.root?.innerHTML).toBe('<div class="sample"></div>')
+
+				s.check1 = true;
+
+				expect(s.root?.innerHTML).toBe('<div class="sample test"></div>')
+			});
+
+			it('should handle style attribute', () => {
+				class AttrB extends WebComponent {
+					check1 = true;
+					check2 = true;
+
+					get template() {
+						return '<div #attr.style="color: white, check1" #attr.style.background-color="red, check2">'
+					}
+				}
+
+				AttrB.register();
+				const s = new AttrB();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<div style="color: white; background-color: red;"></div>');
+
+				s.check1 = false;
+
+				expect(s.root?.innerHTML).toBe('<div style="background-color: red;"></div>');
+
+				s.check1 = true;
+
+				expect(s.root?.innerHTML).toBe('<div style="background-color: red; color: white;"></div>');
+			});
+
+			it('should handle data attribute', () => {
+				class AttrC extends WebComponent {
+					check1 = true;
+					check2 = true;
+
+					get template() {
+						return '<div #attr.data.sampleTest="good, check1" #attr.data.dashed-sample="great, check2">'
+					}
+				}
+
+				AttrC.register();
+				const s = new AttrC();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<div data-sample-test="good" data-dashed-sample="great"></div>');
+
+				s.check1 = false;
+
+				expect(s.root?.innerHTML).toBe('<div data-dashed-sample="great"></div>');
+
+				s.check1 = true;
+
+				expect(s.root?.innerHTML).toBe('<div data-dashed-sample="great" data-sample-test="good"></div>');
+			});
+
+			it('should handle boolean attribute', () => {
+				class AttrD extends WebComponent {
+					check1 = true;
+					check2 = true;
+
+					get template() {
+						return '<button #attr.disabled="check1" #attr.hidden="check2"></button>'
+					}
+				}
+
+				AttrD.register();
+				const s = new AttrD();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<button disabled="" hidden=""></button>');
+
+				s.check1 = false;
+
+				expect(s.root?.innerHTML).toBe('<button hidden=""></button>');
+
+				s.check1 = true;
+
+				expect(s.root?.innerHTML).toBe('<button hidden="" disabled=""></button>');
+			});
+
+			it('should handle other attributes', () => {
+				class AttrE extends WebComponent {
+					check1 = true;
+					check2 = true;
+
+					get template() {
+						return '<button #attr.autocomplete="check1" #attr.autofocus="check2" #attr.name="sample, check2"></button>'
+					}
+				}
+
+				AttrE.register();
+				const s = new AttrE();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<button autocomplete="true" autofocus="" name="sample"></button>');
+
+				s.check2 = false;
+
+				expect(s.root?.innerHTML).toBe('<button autocomplete="true"></button>');
+
+				s.check2 = true;
+
+				expect(s.root?.innerHTML).toBe('<button autocomplete="true" autofocus="" name="sample"></button>');
+			});
+		});
+
+		describe('should handle #if', () => {
+			it('should render element if truthy', () => {
+				class IfA extends WebComponent {
+					check = true;
+
+					get template() {
+						return '<button #if="check">click me</button>'
+					}
+				}
+
+				IfA.register();
+				const s = new IfA();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<button>click me</button>');
+
+				s.check = false;
+
+				expect(s.root?.innerHTML).toBe('<!--#if: check-->');
+
+				s.check = true;
+
+				expect(s.root?.innerHTML).toBe('<button>click me</button>');
+			});
+		});
+
+		describe('should handle #repeat', () => {
+			it('should repeat element based on number', () => {
+				class RepeatA extends WebComponent {
+					count: any = 3;
+
+					get template() {
+						return '<li #repeat="count" class="item-{$key}">item {$item}</li>'
+					}
+				}
+
+				RepeatA.register();
+				const s = new RepeatA();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-0">item 1</li><li class="item-1">item 2</li><li class="item-2">item 3</li>');
+
+				s.count = 1;
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-0">item 1</li>');
+
+				s.count = Array.from({length: 3}, (_, i) => i+1);
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-0">item 1</li><li class="item-1">item 2</li><li class="item-2">item 3</li>');
+
+				s.count = new Set([2, 4, 6]);
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-0">item 2</li><li class="item-1">item 4</li><li class="item-2">item 6</li>');
+
+				s.count = new Map([['one', 1], ['two', 2], ['three', 3]]);
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-one">item 1</li><li class="item-two">item 2</li><li class="item-three">item 3</li>');
+
+				s.count = {one: 100, two: 200, three: 300};
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-one">item 100</li><li class="item-two">item 200</li><li class="item-three">item 300</li>');
+
+				s.count = 'two';
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-0">item t</li><li class="item-1">item w</li><li class="item-2">item o</li>');
+
+				s.count = {
+					*[Symbol.iterator]() {
+						yield 500;
+						yield 250;
+						yield 50;
+					}
+				}
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-0">item 500</li><li class="item-1">item 250</li><li class="item-2">item 50</li>');
+
+			});
+		});
+
+		describe('should allow mix of hashed attributes', () => {
+			it('#if and #repeat', () => {
+				class ComboA extends WebComponent {
+					condition = false;
+					count = 3;
+
+					get template() {
+						return '<li #repeat="count" #if="condition" class="item-{$key}">item {$item}</li>'
+					}
+				}
+
+				ComboA.register();
+				const s = new ComboA();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<!--#if: condition-->');
+
+				s.condition = true;
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-0">item 1</li><li class="item-1">item 2</li><li class="item-2">item 3</li>');
+
+				s.condition = false;
+
+				expect(s.root?.innerHTML).toBe('<!--#if: condition-->');
+
+				s.count = 2;
+
+				expect(s.root?.innerHTML).toBe('<!--#if: condition-->');
+
+				s.condition = true;
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-0">item 1</li><li class="item-1">item 2</li>');
+			});
+
+			it('#if and #ref', () => {
+				class ComboB extends WebComponent {
+					condition = false;
+
+					get template() {
+						return '<li #if="condition" class="item" #ref="item">my item</li>'
+					}
+				}
+
+				ComboB.register();
+				const s = new ComboB();
+
+				document.body.appendChild(s);
+
+				const initItemRef = s.$refs.item;
+
+				expect(s.root?.innerHTML).toBe('<!--#if: condition-->');
+				expect(initItemRef).toBeDefined();
+
+				s.condition = true;
+
+				expect(s.root?.innerHTML).toBe('<li class="item">my item</li>');
+				expect(initItemRef === s.$refs.item).toBeTruthy();
+			});
+
+			it('#if and #attr', () => {
+				class ComboC extends WebComponent {
+					condition = false;
+
+					get template() {
+						return '<li #if="condition" #attr.class.item="condition" #attr.id="unique, true">my item</li>'
+					}
+				}
+
+				ComboC.register();
+				const s = new ComboC();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<!--#if: condition-->');
+
+				s.condition = true;
+
+				expect(s.root?.innerHTML).toBe('<li class="item" id="unique">my item</li>');
+			});
+
+			it('#repeat and #ref', () => {
+				class ComboD extends WebComponent {
+					count = 2;
+
+					get template() {
+						return '<li #repeat="count" #ref="sample">{$item}-{$key}</li>'
+					}
+				}
+
+				ComboD.register();
+				const s = new ComboD();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li>1-0</li><li>2-1</li>');
+				expect(s.$refs.sample).toBeUndefined();
+			});
+
+			it('#repeat and #attr', () => {
+				class ComboE extends WebComponent {
+					count = 2;
+
+					get template() {
+						return '<li #repeat="count" #attr.data.test="sample, $key">{$item}-{$key}</li>'
+					}
+				}
+
+				ComboE.register();
+				const s = new ComboE();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li>1-0</li><li data-test="sample">2-1</li>');
+			});
+
+			it('#attr and #ref', () => {
+				class ComboF extends WebComponent {
+					get template() {
+						return '<li #ref="item" #attr.data.test="sample, true">my item</li>'
+					}
+				}
+
+				ComboF.register();
+				const s = new ComboF();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<li data-test="sample">my item</li>');
+				expect(s.$refs.item).toBeDefined();
+			});
 		});
 	});
 });

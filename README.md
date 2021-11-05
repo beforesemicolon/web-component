@@ -1,14 +1,19 @@
-# Web Component
-A web component framework that simplifies how web components are created on the client with 
-automatic properties and attribute watch, template data binding and auto update on render and more.
+![BFS Web Component Framework](https://github.com/beforesemicolon/web-component/blob/develop/doc/cover%402x.jpg)
 
-------- `Web Component API As It Should Have Been` -------
+A lightweight and powerful web component framework intended to remove the tedious aspect of building reactive Web Components.
 
+"`Web Component API As It Should Have Been`"
+
+🥇 Build **✅ Flexible, ✅ Extensible, and ✅ Contextful Components** with **✅ Reactive Template**, **🥳 Directives**, **✅ Data and Event Binding**
+with a **✅ Simple and Lightweight** API right in Your Browser.
+
+🚫 No JSX! 🚫 No Tedious State Management and DOM Manipulation! 🚫 No Robust Data Store and Context Setup! 🚫 No Verbose API.
+
+### Example
+Declare a simple action button component
 ```js
-// app.js
-
-class MyButton extends WebComponent {
-  static observedAttributes = ['label', 'type'];
+class ActionButton extends WebComponent {
+  static observedAttributes = ['label', 'type', 'disabled', 'autofocus', 'name'];
   
   get stylesheet() {
     return `
@@ -17,7 +22,7 @@ class MyButton extends WebComponent {
           display: inline-block;
         }
         
-        .my-button {
+        :host .my-button {
           background: #222;
           color: #fff;
         }
@@ -30,9 +35,12 @@ class MyButton extends WebComponent {
       <button 
         class="my-button" 
         type="{type || 'button'}"
+        #attr.disabled="disabled"
+        #attr.autofocus="autofocus"
+        #attr.name="name"
         onclick="handleClick($event)"
         >
-        {label}
+        <slot>{label}</slot>
       </button>
     `;
   }
@@ -42,13 +50,40 @@ class MyButton extends WebComponent {
   }
 }
 
-MyButton.register();
+ActionButton.register();
+```
+Create a simple list data renderer that uses a action button to request more data
+```js
+class PaginatedList extends WebComponent {
+  static observedAttributes = ['tag-name', 'loading', 'items'];
+  
+  get template() {
+    return `
+      <p #if="loading">
+        <slot name="loading">loading...</slot>
+      </p>
+      <p #if="!loading && !items.length">
+        <slot name="empty">List is Empty</slot>
+      </p>
+      <div #if="!loading && items.length" class="paginated-list">
+        <${this.tagName || 'div'} #repeat="items" details="{$item}">{$item}</${this.tagName || 'div'}>
+        <action-button onclick="loadMore()">load more</action-button>
+      </div>
+    `;
+  }
+  
+  loadMore() {
+    this.dispatchEvent(new Event('loadmore'));
+  }
+}
+
+PaginatedList.register();
 ```
 
 In your HTML you can simply use the tag normally.
 
 ```html
-<my-button label="click me"></my-button>
+<paginated-list items="['one', 'two', 'three']" tag-name="p"></paginated-list>
 ```
 
 ### Install
@@ -120,5 +155,6 @@ require('esbuild').build({
 - [Attributes](https://github.com/beforesemicolon/web-component/blob/master/doc/attributes.md)
 - [Properties](https://github.com/beforesemicolon/web-component/blob/master/doc/properties.md)
 - [Context](https://github.com/beforesemicolon/web-component/blob/master/doc/context.md)
+- [Directives](https://github.com/beforesemicolon/web-component/blob/master/doc/directives.md)
 - [LiveCycles](https://github.com/beforesemicolon/web-component/blob/master/doc/livecycles.md)
 - [Styling](https://github.com/beforesemicolon/web-component/blob/master/doc/stylesheet.md)

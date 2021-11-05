@@ -1,14 +1,7 @@
-type snippet = {
-	from: number;
-	to: number;
-	match: string;
-	executable: string;
-}
-
 export function extractExecutableSnippetFromString(str: string) {
 	const stack = [];
 	const pattern = /[}{]/g;
-	let snippets: snippet[] = [];
+	let snippets: Executable[] = [];
 	let match;
 	let startingCurlyIndex: number;
 

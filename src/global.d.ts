@@ -10,37 +10,59 @@ export declare global {
 		}
 	}
 
-	export interface track {
+	export interface NodeTrack {
 		node: HTMLElement | Node | WebComponent;
-		property: string;
-		isAttribute: boolean;
+		attributes: Array<{
+			name: string;
+			value: string;
+			executables: Array<Executable>;
+		}>;
+		hashedAttrs: Array<HashedAttribute>;
+		property: null | {
+			name: string;
+			value: string;
+			executables: Array<Executable>;
+		};
+	}
+
+	export type HashedAttribute = '#attr' | '#ref' | '#repeat' | '#if';
+
+	export interface HashedAttributeValue {
 		value: string;
-		executables: Array<{
-			match: string;
-			executable: string;
-			from: number;
-			to: number;
-		}>
+		prop: string;
+		placeholderNode?: Comment;
 	}
 
 	export type ObjectLiteral = {[key: string]: any};
 
-	export type ObserverCallback = (ctx: ObjectLiteral) => void
+	export type ObserverCallback = (ctx: ObjectLiteral) => void;
+
+	export type Refs = {[key: string]: HTMLElement};
+
+	export type Executable = {
+		from: number;
+		to: number;
+		match: string;
+		executable: string;
+	}
 
 	export class WebComponent extends HTMLElement {
 		static tagName: string;
 		static mode: ShadowRootModeExtended;
 		static observedAttributes: Array<string>;
 		static delegatesFocus: boolean;
-		static register: (tagName?: string) => void
-		static isRegistered: boolean
-		static registerAll: (components: Array<WebComponentConstructor>) => void
+		static register: (tagName?: string) => void;
+		static isRegistered: boolean;
+		static initialContext: ObjectLiteral;
+		static registerAll: (components: Array<WebComponentConstructor>) => void;
 
 		root: HTMLElement | ShadowRoot | null;
 		mounted: boolean;
 		template: string;
 		stylesheet: string;
+
 		$context: ObjectLiteral;
+		$refs: Refs;
 
 		updateContext: (ctx: ObjectLiteral) => void;
 
@@ -48,7 +70,14 @@ export declare global {
 		onDestroy: () => void;
 		onAdoption: () => void;
 		onUpdate: (name: string, oldValue: string, newValue: string) => void;
+		onError: (error: ErrorEvent) => void;
 		forceUpdate: () => void;
+
+		#ref?: HashedAttribute;
+		#repeat?: HashedAttribute;
+		#repeat_id?: HashedAttribute;
+		#if?: HashedAttribute;
+		#attr?: HashedAttribute;
 
 		[key: string]: any;
 	}
@@ -60,8 +89,9 @@ export declare global {
 		mode: ShadowRootModeExtended;
 		observedAttributes: Array<string>;
 		delegatesFocus: boolean;
-		register: (tagName?: string) =>  void
-		registerAll: (components: Array<WebComponentConstructor>) => void
-		isRegistered: boolean
+		register: (tagName?: string) =>  void;
+		registerAll: (components: Array<WebComponentConstructor>) => void;
+		isRegistered: boolean;
+		initialContext: ObjectLiteral;
 	}
 }
