@@ -10,7 +10,7 @@ export function parse(markup: string) {
 	while ((match = tagCommentPattern.exec(markup)) !== null) {
 		let [fullMatch, comment, closeOrBangSymbol, tagName, attributes, selfCloseSlash] = match;
 
-		tagName = tagName.toUpperCase();
+		tagName = tagName?.toUpperCase();
 
 		if (closeOrBangSymbol === '!') {
 			continue;

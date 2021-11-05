@@ -220,15 +220,19 @@ describe('parse', () => {
 
     expect(stringifyNode(p)).toBe('<p></p>');
     // @ts-ignore
-    expect(p['#if']).toEqual({
-      "prop": null,
-      "value": "true"
-    });
+    expect(p['#if']).toEqual([
+      {
+        "prop": null,
+        "value": "true"
+      }
+    ]);
     // @ts-ignore
-    expect(btn['#attr']).toEqual({
-      "prop": "disabled",
-      "value": "true"
-    });
+    expect(btn['#attr']).toEqual([
+      {
+        "prop": "disabled",
+        "value": "true"
+      }
+    ]);
   });
 
 })
