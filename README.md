@@ -1,4 +1,4 @@
-![cover](https://github.com/beforesemicolon/web-component/tree/develop/doc/cover@2x.jpg)
+![cover](https://github.com/beforesemicolon/web-component/blob/develop/doc/cover%402x.jpg)
 
 # Web Component
 A web component framework that simplifies how web components are created on the client with 
