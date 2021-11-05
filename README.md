@@ -1,14 +1,17 @@
-![cover](https://github.com/beforesemicolon/web-component/blob/develop/doc/cover%402x.jpg)
+![BFS Web Component Framework](https://github.com/beforesemicolon/web-component/blob/develop/doc/cover%402x.jpg)
 
-# Web Component
-A web component framework that simplifies how web components are created on the client with 
-automatic properties and attribute watch, template data binding and auto update on render and more.
+A lightweight and powerful web component framework intended to remove the tedious aspect of building reactive Web Components.
 
-------- `Web Component API As It Should Have Been` -------
+"`Web Component API As It Should Have Been`"
 
+🥇 Build ✅**Flexible, ✅ Extensible, and ✅Contextful Components** with **✅ Reactive Template**, 🥳**Directives**, **✅Data and Event Binding**
+with a **✅Simple and Lightweight** API right in Your Browser.
+
+🚫No JSX! 🚫No Tedious State Management and DOM Manipulation! 🚫No Robust Data Store and Context Setup! 🚫No Verbose API.
+
+### Example
+Declare a simple action button component
 ```js
-// app.js
-
 class ActionButton extends WebComponent {
   static observedAttributes = ['label', 'type', 'disabled', 'autofocus', 'name'];
   
@@ -47,6 +50,10 @@ class ActionButton extends WebComponent {
   }
 }
 
+ActionButton.register();
+```
+Create a simple list data renderer that uses a action button to request more data
+```js
 class PaginatedList extends WebComponent {
   static observedAttributes = ['tag-name', 'loading', 'items'];
   
@@ -71,7 +78,6 @@ class PaginatedList extends WebComponent {
 }
 
 PaginatedList.register();
-ActionButton.register();
 ```
 
 In your HTML you can simply use the tag normally.
