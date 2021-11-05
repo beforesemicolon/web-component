@@ -25,7 +25,7 @@ export class WebComponent extends HTMLElement {
 	private _unsubscribeCtx: () => void = () => {
 	};
 	private _hashedAttrs: Array<HashedAttribute> = ['#ref', '#if', '#repeat', '#attr'];
-	readonly refs: Refs = Object.create(null);
+	readonly $refs: Refs = Object.create(null);
 
 	constructor() {
 		super();
@@ -537,9 +537,11 @@ export class WebComponent extends HTMLElement {
 	private _handleIfAttribute(node: WebComponent) {
 		// console.log('-- _handleIfAttribute');
 		const attr = '#if';
+		// @ts-ignore
+		let {$item, $key} = node;
 		let {value, placeholderNode}: HashedAttributeValue = (node as ObjectLiteral)[attr][0];
 
-		const shouldRender = this._execString(value);
+		const shouldRender = this._execString(value, [$item, $key]);
 
 		if (!placeholderNode) {
 			(node as ObjectLiteral)[attr][0].placeholderNode = document.createComment(`${attr}: ${value}`);
@@ -578,7 +580,7 @@ export class WebComponent extends HTMLElement {
 		// @ts-ignore
 		clone.innerHTML = node.__oginner__;
 
-		for (let hAttr of ['#repeat_id', '#if', '#ref', '#attr']) {
+		for (let hAttr of ['#repeat_id', '#if', '#attr']) {
 			if ((node as ObjectLiteral)[hAttr]) {
 				// @ts-ignore
 				clone[hAttr] = node[hAttr];
@@ -595,8 +597,10 @@ export class WebComponent extends HTMLElement {
 		// console.log('-- _handleRepeatAttribute');
 		const attr = '#repeat';
 		const repeatAttr = '#repeat_id';
+		// @ts-ignore
+		let {$item, $key} = node;
 		let {value, placeholderNode}: HashedAttributeValue = (node as ObjectLiteral)[attr][0];
-		let repeatData = this._execString(value);
+		let repeatData = this._execString(value, [$item, $key]);
 		let index = 0;
 
 		if (!(node as ObjectLiteral)[repeatAttr]) {
@@ -675,9 +679,9 @@ export class WebComponent extends HTMLElement {
 		const attr = '#ref';
 		const {value}: HashedAttributeValue = (node as ObjectLiteral)[attr][0];
 
-		if (this.refs[value] === undefined) {
+		if (this.$refs[value] === undefined && !(node as ObjectLiteral)['#repeat']) {
 			if (/^[a-z$_][a-z0-9$_]*$/i.test(value)) {
-				Object.defineProperty(this.refs, value, {
+				Object.defineProperty(this.$refs, value, {
 					get() {
 						return node;
 					}
@@ -697,9 +701,13 @@ export class WebComponent extends HTMLElement {
 		(node as ObjectLiteral)[attr].forEach(({value, prop}: HashedAttributeValue ) => {
 			let parts = prop.split('.');
 			let property = '';
+			// @ts-ignore
+			let {$item, $key} = node;
 			const commaIdx = value.lastIndexOf(',');
 			const val = commaIdx >= 0 ? value.slice(0, commaIdx).trim() : '';
-			const shouldAdd = this._execString(commaIdx >= 0 ? value.slice(commaIdx + 1).trim() : value);
+			const shouldAdd = this._execString(
+				commaIdx >= 0 ? value.slice(commaIdx + 1).trim() : value,
+				[$item, $key]);
 
 			switch (parts[0]) {
 				case 'style':

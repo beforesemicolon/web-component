@@ -626,13 +626,13 @@ describe('WebComponent', () => {
                 document.body.appendChild(s);
 
                 expect(s.root?.innerHTML).toBe('<div></div>')
-                expect(s.refs.myRef).toBeDefined()
+                expect(s.$refs.myRef).toBeDefined()
             });
 
 			it('should allow to be used in template', () => {
 				class RefB extends WebComponent {
 					get template() {
-						return '<div #ref="myRef">{refs.myRef.nodeName}</div>{refs.myRef.childNodes.length}'
+						return '<div #ref="myRef">{$refs.myRef.nodeName}</div>{$refs.myRef.childNodes.length}'
 					}
 				}
 
@@ -642,13 +642,13 @@ describe('WebComponent', () => {
 				document.body.appendChild(s);
 
 				expect(s.root?.innerHTML).toBe('<div>DIV</div>1')
-				expect(s.refs.myRef).toBeDefined()
+				expect(s.$refs.myRef).toBeDefined()
 			});
 
 			it('should crashed if used before create in the template', (done) => {
 				class RefC extends WebComponent {
 					get template() {
-						return '{refs.myRef.nodeName}<div #ref="myRef"></div>'
+						return '{$refs.myRef.nodeName}<div #ref="myRef"></div>'
 					}
 
 					onError(error: ErrorEvent) {
@@ -912,15 +912,102 @@ describe('WebComponent', () => {
 				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li class="item-0">item 1</li><li class="item-1">item 2</li>');
 			});
 
-			// it('#if and #ref', () => {});
-			//
-			// it('#if and #attr', () => {});
-			//
-			// it('#repeat and #ref', () => {});
-			//
-			// it('#repeat and #attr', () => {});
-			//
-			// it('#attr and #ref', () => {});
+			it('#if and #ref', () => {
+				class ComboB extends WebComponent {
+					condition = false;
+
+					get template() {
+						return '<li #if="condition" class="item" #ref="item">my item</li>'
+					}
+				}
+
+				ComboB.register();
+				const s = new ComboB();
+
+				document.body.appendChild(s);
+
+				const initItemRef = s.$refs.item;
+
+				expect(s.root?.innerHTML).toBe('<!--#if: condition-->');
+				expect(initItemRef).toBeDefined();
+
+				s.condition = true;
+
+				expect(s.root?.innerHTML).toBe('<li class="item">my item</li>');
+				expect(initItemRef === s.$refs.item).toBeTruthy();
+			});
+
+			it('#if and #attr', () => {
+				class ComboC extends WebComponent {
+					condition = false;
+
+					get template() {
+						return '<li #if="condition" #attr.class.item="condition" #attr.id="unique, true">my item</li>'
+					}
+				}
+
+				ComboC.register();
+				const s = new ComboC();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<!--#if: condition-->');
+
+				s.condition = true;
+
+				expect(s.root?.innerHTML).toBe('<li class="item" id="unique">my item</li>');
+			});
+
+			it('#repeat and #ref', () => {
+				class ComboD extends WebComponent {
+					count = 2;
+
+					get template() {
+						return '<li #repeat="count" #ref="sample">{$item}-{$key}</li>'
+					}
+				}
+
+				ComboD.register();
+				const s = new ComboD();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li>1-0</li><li>2-1</li>');
+				expect(s.$refs.sample).toBeUndefined();
+			});
+
+			it('#repeat and #attr', () => {
+				class ComboE extends WebComponent {
+					count = 2;
+
+					get template() {
+						return '<li #repeat="count" #attr.data.test="sample, $key">{$item}-{$key}</li>'
+					}
+				}
+
+				ComboE.register();
+				const s = new ComboE();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<!--#repeat: count--><li>1-0</li><li data-test="sample">2-1</li>');
+			});
+
+			it('#attr and #ref', () => {
+				class ComboF extends WebComponent {
+					get template() {
+						return '<li #ref="item" #attr.data.test="sample, true">my item</li>'
+					}
+				}
+
+				ComboF.register();
+				const s = new ComboF();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<li data-test="sample">my item</li>');
+				expect(s.$refs.item).toBeDefined();
+			});
 		});
 	});
 });

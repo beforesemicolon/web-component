@@ -60,8 +60,9 @@ export declare global {
 		mounted: boolean;
 		template: string;
 		stylesheet: string;
+
 		$context: ObjectLiteral;
-		refs: Refs;
+		$refs: Refs;
 
 		updateContext: (ctx: ObjectLiteral) => void;
 
