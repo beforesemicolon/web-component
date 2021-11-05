@@ -25,7 +25,7 @@ export class WebComponent extends HTMLElement {
 	private _unsubscribeCtx: () => void = () => {
 	};
 	private _hashedAttrs: Array<HashedAttribute> = ['#if', '#repeat', '#ref', '#attr'];
-	private _refs: Refs = {};
+	refs: Refs = Object.create(null);
 
 	constructor() {
 		super();
@@ -168,10 +168,6 @@ export class WebComponent extends HTMLElement {
 		});
 	}
 
-	get refs(): Refs {
-		return this._refs;
-	}
-
 	updateContext(ctx: ObjectLiteral) {
 		this._context = {...this._context, ...ctx};
 
@@ -182,59 +178,63 @@ export class WebComponent extends HTMLElement {
 	}
 
 	connectedCallback() {
-		this._contextSource = this._getClosestWebComponentAncestor();
+		try {
+			this._contextSource = this._getClosestWebComponentAncestor();
 
-		if (this._contextSource) {
-			// force update the component if the ancestor context gets updated as well
-			this._unsubscribeCtx = this._contextSource.$context.subscribe((newContext: ObjectLiteral) => {
-				this.forceUpdate();
+			if (this._contextSource) {
+				// force update the component if the ancestor context gets updated as well
+				this._unsubscribeCtx = this._contextSource.$context.subscribe((newContext: ObjectLiteral) => {
+					this.forceUpdate();
 
-				if (this.mounted) {
-					this.onUpdate('$context', this._context, newContext)
-				}
-			})
-		}
-
-		/*
-		only need to parse the element the very first time it gets mounted
-
-		this will make sure that if the element is removed from the dom and mounted again
-		all that needs to be done if update the DOM to grab the possible new context and updated data
-		 */
-		if (this._parsed) {
-			this.forceUpdate();
-		} else {
-			setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
-				this.forceUpdate();
-
-				if (this.mounted) {
-					this.onUpdate(prop, oldValue, newValue);
-				}
-			})
-
-			let contentNode;
-
-			contentNode = parse(this.template);
-
-			this._render(contentNode);
-
-			// console.log('-- _trackers', this.constructor.name, this._trackers);
-
-			const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
-
-			const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
-
-			if (style) {
-				if (hasShadowRoot) {
-					this._root.innerHTML = style;
-				} else if (!document.head.querySelector(`style#${(this.constructor as WebComponentConstructor).tagName}`)) {
-					document.head.insertAdjacentHTML('beforeend', style);
-				}
+					if (this.mounted) {
+						this.onUpdate('$context', this._context, newContext)
+					}
+				})
 			}
 
-			this._parsed = true;
+			/*
+			only need to parse the element the very first time it gets mounted
 
-			this._root.appendChild(contentNode);
+			this will make sure that if the element is removed from the dom and mounted again
+			all that needs to be done if update the DOM to grab the possible new context and updated data
+			 */
+			if (this._parsed) {
+				this.forceUpdate();
+			} else {
+				setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
+					this.forceUpdate();
+
+					if (this.mounted) {
+						this.onUpdate(prop, oldValue, newValue);
+					}
+				})
+
+				let contentNode;
+
+				contentNode = parse(this.template);
+
+				this._render(contentNode);
+
+				// console.log('-- _trackers', this.constructor.name, this._trackers);
+
+				const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
+
+				const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
+
+				if (style) {
+					if (hasShadowRoot) {
+						this._root.innerHTML = style;
+					} else if (!document.head.querySelector(`style#${(this.constructor as WebComponentConstructor).tagName}`)) {
+						document.head.insertAdjacentHTML('beforeend', style);
+					}
+				}
+
+				this._parsed = true;
+
+				this._root.appendChild(contentNode);
+			}
+		} catch(e) {
+			this.onError(e as ErrorEvent);
 		}
 
 		this._mounted = true;
@@ -261,26 +261,30 @@ export class WebComponent extends HTMLElement {
 	}
 
 	attributeChangedCallback(name: string, oldValue: any, newValue: any) {
-		if (!(name.startsWith('data-') || name === 'class' || name === 'style')) {
-			const prop: any = turnKebabToCamelCasing(name);
+		try {
+			if (!(name.startsWith('data-') || name === 'class' || name === 'style')) {
+				const prop: any = turnKebabToCamelCasing(name);
 
-			if (booleanAttr.hasOwnProperty(prop)) {
-				newValue = this.hasAttribute(name);
-			} else if (typeof newValue === 'string') {
-				try {
-					newValue = JSON.parse(newValue);
-				} catch (e) {
+				if (booleanAttr.hasOwnProperty(prop)) {
+					newValue = this.hasAttribute(name);
+				} else if (typeof newValue === 'string') {
+					try {
+						newValue = JSON.parse(newValue);
+					} catch (e) {
+					}
+				}
+
+				// @ts-ignore
+				this[prop] = newValue;
+			} else {
+				this.forceUpdate();
+
+				if (this.mounted) {
+					this.onUpdate(name, oldValue, newValue);
 				}
 			}
-
-			// @ts-ignore
-			this[prop] = newValue;
-		} else {
-			this.forceUpdate();
-
-			if (this.mounted) {
-				this.onUpdate(name, oldValue, newValue);
-			}
+		} catch(e) {
+		    this.onError(e as ErrorEvent)
 		}
 	}
 
@@ -305,6 +309,13 @@ export class WebComponent extends HTMLElement {
 	 * livecycle callback for when element is moved into a new document
 	 */
 	onAdoption() {
+	}
+
+	/**
+     * error callback for when an error occurs
+     */
+	onError(error: ErrorEvent) {
+		console.error(error);
 	}
 
 	private _render(node: Node | HTMLElement | DocumentFragment | WebComponent) {
@@ -447,45 +458,49 @@ export class WebComponent extends HTMLElement {
 	}
 
 	private _updateTrackValue(track: NodeTrack) {
-		const {node, attributes, hashedAttrs, property} = track;
+		try {
+			const {node, attributes, hashedAttrs, property} = track;
 
-		for (let hashAttr of hashedAttrs) {
-			const res = this._hashedAttrHandlers[hashAttr](node as WebComponent);
+			for (let hashAttr of hashedAttrs) {
+				const res = this._hashedAttrHandlers[hashAttr](node as WebComponent);
 
-			if (!res) return;
-		}
+				if (!res) return;
+			}
 
-		if (property?.executables.length) {
-			let newValue = property.value;
+			if (property?.executables.length) {
+				let newValue = property.value;
 
-			property.executables.forEach((exc) => {
-				newValue = this._resolveExecutable(node, exc, newValue);
-			});
-
-			(node as ObjectLiteral)[property.name] = newValue;
-		}
-
-		for (let {name, value, executables} of attributes) {
-			if (executables.length) {
-				let newValue = value;
-
-				executables.forEach((exc) => {
+				property.executables.forEach((exc) => {
 					newValue = this._resolveExecutable(node, exc, newValue);
 				});
 
-				const camelName = turnKebabToCamelCasing(name);
+				(node as ObjectLiteral)[property.name] = newValue;
+			}
 
-				if ((node as ObjectLiteral)[camelName] !== undefined) {
-					try {
-						newValue = JSON.parse(newValue)
-					} catch (e) {
+			for (let {name, value, executables} of attributes) {
+				if (executables.length) {
+					let newValue = value;
+
+					executables.forEach((exc) => {
+						newValue = this._resolveExecutable(node, exc, newValue);
+					});
+
+					const camelName = turnKebabToCamelCasing(name);
+
+					if ((node as ObjectLiteral)[camelName] !== undefined) {
+						try {
+							newValue = JSON.parse(newValue)
+						} catch (e) {
+						}
+
+						(node as ObjectLiteral)[camelName] = newValue;
+					} else {
+						(node as HTMLElement).setAttribute(name, newValue);
 					}
-
-					(node as ObjectLiteral)[camelName] = newValue;
-				} else {
-					(node as HTMLElement).setAttribute(name, newValue);
 				}
 			}
+		} catch(e) {
+		    this.onError(e as ErrorEvent)
 		}
 	}
 
@@ -519,7 +534,7 @@ export class WebComponent extends HTMLElement {
 
 	private _handleIfAttribute(node: WebComponent) {
 		const attr = '#if';
-		const {value, placeholderNode}: HashedAttributeValue = (node as ObjectLiteral)[attr];
+		const {value, placeholderNode}: HashedAttributeValue = (node as ObjectLiteral)[attr][0];
 
 		const shouldRender = this._execString(value);
 
@@ -567,7 +582,7 @@ export class WebComponent extends HTMLElement {
 	private _handleRepeatAttribute(node: WebComponent | HTMLElement) {
 		const attr = '#repeat';
 		const repeatAttr = '#repeat_id';
-		const {value, placeholderNode}: HashedAttributeValue = (node as ObjectLiteral)['#repeat'];
+		const {value, placeholderNode}: HashedAttributeValue = (node as ObjectLiteral)['#repeat'][0];
 		let repeatData = this._execString(value);
 		let index = 0;
 
@@ -642,7 +657,7 @@ export class WebComponent extends HTMLElement {
 
 	private _handleRefAttribute(node: WebComponent) {
 		const attr = '#ref';
-		const {value}: HashedAttributeValue = (node as ObjectLiteral)[attr];
+		const {value}: HashedAttributeValue = (node as ObjectLiteral)[attr][0];
 
 		if (this.refs[value] === undefined) {
 			if (/^[a-z$_][a-z0-9$_]*$/i.test(value)) {
@@ -662,90 +677,93 @@ export class WebComponent extends HTMLElement {
 
 	private _handleAttrAttribute(node: WebComponent) {
 		const attr = '#attr';
-		const {value, prop}: HashedAttributeValue = (node as ObjectLiteral)[attr];
 
-		let parts = prop.split('.');
-		let property = '';
-		const commaIdx = value.indexOf(',');
-		const val = commaIdx >= 0 ? value.slice(0, commaIdx).trim() : '';
-		const shouldAdd = this._execString(commaIdx >= 0 ? value.slice(commaIdx + 1).trim() : value);
+		(node as ObjectLiteral)[attr].forEach(({value, prop}: HashedAttributeValue ) => {
+			let parts = prop.split('.');
+			let property = '';
+			const commaIdx = value.lastIndexOf(',');
+			const val = commaIdx >= 0 ? value.slice(0, commaIdx).trim() : '';
+			const shouldAdd = this._execString(commaIdx >= 0 ? value.slice(commaIdx + 1).trim() : value);
 
-		switch (parts[0]) {
-			case 'style':
-				property = parts.length ? parts[1] : '';
+			switch (parts[0]) {
+				case 'style':
+					property = parts.length ? parts[1] : '';
 
-				if (property) {
-					if (shouldAdd) {
-						(node as ObjectLiteral).style[property] = val;
-					} else {
-						(node as ObjectLiteral).style[property] = '';
-					}
-				} else {
-					val
-						.match(/([a-z][a-z-]+)(?=:):([^;]+)/g)
-						?.forEach(style => {
-							let [name, styleValue] = style.split(':');
-
-							if (shouldAdd) {
-								node.style.setProperty(name, styleValue);
-							} else {
-								const pattern = new RegExp(`${name}\\s*:\\s*${styleValue};?`, 'g');
-								node.setAttribute(
-									'style',
-									node.style.cssText.replace(pattern, ''))
-							}
-
-						})
-				}
-
-				break;
-			case 'class':
-				property = parts.length ? parts[1] : '';
-
-				if (property) {
-					if (shouldAdd) {
-						node.classList.add(property);
-					} else {
-						node.classList.remove(property);
-					}
-				} else {
-					const classes = val.split(/\s+/g);
-
-					if (shouldAdd) {
-						classes.forEach(cls => node.classList.add(cls));
-					} else {
-						classes.forEach(cls => node.classList.remove(cls));
-					}
-				}
-				break;
-			case 'data':
-				property = parts.length ? parts[1] : '';
-
-				if (property) {
-					if (shouldAdd) {
-						node.dataset[property] = val;
-					} else {
-						node.removeAttribute(`data-${turnCamelToKebabCasing(property)}`)
-					}
-				}
-				break;
-			default:
-				property = parts.length ? parts[0] : '';
-				const kebabProp = turnCamelToKebabCasing(property);
-
-				if (property) {
-					if (shouldAdd) {
-						if ((node as ObjectLiteral)[property] !== undefined) {
-							(node as ObjectLiteral)[property] = booleanAttr.hasOwnProperty(property)
-								|| (val || `${shouldAdd}`);
+					if (property) {
+						if (shouldAdd) {
+							(node as ObjectLiteral).style[property] = val;
 						} else {
-							node.setAttribute(kebabProp, val);
+							(node as ObjectLiteral).style[property] = '';
 						}
 					} else {
-						node.removeAttribute(kebabProp);
+						val
+							.match(/([a-z][a-z-]+)(?=:):([^;]+)/g)
+							?.forEach(style => {
+								let [name, styleValue] = style.split(':');
+								name = name.trim();
+								styleValue = styleValue.trim();
+
+								if (shouldAdd) {
+									node.style.setProperty(name, styleValue);
+								} else {
+									const pattern = new RegExp(`${name}\\s*:\\s*${styleValue};?`, 'g');
+									node.setAttribute(
+										'style',
+										node.style.cssText.replace(pattern, ''))
+								}
+
+							})
 					}
-				}
-		}
+
+					break;
+				case 'class':
+					property = parts.length ? parts[1] : '';
+
+					if (property) {
+						if (shouldAdd) {
+							node.classList.add(property);
+						} else {
+							node.classList.remove(property);
+						}
+					} else {
+						const classes = val.split(/\s+/g);
+
+						if (shouldAdd) {
+							classes.forEach(cls => node.classList.add(cls));
+						} else {
+							classes.forEach(cls => node.classList.remove(cls));
+						}
+					}
+					break;
+				case 'data':
+					property = parts.length ? parts[1] : '';
+
+					if (property) {
+						if (shouldAdd) {
+							node.dataset[property] = val;
+						} else {
+							node.removeAttribute(`data-${turnCamelToKebabCasing(property)}`)
+						}
+					}
+					break;
+				default:
+					property = parts.length ? parts[0] : '';
+					const kebabProp = turnCamelToKebabCasing(property);
+
+					if (property) {
+						if (shouldAdd) {
+							if ((node as ObjectLiteral)[property] !== undefined) {
+								(node as ObjectLiteral)[property] = booleanAttr.hasOwnProperty(property)
+									|| (val || `${shouldAdd}`);
+							} else {
+								node.setAttribute(kebabProp, val);
+							}
+						} else {
+							node.removeAttribute(kebabProp);
+						}
+					}
+			}
+		})
 
 		return node;
 	}

@@ -69,6 +69,7 @@ export declare global {
 		onDestroy: () => void;
 		onAdoption: () => void;
 		onUpdate: (name: string, oldValue: string, newValue: string) => void;
+		onError: (error: ErrorEvent) => void;
 		forceUpdate: () => void;
 
 		#ref?: HashedAttribute;

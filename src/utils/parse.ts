@@ -82,7 +82,11 @@ function setAttributes(node: HTMLElement, attributes: string) {
 			// this is a special handler for custom attributes since its syntax is not allowed
 			// for HTML attributes allowing this parser to work with normal DOM elements
 			// @ts-ignore
-			node[name] = {value, prop};
+			if (node[name] === undefined) {
+				(node as any)[name] = [{value, prop}]
+			} else {
+				(node as any)[name].push({value, prop})
+			}
 		} else {
 			node.setAttribute(name, value ?? '');
 		}
