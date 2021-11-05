@@ -215,8 +215,6 @@ export class WebComponent extends HTMLElement {
 
 				this._render(contentNode);
 
-				// console.log('-- _trackers', this.constructor.name, this._trackers);
-
 				const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
 
 				const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
@@ -535,7 +533,6 @@ export class WebComponent extends HTMLElement {
 	}
 
 	private _handleIfAttribute(node: WebComponent) {
-		// console.log('-- _handleIfAttribute');
 		const attr = '#if';
 		// @ts-ignore
 		let {$item, $key} = node;
@@ -594,7 +591,6 @@ export class WebComponent extends HTMLElement {
 	}
 
 	private _handleRepeatAttribute(node: WebComponent | HTMLElement, clear = false) {
-		// console.log('-- _handleRepeatAttribute');
 		const attr = '#repeat';
 		const repeatAttr = '#repeat_id';
 		// @ts-ignore
