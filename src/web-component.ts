@@ -231,12 +231,12 @@ export class WebComponent extends HTMLElement {
 
 				this._root.appendChild(contentNode);
 			}
-		} catch(e) {
+
+			this._mounted = true;
+			this.onMount();
+		} catch (e) {
 			this.onError(e as ErrorEvent);
 		}
-
-		this._mounted = true;
-		this.onMount();
 	}
 
 	/**
@@ -246,10 +246,14 @@ export class WebComponent extends HTMLElement {
 	}
 
 	disconnectedCallback() {
-		this._contextSource = null;
-		this._mounted = false;
-		this._unsubscribeCtx();
-		this.onDestroy();
+		try {
+			this._contextSource = null;
+			this._mounted = false;
+			this._unsubscribeCtx();
+			this.onDestroy();
+		} catch (e) {
+			this.onError(e as Error)
+		}
 	}
 
 	/**
@@ -281,8 +285,8 @@ export class WebComponent extends HTMLElement {
 					this.onUpdate(name, oldValue, newValue);
 				}
 			}
-		} catch(e) {
-		    this.onError(e as ErrorEvent)
+		} catch (e) {
+			this.onError(e as ErrorEvent)
 		}
 	}
 
@@ -300,7 +304,11 @@ export class WebComponent extends HTMLElement {
 	}
 
 	adoptedCallback() {
-		this.onAdoption();
+		try {
+			this.onAdoption();
+		} catch (e) {
+			this.onError(e as Error)
+		}
 	}
 
 	/**
@@ -310,10 +318,10 @@ export class WebComponent extends HTMLElement {
 	}
 
 	/**
-     * error callback for when an error occurs
-     */
-	onError(error: ErrorEvent) {
-		console.error(error);
+	 * error callback for when an error occurs
+	 */
+	onError(error: ErrorEvent | Error) {
+		console.error(this.constructor.name, error);
 	}
 
 	private _render(node: Node | HTMLElement | DocumentFragment | WebComponent) {
@@ -342,11 +350,17 @@ export class WebComponent extends HTMLElement {
 				for (let attribute of node.attributes) {
 					if (attribute.name.startsWith('on')) {
 						const eventName = attribute.name.slice(2).toLowerCase().replace(/^on/, '');
-						handlers.push({
-							eventName,
-							attribute: attribute.name,
-							handler: getComponentNodeEventListener(this, attribute.name, attribute.value)
-						});
+						const handler = getComponentNodeEventListener(this, attribute.name, attribute.value);
+
+						if (handler) {
+							handlers.push({
+								eventName,
+								attribute: attribute.name,
+								handler
+							});
+						} else {
+							this.onError(new Error(`${this.constructor.name}: Invalid event handler for "${attribute.name}" >>> "${attribute.value}".`))
+						}
 					} else {
 						attributes.push(attribute)
 					}
@@ -498,7 +512,7 @@ export class WebComponent extends HTMLElement {
 						}
 					}
 				}
-			} catch(e) {
+			} catch (e) {
 				this.onError(e as ErrorEvent)
 			}
 		}
@@ -625,9 +639,9 @@ export class WebComponent extends HTMLElement {
 			times = repeatData;
 		} else {
 			repeatData = repeatData instanceof Set ? Object.entries(Array.from(repeatData))
-					: repeatData instanceof Map ? Array.from(repeatData.entries())
-						: repeatData[Symbol.iterator] ? Object.entries([...repeatData])
-							: Object.entries(repeatData);
+				: repeatData instanceof Map ? Array.from(repeatData.entries())
+					: repeatData[Symbol.iterator] ? Object.entries([...repeatData])
+						: Object.entries(repeatData);
 			times = repeatData.length;
 		}
 
@@ -685,7 +699,7 @@ export class WebComponent extends HTMLElement {
 				return node;
 			}
 
-			throw new Error(`Invalid #ref property name "${value}"`)
+			this.onError(new Error(`Invalid #ref property name "${value}"`))
 		}
 
 		return node;
@@ -694,7 +708,7 @@ export class WebComponent extends HTMLElement {
 	private _handleAttrAttribute(node: WebComponent) {
 		const attr = '#attr';
 
-		(node as ObjectLiteral)[attr].forEach(({value, prop}: HashedAttributeValue ) => {
+		(node as ObjectLiteral)[attr].forEach(({value, prop}: HashedAttributeValue) => {
 			let parts = prop.split('.');
 			let property = '';
 			// @ts-ignore

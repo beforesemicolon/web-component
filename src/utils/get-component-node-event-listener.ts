@@ -16,12 +16,7 @@ export function getComponentNodeEventListener(component: WebComponent, name: str
 
 			if (typeof component[fnName] === 'function') {
 				return (event: Event) => func.call(component, event);
-			} else {
-				throw new Error(`${component.constructor.name}: "${fnName}" is not a function`);
 			}
 		}
 	}
-
-	throw new Error(`${component.constructor.name}: Invalid event handler for "${name}" >>> "${value}".`);
-
 }
