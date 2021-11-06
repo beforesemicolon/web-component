@@ -607,7 +607,7 @@ export class WebComponent extends HTMLElement {
 
 		this._updateNodeRepeatKeyAndItem(clone as HTMLElement, index, list)
 
-		this._render(clone, this._trackers.get(node)?.directives.filter(d => d === 'repeat'));
+		this._render(clone, this._trackers.get(node)?.directives.filter(d => d !== 'repeat' && d !== 'ref'));
 
 		return clone;
 	}
@@ -714,7 +714,6 @@ export class WebComponent extends HTMLElement {
 	}
 
 	private _handleAttrAttribute(node: WebComponent) {
-		console.log('-- _handleAttrAttribute');
 		const attr = 'attr';
 
 		(node as ObjectLiteral)[attr].forEach(({value, prop}: DirectiveValue ) => {

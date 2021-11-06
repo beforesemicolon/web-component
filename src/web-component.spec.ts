@@ -846,6 +846,12 @@ describe('WebComponent', () => {
 
 				s.count = Array.from({length: 3}, (_, i) => i+1);
 
+				s.count = 1;
+
+				expect(s.root?.innerHTML).toBe('<!--repeat: count--><li class="item-0">item 1</li>');
+
+				s.count = Array.from({length: 3}, (_, i) => i+1);
+
 				expect(s.root?.innerHTML).toBe('<!--repeat: count--><li class="item-0">item 1</li><li class="item-1">item 2</li><li class="item-2">item 3</li>');
 
 				s.count = new Set([2, 4, 6]);
@@ -990,7 +996,7 @@ describe('WebComponent', () => {
 
 				document.body.appendChild(s);
 
-				expect(s.root?.innerHTML).toBe('<!--repeat: count--><li>1-0</li><li>2-1</li>');
+				expect(s.root?.innerHTML).toBe('<!--repeat: count--><li>1-0</li><li data-test="sample">2-1</li>');
 			});
 
 			it('attr and ref', () => {
