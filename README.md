@@ -10,6 +10,10 @@ with a **✅ Simple and Lightweight** API right in Your Browser.
 🚫 No Tedious State Management and DOM Manipulation! 🚫 No Robust Data Store and Context Setup! 🚫 No Verbose API! 🚫 No JSX! 
 🚫 No Weird HTML or Javascript Syntax!
 
+
+**Learn More From The [Documentation](https://github.com/beforesemicolon/web-component#documentation)**
+
+
 ### Example
 Declare a simple action button component
 ```js
