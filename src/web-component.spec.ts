@@ -611,7 +611,7 @@ describe('WebComponent', () => {
 		});
 	});
 
-	describe('hashed attributes', () => {
+	describe('directives', () => {
 		describe('#ref', () => {
 			it('should set ref attribute', () => {
                 class RefA extends WebComponent {

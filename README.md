@@ -7,7 +7,7 @@ A lightweight and powerful web component framework intended to remove the tediou
 🥇 Build **✅ Flexible, ✅ Extensible, and ✅ Contextful Components** with **✅ Reactive Template**, **🥳 Directives**, **✅ Data and Event Binding**
 with a **✅ Simple and Lightweight** API right in Your Browser.
 
-🚫 No JSX! 🚫 No Tedious State Management and DOM Manipulation! 🚫 No Robust Data Store and Context Setup! 🚫 No Verbose API.
+🚫 No Tedious State Management and DOM Manipulation! 🚫 No Robust Data Store and Context Setup! 🚫 No Verbose API. 🚫 No JSX!
 
 ### Example
 Declare a simple action button component
@@ -158,3 +158,4 @@ require('esbuild').build({
 - [Directives](https://github.com/beforesemicolon/web-component/blob/master/doc/directives.md)
 - [LiveCycles](https://github.com/beforesemicolon/web-component/blob/master/doc/livecycles.md)
 - [Styling](https://github.com/beforesemicolon/web-component/blob/master/doc/stylesheet.md)
+- [Error Handling](https://github.com/beforesemicolon/web-component/blob/master/doc/errors.md)
