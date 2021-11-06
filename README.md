@@ -7,7 +7,8 @@ A lightweight and powerful web component framework intended to remove the tediou
 🥇 Build **✅ Flexible, ✅ Extensible, and ✅ Contextful Components** with **✅ Reactive Template**, **🥳 Directives**, **✅ Data and Event Binding**
 with a **✅ Simple and Lightweight** API right in Your Browser.
 
-🚫 No Tedious State Management and DOM Manipulation! 🚫 No Robust Data Store and Context Setup! 🚫 No Verbose API. 🚫 No JSX!
+🚫 No Tedious State Management and DOM Manipulation! 🚫 No Robust Data Store and Context Setup! 🚫 No Verbose API! 🚫 No JSX! 
+🚫 No Weird HTML or Javascript Syntax!
 
 ### Example
 Declare a simple action button component
@@ -35,9 +36,9 @@ class ActionButton extends WebComponent {
       <button 
         class="my-button" 
         type="{type || 'button'}"
-        #attr.disabled="disabled"
-        #attr.autofocus="autofocus"
-        #attr.name="name"
+        attr.disabled="disabled"
+        attr.autofocus="autofocus"
+        attr.name="name"
         onclick="handleClick($event)"
         >
         <slot>{label}</slot>
@@ -59,14 +60,14 @@ class PaginatedList extends WebComponent {
   
   get template() {
     return `
-      <p #if="loading">
+      <p if="loading">
         <slot name="loading">loading...</slot>
       </p>
-      <p #if="!loading && !items.length">
+      <p if="!loading && !items.length">
         <slot name="empty">List is Empty</slot>
       </p>
-      <div #if="!loading && items.length" class="paginated-list">
-        <${this.tagName || 'div'} #repeat="items" details="{$item}">{$item}</${this.tagName || 'div'}>
+      <div if="!loading && items.length" class="paginated-list">
+        <${this.tagName || 'div'} repeat="items" details="{$item}">{$item}</${this.tagName || 'div'}>
         <action-button onclick="loadMore()">load more</action-button>
       </div>
     `;

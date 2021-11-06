@@ -17,7 +17,7 @@ export declare global {
 			value: string;
 			executables: Array<Executable>;
 		}>;
-		hashedAttrs: Array<HashedAttribute>;
+		directives: Array<Directive>;
 		property: null | {
 			name: string;
 			value: string;
@@ -25,9 +25,9 @@ export declare global {
 		};
 	}
 
-	export type HashedAttribute = '#attr' | '#ref' | '#repeat' | '#if';
+	export type Directive = 'attr' | 'ref' | 'repeat' | 'if';
 
-	export interface HashedAttributeValue {
+	export interface DirectiveValue {
 		value: string;
 		prop: string;
 		placeholderNode?: Comment;
@@ -73,11 +73,11 @@ export declare global {
 		onError: (error: ErrorEvent) => void;
 		forceUpdate: () => void;
 
-		#ref?: HashedAttribute;
-		#repeat?: HashedAttribute;
-		#repeat_id?: HashedAttribute;
-		#if?: HashedAttribute;
-		#attr?: HashedAttribute;
+		ref?: Directive;
+		repeat?: Directive;
+		repeat_id?: Directive;
+		if?: Directive;
+		attr?: Directive;
 
 		[key: string]: any;
 	}

@@ -14,7 +14,7 @@ describe('getComponentNodeEventListener', () => {
 		btn.onClick = jest.fn();
 		btn.clicked = jest.fn();
 
-		let handler = getComponentNodeEventListener(btn as any, 'click', 'clicked("sample", 300)');
+		let handler = getComponentNodeEventListener(btn as any, 'click', 'clicked("sample", 300)') as any;
 
 		expect(handler.toString()).toEqual('(event) => func.call(component, event)')
 
@@ -36,20 +36,14 @@ describe('getComponentNodeEventListener', () => {
 		jest.resetAllMocks();
 	});
 
-	it('should throw error if function does not exist or is not a function', () => {
-		expect(() => getComponentNodeEventListener(btn as any, 'click', 'onTest()'))
-			.toThrowError('Button: "onTest" is not a function')
-		expect(() => getComponentNodeEventListener(btn as any, 'click', 'sampler()'))
-			.toThrowError('Button: "sampler" is not a function')
-	});
-
-	it('should throw error it handler is not supported', () => {
-		expect(() => getComponentNodeEventListener(btn as any, 'click', 'onClick'))
-			.toThrowError('Button: Invalid event handler for "click" >>> "onClick".')
+	it('should return null if function does not exist or is not a function', () => {
+		expect(getComponentNodeEventListener(btn as any, 'click', 'onTest()')).toBeNull()
+		expect(getComponentNodeEventListener(btn as any, 'click', 'sampler()')).toBeNull()
+		expect(getComponentNodeEventListener(btn as any, 'click', 'onClick')).toBeNull()
 	});
 
 	it('should get listener with executables', () => {
-		let handler = getComponentNodeEventListener(btn as any, 'click', '{this.sampler = [2, 4, 6]}');
+		let handler = getComponentNodeEventListener(btn as any, 'click', '{this.sampler = [2, 4, 6]}') as any;
 
 		expect(handler.toString()).toEqual('(event) => fn.call(component, event, ...props.map(prop => component[prop]))');
 
