@@ -190,6 +190,8 @@ export class WebComponent extends HTMLElement {
 					if (this.mounted) {
 						this.onUpdate('$context', this._context, newContext)
 					}
+
+					this._contextSubscribers.forEach(cb => cb(newContext));
 				})
 			}
 
