@@ -417,6 +417,10 @@ export class WebComponent extends HTMLElement {
 	}
 
 	private _execString(executable: string, [$item, $key]: any[] = []) {
+		if (!executable.trim()) {
+            return;
+        }
+
 		const keys = new Set(Object.getOwnPropertyNames(this).filter((n) => !n.startsWith('_') && !this._directives.has(n as Directive)));
 		const ctx = this.$context;
 		keys.add('$context');
@@ -707,7 +711,7 @@ export class WebComponent extends HTMLElement {
 				return node;
 			}
 
-			this.onError(new Error(`Invalid #ref property name "${value}"`))
+			this.onError(new Error(`Invalid "ref" property name "${value}"`))
 		}
 
 		return node;
@@ -717,20 +721,22 @@ export class WebComponent extends HTMLElement {
 		const attr = 'attr';
 
 		(node as ObjectLiteral)[attr].forEach(({value, prop}: DirectiveValue ) => {
-			let parts = prop.split('.');
-			let property = '';
-			// @ts-ignore
-			let {$item, $key} = node;
+			let [attrName, property] = prop.split('.');
+			let {$item, $key} = node as ObjectLiteral;
 			const commaIdx = value.lastIndexOf(',');
-			const val = commaIdx >= 0 ? value.slice(0, commaIdx).trim() : '';
+			let val = commaIdx >= 0 ? value.slice(0, commaIdx).trim() : '';
 			const shouldAdd = this._execString(
 				commaIdx >= 0 ? value.slice(commaIdx + 1).trim() : value,
 				[$item, $key]);
 
-			switch (parts[0]) {
-				case 'style':
-					property = parts.length ? parts[1] : '';
+			if (val) {
+				extractExecutableSnippetFromString(val).forEach((exc) => {
+					val = this._resolveExecutable(node, exc, val);
+				});
+			}
 
+			switch (attrName) {
+				case 'style':
 					if (property) {
 						property = turnKebabToCamelCasing(property);
 
@@ -761,8 +767,6 @@ export class WebComponent extends HTMLElement {
 
 					break;
 				case 'class':
-					property = parts.length ? parts[1] : '';
-
 					if (property) {
 						if (shouldAdd) {
 							node.classList.add(property);
@@ -780,8 +784,6 @@ export class WebComponent extends HTMLElement {
 					}
 					break;
 				case 'data':
-					property = parts.length ? parts[1] : '';
-
 					if (property) {
 						if (shouldAdd) {
 							node.dataset[turnKebabToCamelCasing(property)] = val;
@@ -791,15 +793,13 @@ export class WebComponent extends HTMLElement {
 					}
 					break;
 				default:
-					property = parts.length ? parts[0] : '';
-					const kebabProp = turnCamelToKebabCasing(property);
-
-					if (property) {
+					if (attrName) {
+						const kebabProp = turnCamelToKebabCasing(attrName);
 						if (shouldAdd) {
-							const idealVal = booleanAttr.hasOwnProperty(property) || val || `${shouldAdd}`;
+							const idealVal = booleanAttr.hasOwnProperty(attrName) || val || `${shouldAdd}`;
 
-							if ((node as ObjectLiteral)[property] !== undefined) {
-								(node as ObjectLiteral)[property] = idealVal;
+							if ((node as ObjectLiteral)[attrName] !== undefined) {
+								(node as ObjectLiteral)[attrName] = idealVal;
 							} else {
 								node.setAttribute(kebabProp, idealVal.toString());
 							}

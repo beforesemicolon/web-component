@@ -213,26 +213,4 @@ describe('parse', () => {
     });
   });
 
-  it('should handle hashed attribute', () => {
-    const root = parse('<p #if="true"></p><button #attr.disabled="true"></button>');
-    const p = root.children[0];
-    const btn = root.children[1];
-
-    expect(stringifyNode(p)).toBe('<p></p>');
-    // @ts-ignore
-    expect(p['#if']).toEqual([
-      {
-        "prop": null,
-        "value": "true"
-      }
-    ]);
-    // @ts-ignore
-    expect(btn['#attr']).toEqual([
-      {
-        "prop": "disabled",
-        "value": "true"
-      }
-    ]);
-  });
-
 })

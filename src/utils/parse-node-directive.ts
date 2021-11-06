@@ -1,4 +1,4 @@
-export function parseNodeDirective(node: HTMLElement, name: string, value: string): Directive {
+export function parseNodeDirective(node: Element, name: string, value: string): Directive {
 	const ogName = name;
 	const dot = name.indexOf('.');
 	let prop = null;

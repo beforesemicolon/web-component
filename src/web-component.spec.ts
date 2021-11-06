@@ -669,9 +669,10 @@ describe('WebComponent', () => {
 				class AttrA extends WebComponent {
 					check1 = true;
 					check2 = true;
+					val = 'attr'
 
 					get template() {
-						return '<div attr.class.test="check1" attr.class="sample, check2">'
+						return '<div attr.class.test="check1" attr.class="sample-{val}, check2">'
 					}
 				}
 
@@ -680,24 +681,26 @@ describe('WebComponent', () => {
 
 				document.body.appendChild(s);
 
-				expect(s.root?.innerHTML).toBe('<div class="test sample"></div>')
+				expect(s.root?.innerHTML).toBe('<div class="test sample-attr"></div>')
 
 				s.check1 = false;
 
-				expect(s.root?.innerHTML).toBe('<div class="sample"></div>')
+				expect(s.root?.innerHTML).toBe('<div class="sample-attr"></div>')
 
 				s.check1 = true;
 
-				expect(s.root?.innerHTML).toBe('<div class="sample test"></div>')
+				expect(s.root?.innerHTML).toBe('<div class="sample-attr test"></div>')
 			});
 
 			it('should handle style attribute', () => {
 				class AttrB extends WebComponent {
 					check1 = true;
 					check2 = true;
+					errorColor = 'red';
+					textColor = 'white';
 
 					get template() {
-						return '<div attr.style="color: white, check1" attr.style.background-color="red, check2">'
+						return '<div attr.style="color: {textColor}, check1" attr.style.background-color="{errorColor}, check2">'
 					}
 				}
 
@@ -721,9 +724,10 @@ describe('WebComponent', () => {
 				class AttrC extends WebComponent {
 					check1 = true;
 					check2 = true;
+					status = 'good';
 
 					get template() {
-						return '<div attr.data.sample-test="good, check1" attr.data.dashed-sample="great, check2">'
+						return '<div attr.data.sample-test="{status}, check1" attr.data.dashed-sample="great, check2">'
 					}
 				}
 
@@ -821,6 +825,28 @@ describe('WebComponent', () => {
 
 				expect(s.root?.innerHTML).toBe('<button>click me</button>');
 			});
+
+			it('should handle nested if', () => {
+				class IfB extends WebComponent {
+					check = true;
+					icon = '';
+
+					get template() {
+						return '<button if="check">click me <span if="icon">{icon}</span></button>'
+					}
+				}
+
+				IfB.register();
+				const s = new IfB();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<button>click me <!--if: icon--></button>');
+
+				s.icon = 'star';
+
+				expect(s.root?.innerHTML).toBe('<button>click me <span>star</span></button>');
+			});
 		});
 
 		describe('should handle repeat', () => {
@@ -880,6 +906,32 @@ describe('WebComponent', () => {
 
 				expect(s.root?.innerHTML).toBe('<!--repeat: count--><li class="item-0">item 500</li><li class="item-1">item 250</li><li class="item-2">item 50</li>');
 
+			});
+
+			it('should handle nested repeats', () => {
+				class RepeatB extends WebComponent {
+					count: any = 2;
+					innerCount: any = 2;
+
+					get template() {
+						return '<li repeat="count" class="item-{$key}">item {$item} <span repeat="innerCount">{$item}</span></li>'
+					}
+				}
+
+				RepeatB.register();
+				const s = new RepeatB();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<!--repeat: count--><li class="item-0">item 1 <!--repeat: innerCount--><span>1</span><span>2</span></li><li class="item-1">item 2 <!--repeat: innerCount--><span>1</span><span>2</span></li>');
+
+				s.count = 1;
+
+				expect(s.root?.innerHTML).toBe('<!--repeat: count--><li class="item-0">item 1 <!--repeat: innerCount--><span>1</span><span>2</span></li>');
+
+				s.innerCount = 3;
+
+				expect(s.root?.innerHTML).toBe('<!--repeat: count--><li class="item-0">item 1 <!--repeat: innerCount--><span>1</span><span>2</span><span>3</span></li>');
 			});
 		});
 

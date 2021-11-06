@@ -19,4 +19,6 @@ export function getComponentNodeEventListener(component: WebComponent, name: str
 			}
 		}
 	}
+
+	return null;
 }
