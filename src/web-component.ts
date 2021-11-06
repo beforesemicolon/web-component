@@ -7,6 +7,7 @@ import {turnKebabToCamelCasing} from './utils/turn-kebab-to-camel-casing';
 import {getStyleString} from './utils/get-style-string';
 import {getComponentNodeEventListener} from './utils/get-component-node-event-listener';
 import {evaluateStringInComponentContext} from './utils/evaluate-string-in-component-context';
+import {parseNodeDirective} from "./utils/parse-node-directive";
 import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
 import booleanAttr from './utils/boolean-attributes.json';
 
@@ -24,7 +25,7 @@ export class WebComponent extends HTMLElement {
 	private _contextSubscribers: Array<ObserverCallback> = [];
 	private _unsubscribeCtx: () => void = () => {
 	};
-	private _hashedAttrs: Array<HashedAttribute> = ['#ref', '#if', '#repeat', '#attr'];
+	private _directives: Set<Directive> = new Set(['ref', 'if', 'repeat', 'attr']);
 	readonly $refs: Refs = Object.create(null);
 
 	constructor() {
@@ -61,7 +62,7 @@ export class WebComponent extends HTMLElement {
 
 	/**
 	 * an array of attribute names as they will look in the html tag
-	 * https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements#using_the_lifecycle_callbacks
+	 * https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elementsusing_the_lifecycle_callbacks
 	 * @type {[]}
 	 */
 	static observedAttributes: Array<string> = [];
@@ -222,7 +223,7 @@ export class WebComponent extends HTMLElement {
 				if (style) {
 					if (hasShadowRoot) {
 						this._root.innerHTML = style;
-					} else if (!document.head.querySelector(`style#${(this.constructor as WebComponentConstructor).tagName}`)) {
+					} else if (!document.head.querySelector(`style${(this.constructor as WebComponentConstructor).tagName}`)) {
 						document.head.insertAdjacentHTML('beforeend', style);
 					}
 				}
@@ -324,7 +325,7 @@ export class WebComponent extends HTMLElement {
 		console.error(this.constructor.name, error);
 	}
 
-	private _render(node: Node | HTMLElement | DocumentFragment | WebComponent) {
+	private _render(node: Node | HTMLElement | DocumentFragment | WebComponent, directives: Directive[] = []) {
 		if (node.nodeName === '#text') {
 			if (node.nodeValue?.trim()) {
 				this._trackNode(node as Node, [], [], {
@@ -335,35 +336,41 @@ export class WebComponent extends HTMLElement {
 			}
 		} else if (node.nodeType === 1) {
 			const handlers = [];
-			const hashedAttrs: Array<HashedAttribute> = [];
 			const attributes = [];
 
-			for (let hashAttr of this._hashedAttrs) {
-				if (node.hasOwnProperty(hashAttr)) {
-					hashedAttrs.push(hashAttr);
-				}
-			}
-
 			// @ts-ignore
-			if (node.attributes.length) {
-				// @ts-ignore
-				for (let attribute of node.attributes) {
-					if (attribute.name.startsWith('on')) {
-						const eventName = attribute.name.slice(2).toLowerCase().replace(/^on/, '');
-						const handler = getComponentNodeEventListener(this, attribute.name, attribute.value);
-
-						if (handler) {
-							handlers.push({
-								eventName,
-								attribute: attribute.name,
-								handler
-							});
-						} else {
-							this.onError(new Error(`${this.constructor.name}: Invalid event handler for "${attribute.name}" >>> "${attribute.value}".`))
-						}
-					} else {
-						attributes.push(attribute)
+			for (let attribute of [...node.attributes]) {
+				if (/^(attr\.|ref|if|repeat)/.test(attribute.name)) {
+					const directiveName = parseNodeDirective(node as HTMLElement, attribute.name, attribute.value);
+					switch (directiveName){
+						case 'ref':
+							directives[0] = directiveName;
+							break;
+						case 'if':
+							directives[1] = directiveName;
+							break;
+						case 'repeat':
+							directives[2] = directiveName;
+							break;
+						case 'attr':
+							directives[3] = directiveName;
+							break;
 					}
+				} else if (attribute.name.startsWith('on')) {
+					const eventName = attribute.name.slice(2).toLowerCase().replace(/^on/, '');
+					const handler = getComponentNodeEventListener(this, attribute.name, attribute.value);
+
+					if (handler) {
+						handlers.push({
+							eventName,
+							attribute: attribute.name,
+							handler
+						});
+					} else {
+						this.onError(new Error(`${this.constructor.name}: Invalid event handler for "${attribute.name}" >>> "${attribute.value}".`))
+					}
+				} else {
+					attributes.push(attribute)
 				}
 			}
 
@@ -372,20 +379,20 @@ export class WebComponent extends HTMLElement {
 				node.addEventListener(eventName, handler)
 			})
 
-			this._trackNode(node, attributes, hashedAttrs);
+			this._trackNode(node, attributes, directives.filter(d => d));
 		}
 
 		node.childNodes.forEach(node => this._render(node));
 	}
 
-	private _trackNode(node: HTMLElement | Node, attributes: Array<Attr>, hashedAttrs: Array<HashedAttribute>, property: NodeTrack['property'] | null = null) {
+	private _trackNode(node: HTMLElement | Node, attributes: Array<Attr>, directives: Array<Directive>, property: NodeTrack['property'] | null = null) {
 		if (this._trackers.has(node)) {
 			this._updateTrackValue(this._trackers.get(node) as NodeTrack);
 		} else {
 			const track: NodeTrack = {
 				node,
 				attributes: [],
-				hashedAttrs,
+				directives,
 				property
 			};
 
@@ -410,7 +417,11 @@ export class WebComponent extends HTMLElement {
 	}
 
 	private _execString(executable: string, [$item, $key]: any[] = []) {
-		const keys = new Set(Object.getOwnPropertyNames(this).filter(n => !n.startsWith('_') && !n.startsWith('#')));
+		if (!executable.trim()) {
+            return;
+        }
+
+		const keys = new Set(Object.getOwnPropertyNames(this).filter((n) => !n.startsWith('_') && !this._directives.has(n as Directive)));
 		const ctx = this.$context;
 		keys.add('$context');
 		keys.add('$item');
@@ -472,10 +483,10 @@ export class WebComponent extends HTMLElement {
 	private _updateTrackValue(track: NodeTrack) {
 		if (track) {
 			try {
-				const {node, attributes, hashedAttrs, property} = track;
+				const {node, attributes, directives, property} = track;
 
-				for (let hashAttr of hashedAttrs) {
-					const res = this._hashedAttrHandlers[hashAttr](node as WebComponent);
+				for (let directive of directives) {
+					const res = this._directiveHandlers[directive](node as WebComponent);
 
 					if (!res) return;
 				}
@@ -539,18 +550,18 @@ export class WebComponent extends HTMLElement {
 		}
 	}
 
-	private _hashedAttrHandlers: { [attr: string]: (node: WebComponent) => null | WebComponent } = {
-		'#ref': this._handleRefAttribute.bind(this),
-		'#if': this._handleIfAttribute.bind(this),
-		'#repeat': this._handleRepeatAttribute.bind(this),
-		'#attr': this._handleAttrAttribute.bind(this),
+	private _directiveHandlers: { [attr: string]: (node: WebComponent) => null | WebComponent } = {
+		'ref': this._handleRefAttribute.bind(this),
+		'if': this._handleIfAttribute.bind(this),
+		'repeat': this._handleRepeatAttribute.bind(this),
+		'attr': this._handleAttrAttribute.bind(this),
 	}
 
 	private _handleIfAttribute(node: WebComponent) {
-		const attr = '#if';
+		const attr = 'if';
 		// @ts-ignore
 		let {$item, $key} = node;
-		let {value, placeholderNode}: HashedAttributeValue = (node as ObjectLiteral)[attr][0];
+		let {value, placeholderNode}: DirectiveValue = (node as ObjectLiteral)[attr][0];
 
 		const shouldRender = this._execString(value, [$item, $key]);
 
@@ -571,7 +582,7 @@ export class WebComponent extends HTMLElement {
 
 		node.parentNode?.replaceChild((node as ObjectLiteral)[attr][0].placeholderNode, node);
 
-		if ((node as ObjectLiteral)['#repeat']) {
+		if ((node as ObjectLiteral)['repeat']) {
 			this._handleRepeatAttribute(node, true);
 		}
 
@@ -591,7 +602,7 @@ export class WebComponent extends HTMLElement {
 		// @ts-ignore
 		clone.innerHTML = node.__oginner__;
 
-		for (let hAttr of ['#repeat_id', '#if', '#attr']) {
+		for (let hAttr of ['repeat_id', 'if', 'attr']) {
 			if ((node as ObjectLiteral)[hAttr]) {
 				// @ts-ignore
 				clone[hAttr] = node[hAttr];
@@ -600,16 +611,17 @@ export class WebComponent extends HTMLElement {
 
 		this._updateNodeRepeatKeyAndItem(clone as HTMLElement, index, list)
 
-		this._render(clone);
+		this._render(clone, this._trackers.get(node)?.directives.filter(d => d !== 'repeat' && d !== 'ref'));
+
 		return clone;
 	}
 
 	private _handleRepeatAttribute(node: WebComponent | HTMLElement, clear = false) {
-		const attr = '#repeat';
-		const repeatAttr = '#repeat_id';
+		const attr = 'repeat';
+		const repeatAttr = 'repeat_id';
 		// @ts-ignore
 		let {$item, $key} = node;
-		let {value, placeholderNode}: HashedAttributeValue = (node as ObjectLiteral)[attr][0];
+		let {value, placeholderNode}: DirectiveValue = (node as ObjectLiteral)[attr][0];
 		let repeatData = this._execString(value, [$item, $key]);
 		let index = 0;
 
@@ -618,7 +630,7 @@ export class WebComponent extends HTMLElement {
 		}
 
 		if (!placeholderNode) {
-			(node as ObjectLiteral)[attr][0].placeholderNode = document.createComment(`#repeat: ${value}`);
+			(node as ObjectLiteral)[attr][0].placeholderNode = document.createComment(`repeat: ${value}`);
 		}
 
 		if (!(node as ObjectLiteral).__oginner__) {
@@ -686,10 +698,10 @@ export class WebComponent extends HTMLElement {
 	}
 
 	private _handleRefAttribute(node: WebComponent) {
-		const attr = '#ref';
-		const {value}: HashedAttributeValue = (node as ObjectLiteral)[attr][0];
+		const attr = 'ref';
+		const {value}: DirectiveValue = (node as ObjectLiteral)[attr][0];
 
-		if (this.$refs[value] === undefined && !(node as ObjectLiteral)['#repeat']) {
+		if (this.$refs[value] === undefined && !(node as ObjectLiteral)['repeat']) {
 			if (/^[a-z$_][a-z0-9$_]*$/i.test(value)) {
 				Object.defineProperty(this.$refs, value, {
 					get() {
@@ -699,30 +711,32 @@ export class WebComponent extends HTMLElement {
 				return node;
 			}
 
-			this.onError(new Error(`Invalid #ref property name "${value}"`))
+			this.onError(new Error(`Invalid "ref" property name "${value}"`))
 		}
 
 		return node;
 	}
 
 	private _handleAttrAttribute(node: WebComponent) {
-		const attr = '#attr';
+		const attr = 'attr';
 
-		(node as ObjectLiteral)[attr].forEach(({value, prop}: HashedAttributeValue) => {
-			let parts = prop.split('.');
-			let property = '';
-			// @ts-ignore
-			let {$item, $key} = node;
+		(node as ObjectLiteral)[attr].forEach(({value, prop}: DirectiveValue ) => {
+			let [attrName, property] = prop.split('.');
+			let {$item, $key} = node as ObjectLiteral;
 			const commaIdx = value.lastIndexOf(',');
-			const val = commaIdx >= 0 ? value.slice(0, commaIdx).trim() : '';
+			let val = commaIdx >= 0 ? value.slice(0, commaIdx).trim() : '';
 			const shouldAdd = this._execString(
 				commaIdx >= 0 ? value.slice(commaIdx + 1).trim() : value,
 				[$item, $key]);
 
-			switch (parts[0]) {
-				case 'style':
-					property = parts.length ? parts[1] : '';
+			if (val) {
+				extractExecutableSnippetFromString(val).forEach((exc) => {
+					val = this._resolveExecutable(node, exc, val);
+				});
+			}
 
+			switch (attrName) {
+				case 'style':
 					if (property) {
 						property = turnKebabToCamelCasing(property);
 
@@ -753,8 +767,6 @@ export class WebComponent extends HTMLElement {
 
 					break;
 				case 'class':
-					property = parts.length ? parts[1] : '';
-
 					if (property) {
 						if (shouldAdd) {
 							node.classList.add(property);
@@ -772,8 +784,6 @@ export class WebComponent extends HTMLElement {
 					}
 					break;
 				case 'data':
-					property = parts.length ? parts[1] : '';
-
 					if (property) {
 						if (shouldAdd) {
 							node.dataset[turnKebabToCamelCasing(property)] = val;
@@ -783,15 +793,13 @@ export class WebComponent extends HTMLElement {
 					}
 					break;
 				default:
-					property = parts.length ? parts[0] : '';
-					const kebabProp = turnCamelToKebabCasing(property);
-
-					if (property) {
+					if (attrName) {
+						const kebabProp = turnCamelToKebabCasing(attrName);
 						if (shouldAdd) {
-							const idealVal = booleanAttr.hasOwnProperty(property) || val || `${shouldAdd}`;
+							const idealVal = booleanAttr.hasOwnProperty(attrName) || val || `${shouldAdd}`;
 
-							if ((node as ObjectLiteral)[property] !== undefined) {
-								(node as ObjectLiteral)[property] = idealVal;
+							if ((node as ObjectLiteral)[attrName] !== undefined) {
+								(node as ObjectLiteral)[attrName] = idealVal;
 							} else {
 								node.setAttribute(kebabProp, idealVal.toString());
 							}

@@ -1,7 +1,7 @@
 import selfClosingTags from './self-closing-tags.json';
 
 export function parse(markup: string) {
-	const tagCommentPattern = /<!--([^]*?)-->|<(\/|!)?([a-z][\w-.:]*)((?:\s+#?[a-z][\w-.:]*(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)+\s*|\s*)(\/?)>/ig;
+	const tagCommentPattern = /<!--([^]*?)-->|<(\/|!)?([a-z][\w-.:]*)((?:\s+[a-z][\w-.:]*(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)+\s*|\s*)(\/?)>/ig;
 	const root = document.createDocumentFragment();
 	const stack: Array<DocumentFragment | HTMLElement> = [root];
 	let match: RegExpExecArray | null = null;
@@ -61,7 +61,7 @@ export function parse(markup: string) {
 }
 
 function setAttributes(node: HTMLElement, attributes: string) {
-	const attrPattern = /(#?[a-z][\w-.:]*)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|(\S+)))?/ig;
+	const attrPattern = /([a-z][\w-.:]*)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|(\S+)))?/ig;
 	let match: RegExpExecArray | null = null;
 
 	while ((match = attrPattern.exec(attributes))) {
@@ -70,25 +70,6 @@ function setAttributes(node: HTMLElement, attributes: string) {
 			new RegExp(`^${match[1]}\\s*=`).test(match[0]) ? '' : null
 		)
 
-		if (name.startsWith('#')) {
-			const dot = name.indexOf('.');
-			let prop = null;
-
-			if (dot >= 0) {
-				prop = name.slice(dot + 1);
-				name = name.slice(0, dot);
-			}
-
-			// this is a special handler for custom attributes since its syntax is not allowed
-			// for HTML attributes allowing this parser to work with normal DOM elements
-			// @ts-ignore
-			if (node[name] === undefined) {
-				(node as any)[name] = [{value, prop}]
-			} else {
-				(node as any)[name].push({value, prop})
-			}
-		} else {
-			node.setAttribute(name, value ?? '');
-		}
+		node.setAttribute(name, value ?? '');
 	}
 }
