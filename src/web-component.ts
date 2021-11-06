@@ -234,7 +234,7 @@ export class WebComponent extends HTMLElement {
 
 			this._mounted = true;
 			this.onMount();
-		} catch(e) {
+		} catch (e) {
 			this.onError(e as ErrorEvent);
 		}
 	}
@@ -251,8 +251,8 @@ export class WebComponent extends HTMLElement {
 			this._mounted = false;
 			this._unsubscribeCtx();
 			this.onDestroy();
-		} catch(e) {
-		    this.onError(e as Error)
+		} catch (e) {
+			this.onError(e as Error)
 		}
 	}
 
@@ -285,8 +285,8 @@ export class WebComponent extends HTMLElement {
 					this.onUpdate(name, oldValue, newValue);
 				}
 			}
-		} catch(e) {
-		    this.onError(e as ErrorEvent)
+		} catch (e) {
+			this.onError(e as ErrorEvent)
 		}
 	}
 
@@ -306,8 +306,8 @@ export class WebComponent extends HTMLElement {
 	adoptedCallback() {
 		try {
 			this.onAdoption();
-		} catch(e) {
-		    this.onError(e as Error)
+		} catch (e) {
+			this.onError(e as Error)
 		}
 	}
 
@@ -318,8 +318,8 @@ export class WebComponent extends HTMLElement {
 	}
 
 	/**
-     * error callback for when an error occurs
-     */
+	 * error callback for when an error occurs
+	 */
 	onError(error: ErrorEvent | Error) {
 		console.error(this.constructor.name, error);
 	}
@@ -512,7 +512,7 @@ export class WebComponent extends HTMLElement {
 						}
 					}
 				}
-			} catch(e) {
+			} catch (e) {
 				this.onError(e as ErrorEvent)
 			}
 		}
@@ -639,9 +639,9 @@ export class WebComponent extends HTMLElement {
 			times = repeatData;
 		} else {
 			repeatData = repeatData instanceof Set ? Object.entries(Array.from(repeatData))
-					: repeatData instanceof Map ? Array.from(repeatData.entries())
-						: repeatData[Symbol.iterator] ? Object.entries([...repeatData])
-							: Object.entries(repeatData);
+				: repeatData instanceof Map ? Array.from(repeatData.entries())
+					: repeatData[Symbol.iterator] ? Object.entries([...repeatData])
+						: Object.entries(repeatData);
 			times = repeatData.length;
 		}
 
@@ -708,7 +708,7 @@ export class WebComponent extends HTMLElement {
 	private _handleAttrAttribute(node: WebComponent) {
 		const attr = '#attr';
 
-		(node as ObjectLiteral)[attr].forEach(({value, prop}: HashedAttributeValue ) => {
+		(node as ObjectLiteral)[attr].forEach(({value, prop}: HashedAttributeValue) => {
 			let parts = prop.split('.');
 			let property = '';
 			// @ts-ignore
