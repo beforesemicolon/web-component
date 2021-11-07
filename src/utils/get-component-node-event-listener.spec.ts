@@ -16,7 +16,7 @@ describe('getComponentNodeEventListener', () => {
 
 		let handler = getComponentNodeEventListener(btn as any, 'click', 'clicked("sample", 300)') as any;
 
-		expect(handler.toString()).toEqual('(event) => func.call(component, event)')
+		expect(handler.toString()).toEqual('(event) => func.call(component, event, ...values)')
 
 		handler({type: 'click'} as any);
 
@@ -27,11 +27,15 @@ describe('getComponentNodeEventListener', () => {
 
 		handler = getComponentNodeEventListener(btn as any, 'click', 'this.onClick($event, 12, [23, 45])');
 
-		expect(handler.toString()).toEqual('(event) => func.call(component, event)')
-
 		handler({type: 'click'} as any);
 
 		expect(btn.onClick).toHaveBeenCalledWith({"type": "click"}, 12, [23, 45]);
+
+		handler = getComponentNodeEventListener(btn as any, 'click', 'onClick($item)', ['$item'], [[23, 45]]);
+
+		handler({type: 'click'} as any);
+
+		expect(btn.onClick).toHaveBeenCalledWith([23, 45]);
 
 		jest.resetAllMocks();
 	});
@@ -45,7 +49,7 @@ describe('getComponentNodeEventListener', () => {
 	it('should get listener with executables', () => {
 		let handler = getComponentNodeEventListener(btn as any, 'click', '{this.sampler = [2, 4, 6]}') as any;
 
-		expect(handler.toString()).toEqual('(event) => fn.call(component, event, ...props.map(prop => component[prop]))');
+		expect(handler.toString()).toEqual('(event) => fn.call(component, event, ...values)');
 
 		handler({type: 'click'} as any);
 
@@ -54,5 +58,11 @@ describe('getComponentNodeEventListener', () => {
 			4,
 			6
 		]);
+
+		handler = getComponentNodeEventListener(btn as any, 'click', '{this.sampler = $item}', ['$item'], [{x: 10}]) as any;
+
+		handler({type: 'click'} as any);
+
+		expect(btn.sampler).toEqual({x: 10});
 	});
 });
