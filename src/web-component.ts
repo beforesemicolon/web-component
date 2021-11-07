@@ -352,10 +352,7 @@ export class WebComponent extends HTMLElement {
 			node.addEventListener('slotchange', (e) => {
 				(node as HTMLSlotElement).assignedNodes().forEach(n => this._render(n))
 			});
-			return;
-		}
-
-		if (node.nodeName === '#text') {
+		} else if (node.nodeName === '#text') {
 			if (node.nodeValue?.trim()) {
 				this._trackNode(node as Node, [], [], [], {
 					name: 'nodeValue',
