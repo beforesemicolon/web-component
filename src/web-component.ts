@@ -327,7 +327,27 @@ export class WebComponent extends HTMLElement {
 		console.error(this.constructor.name, error);
 	}
 
-	private _render(node: Node | HTMLElement | DocumentFragment | WebComponent, directives: Directive[] = []) {
+	private _getEventHandlerFunction(node: ObjectLiteral, attribute: Attr) {
+		const props = ['$item', '$key', '$refs', '$context'];
+		const values = [
+			(node as ObjectLiteral).$item,
+			(node as ObjectLiteral).$key,
+			this.$refs,
+			this.$context
+		];
+
+		const fn = getComponentNodeEventListener(this, attribute.name, attribute.value, props, values);
+
+		if (fn) {
+			return fn;
+		} else {
+			this.onError(new Error(`${this.constructor.name}: Invalid event handler for "${attribute.name}" >>> "${attribute.value}".`))
+		}
+
+		return null
+	}
+
+	private _render(node: Node | HTMLElement | DocumentFragment | WebComponent, directives: Directive[] = [], handlers: NodeTrack['eventHandlers'] = []) {
 		if (node.nodeName === 'SLOT') {
 			node.addEventListener('slotchange', (e) => {
 				(node as HTMLSlotElement).assignedNodes().forEach(n => this._render(n))
@@ -335,23 +355,23 @@ export class WebComponent extends HTMLElement {
 			return;
 		}
 
-		if (node.nodeName === '#text' ) {
+		if (node.nodeName === '#text') {
 			if (node.nodeValue?.trim()) {
-				this._trackNode(node as Node, [], [], {
+				this._trackNode(node as Node, [], [], [], {
 					name: 'nodeValue',
 					value: node.nodeValue,
 					executables: []
 				});
 			}
 		} else if (node.nodeType === 1) {
-			const handlers = [];
 			const attributes = [];
+			const isRepeatedNode = (node as HTMLElement).hasAttribute('repeat');
 
 			// @ts-ignore
 			for (let attribute of [...node.attributes]) {
 				if (/^(attr\.|ref|if|repeat)/.test(attribute.name)) {
 					const directiveName = parseNodeDirective(node as HTMLElement, attribute.name, attribute.value);
-					switch (directiveName){
+					switch (directiveName) {
 						case 'ref':
 							directives[0] = directiveName;
 							break;
@@ -366,29 +386,25 @@ export class WebComponent extends HTMLElement {
 							break;
 					}
 				} else if (attribute.name.startsWith('on')) {
-					const eventName = attribute.name.slice(2).toLowerCase().replace(/^on/, '');
-					const handler = getComponentNodeEventListener(this, attribute.name, attribute.value);
-
-					if (handler) {
-						handlers.push({
-							eventName,
-							attribute: attribute.name,
-							handler
-						});
-					} else {
-						this.onError(new Error(`${this.constructor.name}: Invalid event handler for "${attribute.name}" >>> "${attribute.value}".`))
-					}
+					handlers.push({
+						eventName: attribute.name.slice(2).toLowerCase(),
+						attribute
+					});
 				} else {
 					attributes.push(attribute)
 				}
 			}
 
-			handlers.forEach(({eventName, handler, attribute}) => {
-				(node as HTMLElement).removeAttribute(attribute);
-				node.addEventListener(eventName, handler)
+			handlers.forEach(({eventName, fn, attribute}) => {
+				if (!fn && !isRepeatedNode) {
+					fn = this._getEventHandlerFunction(node, attribute) as EventListenerCallback;
+					node.addEventListener(eventName, fn as EventListenerCallback);
+				}
+
+				(node as HTMLElement).removeAttribute(attribute.name);
 			})
 
-			this._trackNode(node, attributes, directives.filter(d => d));
+			this._trackNode(node, attributes, directives.filter(d => d), handlers);
 		}
 
 		if (node.nodeName !== '#text' && node.nodeName !== '#comment') {
@@ -397,7 +413,13 @@ export class WebComponent extends HTMLElement {
 
 	}
 
-	private _trackNode(node: HTMLElement | Node, attributes: Array<Attr>, directives: Array<Directive>, property: NodeTrack['property'] | null = null) {
+	private _trackNode(
+		node: HTMLElement | Node,
+		attributes: Array<Attr>,
+		directives: Array<Directive>,
+		eventHandlers: NodeTrack['eventHandlers'],
+		property: NodeTrack['property'] | null = null
+	) {
 		if (this._trackers.has(node)) {
 			this._updateTrackValue(this._trackers.get(node) as NodeTrack);
 		} else {
@@ -405,7 +427,8 @@ export class WebComponent extends HTMLElement {
 				node,
 				attributes: [],
 				directives,
-				property
+				property,
+				eventHandlers
 			};
 
 			if (property?.value.trim()) {
@@ -430,8 +453,8 @@ export class WebComponent extends HTMLElement {
 
 	private _execString(executable: string, [$item, $key]: any[] = []) {
 		if (!executable.trim()) {
-            return;
-        }
+			return;
+		}
 
 		const keys = new Set(Object.getOwnPropertyNames(this).filter((n) => !n.startsWith('_') && !this._directives.has(n as Directive)));
 		const ctx = this.$context;
@@ -623,7 +646,9 @@ export class WebComponent extends HTMLElement {
 
 		this._updateNodeRepeatKeyAndItem(clone as HTMLElement, index, list)
 
-		this._render(clone, this._trackers.get(node)?.directives.filter(d => d !== 'repeat' && d !== 'ref'));
+		const {directives, eventHandlers} = this._trackers.get(node) as NodeTrack;
+
+		this._render(clone, directives.filter(d => d !== 'repeat' && d !== 'ref'), eventHandlers);
 
 		return clone;
 	}
@@ -732,7 +757,7 @@ export class WebComponent extends HTMLElement {
 	private _handleAttrAttribute(node: WebComponent) {
 		const attr = 'attr';
 
-		(node as ObjectLiteral)[attr].forEach(({value, prop}: DirectiveValue ) => {
+		(node as ObjectLiteral)[attr].forEach(({value, prop}: DirectiveValue) => {
 			let [attrName, property] = prop.split('.');
 			let {$item, $key} = node as ObjectLiteral;
 			const commaIdx = value.lastIndexOf(',');

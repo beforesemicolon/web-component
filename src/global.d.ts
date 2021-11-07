@@ -10,6 +10,14 @@ export declare global {
 		}
 	}
 
+	export type EventListenerCallback = (event: Event) => void;
+
+	export type EventHandlerTrack = {
+		eventName: string;
+		attribute: Attr;
+		fn?: EventListenerCallback;
+	};
+
 	export interface NodeTrack {
 		node: HTMLElement | Node | WebComponent;
 		attributes: Array<{
@@ -18,6 +26,7 @@ export declare global {
 			executables: Array<Executable>;
 		}>;
 		directives: Array<Directive>;
+		eventHandlers: Array<EventHandlerTrack>;
 		property: null | {
 			name: string;
 			value: string;
