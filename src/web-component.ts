@@ -330,7 +330,7 @@ export class WebComponent extends HTMLElement {
 	private _render(node: Node | HTMLElement | DocumentFragment | WebComponent, directives: Directive[] = []) {
 		if (node.nodeName === 'SLOT') {
 			node.addEventListener('slotchange', (e) => {
-				(node as HTMLSlotElement).assignedNodes().forEach(n => this._render(n, directives))
+				(node as HTMLSlotElement).assignedNodes().forEach(n => this._render(n))
 			});
 			return;
 		}
