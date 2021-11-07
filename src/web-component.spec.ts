@@ -933,6 +933,8 @@ describe('WebComponent', () => {
 
 				expect(s.root?.innerHTML).toBe('<!--repeat: count--><li class="item-0">item 1 <!--repeat: innerCount--><span>1</span><span>2</span><span>3</span></li>');
 			});
+
+			it.todo('should handle event listener for each repeated node');
 		});
 
 		describe('should allow mix of hashed attributes', () => {
