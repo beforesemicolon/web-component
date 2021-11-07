@@ -91,26 +91,21 @@ method.
 
 ```js
 class TodoList extends WebComponent {
-  onUpdate(name) {
-    if (name === '$context') {
-      const container = this.root.querySelector('.todo-list');
-      
-      container.innerHTML = '';
-      
-      this.$context.todos.forEach(item => {
-        const todoElement = new TodoItem();
-        
-        todoElement.name = item.name;
-        todoElement.status = item.status;
-        todoElement.description = item.description;
-        
-        container.appendChild(todoElement)
-      })
-    }
+  onMount() {
+    console.log(this.$context);
   }
   
   get template() {
-    return '<div class="todo-list"></div>';
+    return `
+    <div class="todo-list">
+      <todo-item 
+        repeat="$context.todos" 
+        name="{$item.name}" 
+        status="{$item.status}" 
+        description="{$item.description}"
+      ></todo-item>
+    </div>
+    `;
   }
 }
 
@@ -181,6 +176,33 @@ class SearchForm extends WebComponent {
 
 
 SearchForm.register();
+```
+
+### Context Provider
+You can combine the power of template `slot` and context to create context provider components.
+
+```js
+class ThemeProvider extends WebComponent {
+  static initialContext = {
+    theme: 'dark',
+    primaryColor: #222,
+    secondaryColor: #ddd,
+    ctaColor: #930,
+  };
+  
+  get template() {
+    return '<slot></slot>'
+  }
+}
+
+```
+
+So whenever you need to use this information you can simply wrap the part of the app with this component.
+
+```html
+<theme-provider>
+  <button type="button" style="background: {primaryColor}; color: #fff">themed button</button>
+</theme-provider>
 ```
 
 ### Best Practice

@@ -190,6 +190,8 @@ export class WebComponent extends HTMLElement {
 					if (this.mounted) {
 						this.onUpdate('$context', this._context, newContext)
 					}
+
+					this._contextSubscribers.forEach(cb => cb(newContext));
 				})
 			}
 
@@ -326,7 +328,14 @@ export class WebComponent extends HTMLElement {
 	}
 
 	private _render(node: Node | HTMLElement | DocumentFragment | WebComponent, directives: Directive[] = []) {
-		if (node.nodeName === '#text') {
+		if (node.nodeName === 'SLOT') {
+			node.addEventListener('slotchange', (e) => {
+				(node as HTMLSlotElement).assignedNodes().forEach(n => this._render(n, directives))
+			});
+			return;
+		}
+
+		if (node.nodeName === '#text' ) {
 			if (node.nodeValue?.trim()) {
 				this._trackNode(node as Node, [], [], {
 					name: 'nodeValue',
@@ -382,7 +391,10 @@ export class WebComponent extends HTMLElement {
 			this._trackNode(node, attributes, directives.filter(d => d));
 		}
 
-		node.childNodes.forEach(node => this._render(node));
+		if (node.nodeName !== '#text' && node.nodeName !== '#comment') {
+			node.childNodes.forEach(node => this._render(node));
+		}
+
 	}
 
 	private _trackNode(node: HTMLElement | Node, attributes: Array<Attr>, directives: Array<Directive>, property: NodeTrack['property'] | null = null) {
