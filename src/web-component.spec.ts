@@ -490,6 +490,24 @@ describe('WebComponent', () => {
 			expect(s.root?.innerHTML).toBe('some text')
 		});
 
+		it('should handle textarea text binding', () => {
+			class SampleF extends WebComponent {
+				val = 'some text';
+
+				get template() {
+					return '<textarea>{val}</textarea>'
+				}
+			}
+
+			SampleF.register();
+			const s = new SampleF();
+
+			document.body.appendChild(s);
+
+			expect(s.root?.innerHTML).toBe('<textarea></textarea>')
+			expect((s.root?.children[0] as HTMLTextAreaElement).value).toBe('some text')
+		});
+
 		it('should take object as attribute value', () => {
 			class SampleE extends WebComponent {
 				static observedAttributes = ['list']
@@ -514,7 +532,7 @@ describe('WebComponent', () => {
 		it('should attach event listener and remove the reference attribute', () => {
 			const handler = jest.fn();
 
-			class SampleF extends WebComponent {
+			class EventA extends WebComponent {
 				focused = false;
 
 				get template() {
@@ -529,8 +547,8 @@ describe('WebComponent', () => {
 				}
 			}
 
-			SampleF.register();
-			const s = new SampleF();
+			EventA.register();
+			const s = new EventA();
 
 			document.body.appendChild(s);
 
