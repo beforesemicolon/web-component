@@ -373,8 +373,10 @@ export class WebComponent extends HTMLElement {
 
 		// process element nodes https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
 		if (node.nodeType === 1) {
+			let property: NodeTrack['property'] | null = null;
 			const attributes = [];
 			const isRepeatedNode = (node as HTMLElement).hasAttribute('repeat');
+			const isTextArea = node.nodeName === 'TEXTAREA';
 
 			// @ts-ignore
 			for (let attribute of [...node.attributes]) {
@@ -411,11 +413,20 @@ export class WebComponent extends HTMLElement {
 				}
 
 				(node as HTMLElement).removeAttribute(attribute.name);
-			})
+			});
 
-			this._trackNode(node, attributes, directives.filter(d => d), handlers);
+			if (isTextArea) {
+				property = {
+					name: 'value',
+					value: node.textContent || '',
+					executables: []
+				}
+				node.textContent = '';
+			}
 
-			if (isRepeatedNode) {
+			this._trackNode(node, attributes, directives.filter(d => d), handlers, property);
+
+			if (isRepeatedNode || isTextArea) {
 				return;
 			}
 		}
