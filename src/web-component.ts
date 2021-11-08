@@ -514,6 +514,7 @@ export class WebComponent extends HTMLElement {
 
 	private _updateTrackValue(track: NodeTrack) {
 		if (track) {
+			// console.log('-- _updateTrackValue', track);
 			try {
 				const {node, attributes, directives, property} = track;
 

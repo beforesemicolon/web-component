@@ -82,12 +82,6 @@ export declare global {
 		onError: (error: ErrorEvent) => void;
 		forceUpdate: () => void;
 
-		ref?: Directive;
-		repeat?: Directive;
-		repeat_id?: Directive;
-		if?: Directive;
-		attr?: Directive;
-
 		[key: string]: any;
 	}
 

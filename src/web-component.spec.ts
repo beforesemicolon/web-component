@@ -123,7 +123,7 @@ describe('WebComponent', () => {
 
 			document.body.appendChild(f);
 
-			expect(f.root?.innerHTML).toBe('<style id="f-comp">:host {display: inline-block;}</style>')
+			expect(f.root?.innerHTML).toBe('<style class="f-comp">:host {display: inline-block;}</style>')
 		});
 
 		it('should define style with CSS inside style tag', () => {
@@ -139,7 +139,7 @@ describe('WebComponent', () => {
 
 			document.body.appendChild(g);
 
-			expect(g.root?.innerHTML).toBe('<style>:host {display: inline-block;}</style>')
+			expect(g.root?.innerHTML).toBe('<style class="g-comp">:host {display: inline-block;}</style>')
 		});
 
 		it('should not set style if stylesheet is empty', () => {
@@ -174,7 +174,7 @@ describe('WebComponent', () => {
 			document.body.appendChild(i);
 
 			expect(i.root?.innerHTML).toBeUndefined()
-			expect(document.head.innerHTML).toBe('<style id="i-comp">i-comp {display: inline-block;}</style>')
+			expect(document.head.innerHTML).toBe('<style class="i-comp">i-comp {display: inline-block;}</style>')
 		});
 	});
 
