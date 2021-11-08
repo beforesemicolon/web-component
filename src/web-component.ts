@@ -348,29 +348,9 @@ export class WebComponent extends HTMLElement {
 
 	private _render(node: Node | HTMLElement | DocumentFragment | WebComponent, directives: Directive[] = [], handlers: NodeTrack['eventHandlers'] = []) {
 		if (node.nodeName === 'SLOT') {
-			const {mode} = this.constructor as WebComponentConstructor;
-			// when there is no shadow root the slot does not work so in that case
-			// the slot element must be replaced by all its assigned nodes
-			if (mode === 'none') {
-				const frag = document.createDocumentFragment();
-				const slotName = (node as HTMLSlotElement).name;
-
-				if (slotName) {
-					this.querySelectorAll(`[slot="${slotName}"]`).forEach(n => frag.appendChild(n));
-				} else {
-					this.childNodes.forEach(n => {
-						if (n.nodeType !== 1 || !(n as Element).hasAttribute('slot')) {
-							frag.appendChild(n)
-						}
-					});
-				}
-
-				node.parentNode?.replaceChild(frag, node);
-			} else {
-				node.addEventListener('slotchange', (e) => {
-					(node as HTMLSlotElement).assignedNodes().forEach(n => this._render(n))
-				});
-			}
+			node.addEventListener('slotchange', (e) => {
+				(node as HTMLSlotElement).assignedNodes().forEach(n => this._render(n))
+			});
 		} else if (node.nodeName === '#text') {
 			if (node.nodeValue?.trim()) {
 				this._trackNode(node as Node, [], [], [], {
