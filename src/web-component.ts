@@ -17,15 +17,14 @@ import booleanAttr from './utils/boolean-attributes.json';
  */
 export class WebComponent extends HTMLElement {
 	private readonly _root: WebComponent | ShadowRoot;
-	private _trackers: Map<HTMLElement | Node | WebComponent, NodeTrack> = new Map();
+	private readonly _trackers: Map<HTMLElement | Node | WebComponent, NodeTrack> = new Map();
+	private readonly _directives: Set<Directive> = new Set(['ref', 'if', 'repeat', 'attr']);
 	private _mounted = false;
 	private _parsed = false;
 	private _context: ObjectLiteral = {};
 	private _contextSource: WebComponent | null = null;
 	private _contextSubscribers: Array<ObserverCallback> = [];
-	private _unsubscribeCtx: () => void = () => {
-	};
-	private _directives: Set<Directive> = new Set(['ref', 'if', 'repeat', 'attr']);
+	private _unsubscribeCtx: () => void = () => {};
 	readonly $refs: Refs = Object.create(null);
 
 	constructor() {
@@ -225,7 +224,7 @@ export class WebComponent extends HTMLElement {
 				if (style) {
 					if (hasShadowRoot) {
 						this._root.innerHTML = style;
-					} else if (!document.head.querySelector(`style${(this.constructor as WebComponentConstructor).tagName}`)) {
+					} else if (!document.head.querySelector(`style.${(this.constructor as WebComponentConstructor).tagName}`)) {
 						document.head.insertAdjacentHTML('beforeend', style);
 					}
 				}
@@ -407,7 +406,6 @@ export class WebComponent extends HTMLElement {
 		if (node.nodeName !== '#text' && node.nodeName !== '#comment') {
 			node.childNodes.forEach(node => this._render(node));
 		}
-
 	}
 
 	private _trackNode(
@@ -831,12 +829,16 @@ export class WebComponent extends HTMLElement {
 					if (attrName) {
 						const kebabProp = turnCamelToKebabCasing(attrName);
 						if (shouldAdd) {
-							const idealVal = booleanAttr.hasOwnProperty(attrName) || val || `${shouldAdd}`;
-
-							if ((node as ObjectLiteral)[attrName] !== undefined) {
-								(node as ObjectLiteral)[attrName] = idealVal;
+							if (booleanAttr.hasOwnProperty(attrName)) {
+								node.setAttribute(kebabProp, '');
 							} else {
-								node.setAttribute(kebabProp, idealVal.toString());
+								const idealVal = val || shouldAdd;
+
+								if ((node as ObjectLiteral)[attrName] !== undefined) {
+									(node as ObjectLiteral)[attrName] = idealVal;
+								} else {
+									node.setAttribute(kebabProp, idealVal.toString());
+								}
 							}
 						} else {
 							node.removeAttribute(kebabProp);
