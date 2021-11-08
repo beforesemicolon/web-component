@@ -4,10 +4,9 @@ A lightweight and powerful web component framework intended to remove the tediou
 
 "`Web Component API As It Should Have Been`"
 
-🥇 Build **✅ Flexible, ✅ Extensible, and ✅ Contextful Components** with **✅ Reactive Template**, **🥳 Directives**, **✅ Data and Event Binding**
-with a **✅ Simple and Lightweight** API right in Your Browser.
+🥇 Build **✅ Flexible, ✅ Extensible, and ✅ Contextful Components** with **✅ Reactive Template**, **✅ Powerful Directives**, **✅ Data and Event Template Binding**, **✅ Simple API** in a **✅ Lightweight package** right in Your Browser.
 
-🚫 No Tedious State Management and DOM Manipulation! 🚫 No Robust Data Store and Context Setup! 🚫 No Verbose API! 🚫 No JSX! 
+🚫 No Tedious State Management and DOM Manipulation! 🚫 No Robust Data Store and Context Setup! 🚫 No Verbose API! 🚫 No JSX! 🚫 No Virtual DOM! 
 🚫 No Weird HTML or Javascript Syntax!
 
 
