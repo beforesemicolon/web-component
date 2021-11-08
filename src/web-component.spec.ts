@@ -419,7 +419,7 @@ describe('WebComponent', () => {
 		});
 	})
 
-	describe('data bind and event handling rendering', () => {
+	describe('data bind', () => {
 		it('should render attribute with multiple bindings', () => {
 			class SampleA extends WebComponent {
 				x = 'X';
@@ -508,7 +508,9 @@ describe('WebComponent', () => {
 
 			expect(s.root?.innerHTML).toBe('second')
 		});
+	})
 
+	describe('event handling', () => {
 		it('should attach event listener and remove the reference attribute', () => {
 			const handler = jest.fn();
 
@@ -546,7 +548,7 @@ describe('WebComponent', () => {
 
 			expect(s.root?.innerHTML).toBe('<button></button>')
 		});
-	})
+	});
 
 	describe('context', () => {
 		class TargetComp extends WebComponent {
@@ -610,6 +612,16 @@ describe('WebComponent', () => {
 			expect(target?.root?.innerHTML).toBe('Updated Text App');
 		});
 	});
+
+	describe('slot', () => {
+		it.todo('should render plain slot content with shadow root');
+
+		it.todo('should render plain slot content WITHOUT shadow root');
+
+		it.todo('should render named slot content with shadow root');
+
+		it.todo('should render named slot content WITHOUT shadow root');
+	})
 
 	describe('directives', () => {
 		describe('ref', () => {
