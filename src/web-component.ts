@@ -24,7 +24,8 @@ export class WebComponent extends HTMLElement {
 	private _context: ObjectLiteral = {};
 	private _contextSource: WebComponent | null = null;
 	private _contextSubscribers: Array<ObserverCallback> = [];
-	private _unsubscribeCtx: () => void = () => {};
+	private _unsubscribeCtx: () => void = () => {
+	};
 	readonly $refs: Refs = Object.create(null);
 
 	constructor() {
@@ -349,17 +350,29 @@ export class WebComponent extends HTMLElement {
 	private _render(node: Node | HTMLElement | DocumentFragment | WebComponent, directives: Directive[] = [], handlers: NodeTrack['eventHandlers'] = []) {
 		if (node.nodeName === 'SLOT') {
 			node.addEventListener('slotchange', (e) => {
-				(node as HTMLSlotElement).assignedNodes().forEach(n => this._render(n))
+				const assignedNodes = (node as HTMLSlotElement).assignedNodes();
+
+				assignedNodes.forEach(n => this._render(n));
+
+				if (!assignedNodes.length) {
+					node.childNodes.forEach(child => this._render(child));
+				}
 			});
-		} else if (node.nodeName === '#text') {
+			return;
+		}
+
+		if (node.nodeName === '#text') {
 			if (node.nodeValue?.trim()) {
-				this._trackNode(node as Node, [], [], [], {
+				return this._trackNode(node as Node, [], [], [], {
 					name: 'nodeValue',
 					value: node.nodeValue,
 					executables: []
 				});
 			}
-		} else if (node.nodeType === 1) {
+		}
+
+		// process element nodes https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
+		if (node.nodeType === 1) {
 			const attributes = [];
 			const isRepeatedNode = (node as HTMLElement).hasAttribute('repeat');
 
@@ -401,10 +414,14 @@ export class WebComponent extends HTMLElement {
 			})
 
 			this._trackNode(node, attributes, directives.filter(d => d), handlers);
+
+			if (isRepeatedNode) {
+				return;
+			}
 		}
 
-		if (node.nodeName !== '#text' && node.nodeName !== '#comment') {
-			node.childNodes.forEach(node => this._render(node));
+		if (node.nodeName !== '#comment') {
+			node.childNodes.forEach(child => this._render(child));
 		}
 	}
 
@@ -481,14 +498,13 @@ export class WebComponent extends HTMLElement {
 	}
 
 	private _resolveExecutable(node: Node, {match, executable}: Executable, newValue: string) {
-		// @ts-ignore
-		let {$item, $key} = node;
+		let {$item, $key} = node as ObjectLiteral;
 
 		if (/(?:^|\W)\$(index|key|item)(?:$|\W)/.test(executable) && $item === undefined) {
 			let parent: any = node.parentNode;
 
 			while (parent && !(parent instanceof ShadowRoot) && parent !== this) {
-				if (parent['$item']) {
+				if (parent['$item'] !== undefined) {
 					$item = parent['$item'];
 					$key = parent['$key'];
 					break;
@@ -512,7 +528,6 @@ export class WebComponent extends HTMLElement {
 
 	private _updateTrackValue(track: NodeTrack) {
 		if (track) {
-			// console.log('-- _updateTrackValue', track);
 			try {
 				const {node, attributes, directives, property} = track;
 
@@ -652,10 +667,8 @@ export class WebComponent extends HTMLElement {
 	private _handleRepeatAttribute(node: WebComponent | HTMLElement, clear = false) {
 		const attr = 'repeat';
 		const repeatAttr = 'repeat_id';
-		// @ts-ignore
-		let {$item, $key} = node;
 		let {value, placeholderNode}: DirectiveValue = (node as ObjectLiteral)[attr][0];
-		let repeatData = this._execString(value, [$item, $key]);
+		let repeatData = this._execString(value);
 		let index = 0;
 
 		if (!(node as ObjectLiteral)[repeatAttr]) {
