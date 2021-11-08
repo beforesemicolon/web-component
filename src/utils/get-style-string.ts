@@ -7,7 +7,9 @@ export function getStyleString(stylesheet: string, tagName: string, hasShadowRoo
 
 	let style = stylesheet.startsWith('<style')
 		? stylesheet
-		: `<style id="${tagName}">${stylesheet}</style>`
+		: `<style>${stylesheet}</style>`;
+
+	const div = document.createElement('div');
 
 	if (!hasShadowRoot) {
 		style = style.replace(/(:host)((\s*\(.*\)|))?/g, (_, h, s) => {
@@ -18,5 +20,11 @@ export function getStyleString(stylesheet: string, tagName: string, hasShadowRoo
 		})
 	}
 
-	return style;
+	div.innerHTML = style;
+
+	Array.from(div.children).forEach(child => {
+		child.className = tagName;
+	});
+
+	return div.innerHTML;
 }
