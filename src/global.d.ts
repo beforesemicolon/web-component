@@ -82,7 +82,7 @@ export declare global {
 		onError: (error: ErrorEvent) => void;
 		forceUpdate: () => void;
 
-		[key: string]: any;
+		[key: string | Directive]: any;
 	}
 
 	export interface WebComponentConstructor {

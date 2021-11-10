@@ -26,7 +26,7 @@ describe('WebComponent', () => {
 
 			expect(a.root).toEqual(null);
 
-			AComp.mode = ShadowRootModeExtended.NODE;
+			AComp.mode = ShadowRootModeExtended.NONE;
 			a = new AComp();
 
 			expect(a.root).toEqual(null);
@@ -160,7 +160,7 @@ describe('WebComponent', () => {
 
 		it('should put style in the head tag if mode is none', () => {
 			class IComp extends WebComponent {
-				static mode = ShadowRootModeExtended.NODE;
+				static mode = ShadowRootModeExtended.NONE;
 
 				get stylesheet() {
 					return ':host {display: inline-block;}'
@@ -209,7 +209,7 @@ describe('WebComponent', () => {
 
 		it('should set template in the element if mode is none', () => {
 			class LComp extends WebComponent {
-				static mode = ShadowRootModeExtended.NODE;
+				static mode = ShadowRootModeExtended.NONE;
 
 				get template() {
 					return '<div>test</div>'
@@ -632,13 +632,85 @@ describe('WebComponent', () => {
 	});
 
 	describe('slot', () => {
-		it.todo('should render plain slot content with shadow root');
+		it('should render plain slot content with shadow root', () => {
+			class SlotA extends WebComponent {
+				get template() {
+					return '<slot></slot>'
+				}
+			}
 
-		it.todo('should render plain slot content WITHOUT shadow root');
+			SlotA.register();
 
-		it.todo('should render named slot content with shadow root');
+			document.body.innerHTML = '<slot-a><p>one</p><p>two</p></slot-a>';
 
-		it.todo('should render named slot content WITHOUT shadow root');
+			const s = document.body.children[0] as WebComponent;
+
+			expect(s.root?.innerHTML).toBe('<!--slotted []--><p>one</p><p>two</p>');
+		});
+
+		it('should render plain slot content WITHOUT shadow root', () => {
+			class SlotB extends WebComponent {
+				static mode = ShadowRootModeExtended.NONE;
+
+				get template() {
+					return '<slot></slot>'
+				}
+			}
+
+			SlotB.register();
+
+			document.body.innerHTML = '<slot-b><p>one</p><p>two</p></slot-b>';
+
+			const s = document.body.children[0] as WebComponent;
+
+			expect(s.innerHTML).toBe('<!--slotted []--><p>one</p><p>two</p>');
+		});
+
+		it('should render named slot content with shadow root', () => {
+			class SlotC extends WebComponent {
+				get template() {
+					return '<slot name="content"></slot>'
+				}
+			}
+
+			SlotC.register();
+
+			document.body.innerHTML = '<slot-c><p>one</p><p>two</p></slot-c>';
+
+			let s = document.body.children[0] as WebComponent;
+
+			expect(s.root?.innerHTML).toBe('<!--slotted [content]-->');
+
+			document.body.innerHTML = '<slot-c><p slot="content">one</p><p>two</p></slot-c>';
+
+			s = document.body.children[0] as WebComponent;
+
+			expect(s.root?.innerHTML).toBe('<!--slotted [content]--><p slot="content">one</p>');
+		});
+
+		it('should render named slot content WITHOUT shadow root', () => {
+			class SlotD extends WebComponent {
+				static mode = ShadowRootModeExtended.NONE;
+
+				get template() {
+					return '<slot name="content"></slot>'
+				}
+			}
+
+			SlotD.register();
+
+			document.body.innerHTML = '<slot-d><p>one</p><p>two</p></slot-d>';
+
+			let s = document.body.children[0] as WebComponent;
+
+			expect(s.innerHTML).toBe('<!--slotted [content]-->');
+
+			document.body.innerHTML = '<slot-d><p slot="content">one</p><p>two</p></slot-d>';
+
+			s = document.body.children[0] as WebComponent;
+
+			expect(s.innerHTML).toBe('<!--slotted [content]--><p slot="content">one</p>');
+		});
 	})
 
 	describe('directives', () => {
@@ -964,7 +1036,36 @@ describe('WebComponent', () => {
 				expect(s.root?.innerHTML).toBe('<!--repeat: count--><li class="item-0">item 1 <!--repeat: innerCount--><span>1</span><span>2</span><span>3</span></li>');
 			});
 
-			it.todo('should handle event listener for each repeated node');
+			it('should handle event listener for each repeated node', () => {
+				const cb = jest.fn();
+
+				class RepeatC extends WebComponent {
+					count = 2;
+
+					get template() {
+						return '<li repeat="count" class="item-{$key}" onclick="handleClick($event, $item, $key)">item {$item}</li>'
+					}
+
+					handleClick(...args: any[]) {
+						cb(...args);
+					}
+				}
+
+				RepeatC.register();
+				const s = new RepeatC();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<!--repeat: count--><li class="item-0">item 1</li><li class="item-1">item 2</li>');
+
+				(s.root?.children[0] as HTMLElement).click();
+				(s.root?.children[1] as HTMLElement).click();
+
+				expect(cb).toHaveBeenCalledTimes(2)
+				expect(cb).toHaveBeenCalledWith(new MouseEvent('click'), 1, 0)
+				expect(cb).toHaveBeenCalledWith(new MouseEvent('click'), 2, 1)
+
+			});
 		});
 
 		describe('should allow mix of hashed attributes', () => {
