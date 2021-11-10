@@ -7,3 +7,4 @@ doc
 **.tgz
 coverage
 jest.config.js
+.github
