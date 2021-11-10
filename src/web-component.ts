@@ -27,11 +27,14 @@ export class WebComponent extends HTMLElement {
 	private _unsubscribeCtx: () => void = () => {
 	};
 	readonly $refs: Refs = Object.create(null);
+	private _childNodes: Array<ChildNode>= []
 
 	constructor() {
 		super();
 
 		this._root = this;
+		this._childNodes = Array.from(this.childNodes);
+		this.innerHTML = '';
 
 		// @ts-ignore
 		let {name, mode, observedAttributes, delegatesFocus, initialContext} = this.constructor;
@@ -233,6 +236,7 @@ export class WebComponent extends HTMLElement {
 				this._parsed = true;
 
 				this._root.appendChild(contentNode);
+				this._childNodes = [];
 			}
 
 			this._mounted = true;
@@ -347,18 +351,41 @@ export class WebComponent extends HTMLElement {
 		return null
 	}
 
+	private _renderSlotNode(node: HTMLSlotElement) {
+		const name = node.getAttribute('name');
+		let nodeList: any;
+		let comment = document.createComment(`slotted [${name || ''}]`);
+		node.parentNode?.replaceChild(comment, node);
+
+		if (name) {
+			nodeList = this._childNodes.filter(n => {
+				return n.nodeType === 1 && (n as HTMLElement).getAttribute('slot') === name;
+			});
+		} else {
+			nodeList = this._childNodes.filter(n => {
+				return n.nodeType !== 1 || !(n as HTMLElement).hasAttribute('slot');
+			});
+		}
+
+		if (!nodeList.length) {
+			nodeList = node.childNodes;
+		}
+
+		let anchor = comment;
+
+		for (let n of nodeList) {
+			anchor.after(n);
+			anchor = n;
+		}
+
+		for (let n of nodeList) {
+			this._render(n);
+		}
+	}
+
 	private _render(node: Node | HTMLElement | DocumentFragment | WebComponent, directives: Directive[] = [], handlers: NodeTrack['eventHandlers'] = []) {
 		if (node.nodeName === 'SLOT') {
-			node.addEventListener('slotchange', (e) => {
-				const assignedNodes = (node as HTMLSlotElement).assignedNodes();
-
-				assignedNodes.forEach(n => this._render(n));
-
-				if (!assignedNodes.length) {
-					node.childNodes.forEach(child => this._render(child));
-				}
-			});
-			return;
+			return this._renderSlotNode(node as HTMLSlotElement);
 		}
 
 		if (node.nodeName === '#text') {
