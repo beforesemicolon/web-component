@@ -2,12 +2,23 @@
 
 A lightweight and powerful web component framework intended to remove the tedious aspect of building reactive Web Components.
 
-"`Web Component API As It Should Have Been`"
+<p align="center"><strong>Web Component API As It Should Have Been</strong></p>
 
-🥇 Build **✅ Flexible, ✅ Extensible, and ✅ Contextful Components** with **✅ Reactive Template**, **✅ Powerful Directives**, **✅ Data and Event Template Binding**, **✅ Simple API** in a **✅ Lightweight package** right in Your Browser.
+🥇 Build **✅ Flexible, ✅ Extensible, and ✅ Contextful Components** with **✅ Reactive Template**, **✅ Powerful Directives**, **✅ Event and Data Binding**, **✅ Simple API** in a **✅ Lightweight package** right in Your Browser.
 
-🚫 No Tedious State Management and DOM Manipulation! 🚫 No Robust Data Store and Context Setup! 🚫 No Verbose API! 🚫 No JSX! 🚫 No Virtual DOM! 
-🚫 No Weird HTML or Javascript Syntax! 🚫 No Decorators Hell!
+🚫 No Tedious State Management and DOM Manipulation! 
+
+🚫 No Robust Data Store and Context Setup! 
+
+🚫 No Verbose API! 
+
+🚫 No JSX! 
+
+🚫 No Virtual DOM! 
+
+🚫 No Weird HTML or Javascript Syntax! 
+
+🚫 No Decorators Hell!
 
 **Learn More From The [Documentation](https://github.com/beforesemicolon/web-component#documentation)**
 
