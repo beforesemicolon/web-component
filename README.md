@@ -1,4 +1,4 @@
-![BFS Web Component Framework](https://github.com/beforesemicolon/web-component/blob/develop/doc/cover.jpg)
+![BFS Web Component Framework](https://github.com/beforesemicolon/web-component/blob/master/doc/cover.jpg)
 
 A lightweight and powerful web component framework intended to remove the tedious aspect of building reactive Web Components.
 
