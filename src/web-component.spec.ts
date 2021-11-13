@@ -235,6 +235,9 @@ describe('WebComponent', () => {
 		class MComp extends WebComponent {
 			static observedAttributes = ['sample', 'style', 'class', 'data-x'];
 			numb = 12;
+			deep = {
+				value: 2000
+			}
 
 			onMount() {
 				mountFn();
@@ -302,6 +305,21 @@ describe('WebComponent', () => {
 			k.setAttribute('sample', 'bold');
 
 			expect(updateFn).toHaveBeenCalledTimes(3);
+		});
+
+		it('should trigger onUpdate when properties DEEP update only if mounted', () => {
+			k.deep.value = 1000
+
+			expect(updateFn).toHaveBeenCalledTimes(0);
+			expect(k.deep).toEqual({"value": 1000});
+
+			document.body.appendChild(k);
+
+			updateFn.mockClear(); // clear the call when appended to the DOM
+
+			k.deep.value = 1500;
+
+			expect(updateFn).toHaveBeenCalledWith("deep", {value: 1500}, {value: 1500});
 		});
 
 		it('should trigger onUpdate when class gets updated through classes property or setAttribute', () => {
