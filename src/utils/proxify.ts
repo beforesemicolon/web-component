@@ -1,49 +1,105 @@
-export function proxify(name: string, object: any, change: (name: string, o: any) => void = () => {}): any {
+export function proxify(name: string, object: any, notify: (name: string, o: any) => void = () => {
+}, self = null): any {
+	self = self ?? object;
+
 	if (!object || object.__proxy__ || typeof object === 'number' || typeof object === 'string' || typeof object === 'boolean' || typeof object === 'function') {
 		return object;
 	}
 
-	const proxy = new Proxy(object, {
+	return new Proxy(object, {
 		get(obj, n: string) {
-			if (n == '__proxy__') {
-				return true;
-			}
-
 			const res = Reflect.get(obj, n);
 
-			if(typeof res === 'function') {
-				return (...args: any[]) => {
-					const r = res.apply(obj, args);
+			if (res) {
+				if (typeof res === 'object') {
+					return proxify(name, res, notify, self);
+				}
 
-					// todo: change this to actually check if the array changed in size or items
-					if(Array.isArray(obj) && /push|pop|splice|shift|unshift|reverse|sort|fill|copyWithin/.test(n)) {
-						change(name, obj);
+				if (typeof n !== 'symbol' && typeof res === 'function') {
+
+					// for each can be used to loop over the properties of an object
+					// to change the value of each property which is the reason to proxify the items
+					// but the same cannot be said to methods like map, reduce and filter
+					// which return a new object and not the original one so for those
+					// to have the change event triggered, the return objects must be used to replace the object
+					// and get proxified in the process
+					if (/forEach/.test(n)) {
+                        return (cb: (v: any, k: number, l: any) => void, thisArg?: any) => {
+	                        obj[n]((v: any, k: number, l: any) => {
+		                        cb.call(thisArg ?? obj, proxify(name, v, notify, self), k, l);
+	                        }, thisArg ?? obj);
+                        };
+                    } else if (/values|entries|keys/.test(n)) {
+						// keys need to also be proxified becuase they may be objects which are used in the
+						// template for rendering
+						return () => ({
+							*[Symbol.iterator]() {
+								if (n === 'entries') {
+									for (const [k, v] of obj[n]()) {
+										yield [proxify(name, k, notify, self), proxify(name, v, notify, self)];
+									}
+								} else {
+									for (const v of obj[n]()) {
+										yield proxify(name, v, notify, self);
+									}
+								}
+
+							}
+						})
 					}
 
-					return r;
+					return (...args: any[]) => {
+						const r = res.apply(obj, args);
+
+						// reading any item while it is still in the object should be proxified
+						// to allow for detecting changes
+						if (typeof r === 'object' && (
+							(Array.isArray(obj) && /at|find/.test(n)) ||
+							((obj instanceof Map) && /get/.test(n)) ||
+							((obj instanceof WeakMap) && /get/.test(n))
+						)) {
+							return proxify(name, r, notify, self);
+						}
+
+						// this is done under the assumption that the function
+						// will always update the object
+						if (
+							(Array.isArray(obj) && /push|pop|splice|shift|unshift|reverse|sort|fill|copyWithin/.test(n)) ||
+							((obj instanceof Map) && /set|delete|clear/.test(n)) ||
+							((obj instanceof Set) && /add|delete|clear/.test(n)) ||
+							((obj instanceof WeakSet) && /add|delete/.test(n)) ||
+							((obj instanceof WeakMap) && /set|delete/.test(n))
+						) {
+							notify(name, self);
+						}
+
+						return r;
+					}
 				}
 			}
 
 			return res;
 		},
 		set(obj, n: string, value) {
-			if (value && typeof value == 'object') {
-				value = proxify(n, value, change);
-			}
-
 			const res = Reflect.set(obj, n, value);
 
-			change(name, obj);
+			notify(name, self);
 
 			return res;
-		}
+		},
+		deleteProperty(target: any, p: string | symbol): boolean {
+            const res = Reflect.deleteProperty(target, p);
+
+            notify(name, self);
+
+            return res;
+        },
+		defineProperty(target: any, p: string | symbol, attributes: PropertyDescriptor): boolean {
+            const res = Reflect.defineProperty(target, p, attributes);
+
+            notify(name, self);
+
+            return res;
+        },
 	});
-
-	for (const prop in object) {
-		if (object.hasOwnProperty(prop) && object[prop] && typeof object[prop] === 'object') {
-			object[prop] = proxify(name, object[prop], change);
-		}
-	}
-
-	return proxy;
 }
