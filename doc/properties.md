@@ -59,11 +59,12 @@ CounterWidget.register();
 document.body.appendChild(new CounterWidget())
 ```
 
-But the update is only triggered on **re-assignment** and will not work if updating a property in
-an object. 
+The component can even detect deep object changes.
 
-If we update the `count` to be an object with a `value` property, updating that property
-will not trigger a DOM update.
+If we change the count to be an object with the `value` property, the component will update the DOM when we change
+that property.
+
+Any property you declare on the class including all the attributes will be deeply watched.
 
 ```js
 class CounterWidget extends WebComponent {
@@ -79,7 +80,7 @@ class CounterWidget extends WebComponent {
   }
   
   updateCount(newCount) {
-    this.count.value = newCount; // will NOT trigger DOM update
+    this.count.value = newCount;
   }
 }
 
@@ -87,9 +88,6 @@ CounterWidget.register();
 
 document.body.appendChild(new CounterWidget())
 ```
-
-That means that you should always re-assign to get the automatic update but in case you still
-need to do the update, you can use the **Not Recommended** `forceUpdate` method.
 
 #### forceUpdate
 The `forceUpdate` is a NOT recommended way to force the component DOM Nodes to be updated.
