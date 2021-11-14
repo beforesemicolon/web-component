@@ -407,6 +407,20 @@ describe('proxify', () => {
         ]));
       });
     })
+
+    describe('should allow for common map actions like', () => {
+      it('to array', () => {
+        prx.set('sample', 10);
+        cb.mockClear();
+
+        expect(Array.from(prx)).toEqual([['sample', 10]]);
+        expect(Array.from(prx.keys())).toEqual(['sample']);
+        expect(Array.from(prx.values())).toEqual([10]);
+        expect(Array.from(prx.entries())).toEqual([['sample', 10]]);
+
+        expect(cb).not.toHaveBeenCalled();
+      });
+    })
   })
 
   describe('Set', () => {
@@ -442,6 +456,20 @@ describe('proxify', () => {
         prx.clear();
 
         expect(cb).toHaveBeenCalledWith("sample", new Set());
+      });
+    })
+
+    describe('should allow for common set actions like', () => {
+      it('to array', () => {
+        prx.add(10);
+        cb.mockClear();
+
+        expect(Array.from(prx)).toEqual([10]);
+        expect(Array.from(prx.keys())).toEqual([10]);
+        expect(Array.from(prx.values())).toEqual([10]);
+        expect(Array.from(prx.entries())).toEqual([[10, 10]]);
+
+        expect(cb).not.toHaveBeenCalled();
       });
     })
   })

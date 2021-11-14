@@ -6,7 +6,8 @@ export function setupComponentPropertiesForAutoUpdate(component: WebComponent, o
 	for (let property of Object.getOwnPropertyNames(component)) {
 		const attr = turnCamelToKebabCasing(property);
 
-		if (property[0] !== '_' && !(component.constructor as WebComponentConstructor).observedAttributes.includes(attr)) {
+		// ignore private properties and $ properties as well as attribute properties
+		if (!/\$|_/.test(property[0]) && !(component.constructor as WebComponentConstructor).observedAttributes.includes(attr)) {
 			let value = component[property];
 
 			value = proxify(property, value, () => {

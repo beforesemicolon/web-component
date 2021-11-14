@@ -404,13 +404,13 @@ describe('WebComponent', () => {
 		});
 
 		it('should update DOM when forceUpdate is called', () => {
-			n.obj.value = 15;
-
-			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">12 </strong>')
+			const spy = jest.spyOn(n, '_updateTrackValue');
 
 			n.forceUpdate();
 
-			expect(n.root?.innerHTML).toBe('15<strong class="" style="" data-x="">12 </strong>')
+			expect(n._updateTrackValue).toHaveBeenCalledTimes(n._trackers.size);
+
+			spy.mockReset();
 		});
 
 		it('should update DOM when class gets updated', () => {
