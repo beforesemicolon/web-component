@@ -1,4 +1,5 @@
 import {turnKebabToCamelCasing} from './turn-kebab-to-camel-casing';
+import {proxify} from './proxify';
 import boolAttr from './boolean-attributes.json';
 
 export function setComponentPropertiesFromObservedAttributes(component: HTMLElement, observedAttributes: string[], onUpdate: onUpdateCallback) {
@@ -16,6 +17,10 @@ export function setComponentPropertiesFromObservedAttributes(component: HTMLElem
 				}
 			}
 
+			value = proxify(prop, value, () => {
+				onUpdate(prop, value, value);
+			})
+
 			if ((boolAttr).hasOwnProperty(prop)) {
 				value = (boolAttr as booleanAttributes)[prop].value;
 				prop = (boolAttr as booleanAttributes)[prop].name;
@@ -28,7 +33,9 @@ export function setComponentPropertiesFromObservedAttributes(component: HTMLElem
 				set(newValue) {
 					if (value !== newValue) {
 						const oldValue = value;
-						value = newValue;
+						value = proxify(prop, newValue, () => {
+							onUpdate(prop, oldValue, value);
+						});
 						onUpdate(prop, oldValue, newValue);
 					}
 				}

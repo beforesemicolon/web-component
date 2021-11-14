@@ -235,6 +235,9 @@ describe('WebComponent', () => {
 		class MComp extends WebComponent {
 			static observedAttributes = ['sample', 'style', 'class', 'data-x'];
 			numb = 12;
+			deep = {
+				value: 2000
+			}
 
 			onMount() {
 				mountFn();
@@ -302,6 +305,21 @@ describe('WebComponent', () => {
 			k.setAttribute('sample', 'bold');
 
 			expect(updateFn).toHaveBeenCalledTimes(3);
+		});
+
+		it('should trigger onUpdate when properties DEEP update only if mounted', () => {
+			k.deep.value = 1000
+
+			expect(updateFn).toHaveBeenCalledTimes(0);
+			expect(k.deep).toEqual({"value": 1000});
+
+			document.body.appendChild(k);
+
+			updateFn.mockClear(); // clear the call when appended to the DOM
+
+			k.deep.value = 1500;
+
+			expect(updateFn).toHaveBeenCalledWith("deep", {value: 1500}, {value: 1500});
 		});
 
 		it('should trigger onUpdate when class gets updated through classes property or setAttribute', () => {
@@ -386,13 +404,13 @@ describe('WebComponent', () => {
 		});
 
 		it('should update DOM when forceUpdate is called', () => {
-			n.obj.value = 15;
-
-			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">12 </strong>')
+			const spy = jest.spyOn(n, '_updateTrackValue');
 
 			n.forceUpdate();
 
-			expect(n.root?.innerHTML).toBe('15<strong class="" style="" data-x="">12 </strong>')
+			expect(n._updateTrackValue).toHaveBeenCalledTimes(n._trackers.size);
+
+			spy.mockReset();
 		});
 
 		it('should update DOM when class gets updated', () => {
