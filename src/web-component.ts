@@ -10,6 +10,7 @@ import {evaluateStringInComponentContext} from './utils/evaluate-string-in-compo
 import {parseNodeDirective} from "./utils/parse-node-directive";
 import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
 import booleanAttr from './utils/boolean-attributes.json';
+import {directives} from "./utils/directives";
 
 /**
  * a extension on the native web component API to simplify and automate most of the pain points
@@ -18,7 +19,6 @@ import booleanAttr from './utils/boolean-attributes.json';
 export class WebComponent extends HTMLElement {
 	private readonly _root: WebComponent | ShadowRoot;
 	private readonly _trackers: Map<HTMLElement | Node | WebComponent, NodeTrack> = new Map();
-	private readonly _directives: Set<Directive> = new Set(['ref', 'if', 'repeat', 'attr']);
 	private _mounted = false;
 	private _parsed = false;
 	private _context: ObjectLiteral = {};
@@ -33,8 +33,6 @@ export class WebComponent extends HTMLElement {
 		super();
 
 		this._root = this;
-		this._childNodes = Array.from(this.childNodes);
-		this.innerHTML = '';
 
 		// @ts-ignore
 		let {name, mode, observedAttributes, delegatesFocus, initialContext} = this.constructor;
@@ -216,6 +214,8 @@ export class WebComponent extends HTMLElement {
 				})
 
 				let contentNode;
+				this._childNodes = Array.from(this.childNodes);
+				this.innerHTML = '';
 
 				contentNode = parse(this.template);
 
@@ -506,7 +506,7 @@ export class WebComponent extends HTMLElement {
 			return;
 		}
 
-		const keys = new Set(Object.getOwnPropertyNames(this).filter((n) => !n.startsWith('_') && !this._directives.has(n as Directive)));
+		const keys = new Set(Object.getOwnPropertyNames(this).filter((n) => !n.startsWith('_') && !directives.has(n as Directive)));
 		const ctx = this.$context;
 		keys.add('$context');
 		keys.add('$item');
@@ -582,7 +582,9 @@ export class WebComponent extends HTMLElement {
 						newValue = this._resolveExecutable(node, exc, newValue);
 					});
 
-					(node as ObjectLiteral)[property.name] = newValue;
+					if (newValue !== (node as ObjectLiteral)[property.name]) {
+						(node as ObjectLiteral)[property.name] = newValue;
+					}
 				}
 
 				for (let {name, value, executables} of attributes) {
@@ -601,8 +603,10 @@ export class WebComponent extends HTMLElement {
 							} catch (e) {
 							}
 
-							(node as ObjectLiteral)[camelName] = newValue;
-						} else {
+							if (newValue !== (node as ObjectLiteral)[camelName]) {
+								(node as ObjectLiteral)[camelName] = newValue;
+							}
+						} else if((node as HTMLElement).getAttribute(name) !== newValue) {
 							(node as HTMLElement).setAttribute(name, newValue);
 						}
 					}
@@ -648,6 +652,8 @@ export class WebComponent extends HTMLElement {
 		let {value, placeholderNode}: DirectiveValue = (node as ObjectLiteral)[attr][0];
 
 		const shouldRender = this._execString(value, [$item, $key]);
+
+		(node as ObjectLiteral)[attr][0].prevValue = shouldRender
 
 		if (!placeholderNode) {
 			(node as ObjectLiteral)[attr][0].placeholderNode = document.createComment(`${attr}: ${value}`);
