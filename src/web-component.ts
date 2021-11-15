@@ -649,16 +649,9 @@ export class WebComponent extends HTMLElement {
 		const attr = 'if';
 		// @ts-ignore
 		let {$item, $key} = node;
-		let {value, placeholderNode, prevValue}: DirectiveValue = (node as ObjectLiteral)[attr][0];
+		let {value, placeholderNode}: DirectiveValue = (node as ObjectLiteral)[attr][0];
 
 		const shouldRender = this._execString(value, [$item, $key]);
-
-		// if the condition came to be same as previous, there is no need to
-		// go through all the calculation to decide on the rendering.
-		// the DOM node simply continues to be the same
-		if (prevValue !== undefined && shouldRender === prevValue) {
-		    return shouldRender ? node : null;
-		}
 
 		(node as ObjectLiteral)[attr][0].prevValue = shouldRender
 
