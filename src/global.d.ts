@@ -38,6 +38,7 @@ export declare global {
 
 	export interface DirectiveValue {
 		value: string;
+		prevValue?: unknown;
 		prop: string;
 		placeholderNode?: Comment;
 	}
