@@ -157,6 +157,9 @@ describe('proxify', () => {
         prx.push({ a: 10 }, { a: 20 }, { a: 30 });
         cb.mockClear();
 
+        // todo: this part of the tests is failing because the symbol iterator func gets the object bound to it
+        // the bound is needed for when converting object to a different type
+        // further research is needed to understand why this is happening
         // for (let item of prx) {
         //   item.a += 1;
         // }
