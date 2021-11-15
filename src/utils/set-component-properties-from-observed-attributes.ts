@@ -1,12 +1,13 @@
 import {turnKebabToCamelCasing} from './turn-kebab-to-camel-casing';
 import {proxify} from './proxify';
 import boolAttr from './boolean-attributes.json';
+import {directives} from "./directives";
 
 export function setComponentPropertiesFromObservedAttributes(component: HTMLElement, observedAttributes: string[], onUpdate: onUpdateCallback) {
 	observedAttributes.forEach(prop => {
 		prop = prop.trim();
 
-		if (!(prop.startsWith('data-') || prop === 'class' || prop === 'style')) {
+		if (!directives.has(prop) && !(prop.startsWith('data-') || prop === 'class' || prop === 'style')) {
 			let value: string | boolean = component.getAttribute(prop) ?? '';
 			prop = turnKebabToCamelCasing(prop);
 
