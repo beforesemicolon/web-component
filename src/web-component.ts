@@ -506,11 +506,12 @@ export class WebComponent extends HTMLElement {
 		}
 	}
 
-	private _execString(executable: string, [$item, $key]: any[] = []) {
+	private _execString(executable: string, node: ObjectLiteral) {
 		if (!executable.trim()) {
 			return;
 		}
 
+		const {$item, $key} = node;
 		const keys = this._properties.slice();
 		const ctx = this.$context;
 
@@ -554,7 +555,7 @@ export class WebComponent extends HTMLElement {
 			}
 		}
 
-		let res = this._execString(executable, [$item, $key]);
+		let res = this._execString(executable, node);
 
 		if (res && typeof res === 'object') {
 			try {
@@ -649,11 +650,9 @@ export class WebComponent extends HTMLElement {
 
 	private _handleIfAttribute(node: WebComponent) {
 		const attr = 'if';
-		// @ts-ignore
-		let {$item, $key} = node;
 		let {value, placeholderNode}: DirectiveValue = (node as ObjectLiteral)[attr][0];
 
-		const shouldRender = this._execString(value, [$item, $key]);
+		const shouldRender = this._execString(value, node);
 
 		(node as ObjectLiteral)[attr][0].prevValue = shouldRender
 
@@ -714,7 +713,7 @@ export class WebComponent extends HTMLElement {
 		const attr = 'repeat';
 		const repeatAttr = 'repeat_id';
 		let {value, placeholderNode}: DirectiveValue = (node as ObjectLiteral)[attr][0];
-		let repeatData = this._execString(value);
+		let repeatData = this._execString(value, node);
 		let index = 0;
 
 		if (!(node as ObjectLiteral)[repeatAttr]) {
@@ -814,12 +813,11 @@ export class WebComponent extends HTMLElement {
 
 		(node as ObjectLiteral)[attr].forEach(({value, prop}: DirectiveValue) => {
 			let [attrName, property] = prop.split('.');
-			let {$item, $key} = node as ObjectLiteral;
 			const commaIdx = value.lastIndexOf(',');
 			let val = commaIdx >= 0 ? value.slice(0, commaIdx).trim() : '';
 			const shouldAdd = this._execString(
 				commaIdx >= 0 ? value.slice(commaIdx + 1).trim() : value,
-				[$item, $key]);
+				node);
 
 			if (val) {
 				extractExecutableSnippetFromString(val).forEach((exc) => {
