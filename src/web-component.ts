@@ -884,21 +884,21 @@ export class WebComponent extends HTMLElement {
 					break;
 				default:
 					if (attrName) {
-						const kebabProp = turnCamelToKebabCasing(attrName);
 						if (shouldAdd) {
 							if (booleanAttr.hasOwnProperty(attrName)) {
-								node.setAttribute(kebabProp, '');
+								node.setAttribute(attrName, '');
 							} else {
 								const idealVal = val || shouldAdd;
+								const kebabProp = turnCamelToKebabCasing(attrName);
 
-								if ((node as ObjectLiteral)[attrName] !== undefined) {
-									(node as ObjectLiteral)[attrName] = idealVal;
+								if ((node as ObjectLiteral)[kebabProp] !== undefined) {
+									(node as ObjectLiteral)[kebabProp] = idealVal;
 								} else {
-									node.setAttribute(kebabProp, idealVal.toString());
+									node.setAttribute(attrName, idealVal.toString());
 								}
 							}
 						} else {
-							node.removeAttribute(kebabProp);
+							node.removeAttribute(attrName);
 						}
 					}
 			}
