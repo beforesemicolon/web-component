@@ -219,10 +219,11 @@ export class WebComponent extends HTMLElement {
 				)
 
 				let contentNode;
-				this._childNodes = Array.from(this.childNodes);
-				this.innerHTML = '';
 
 				contentNode = parse(this.template);
+
+				this._childNodes = Array.from(this.childNodes);
+				this.innerHTML = '';
 
 				this._render(contentNode);
 
@@ -389,8 +390,12 @@ export class WebComponent extends HTMLElement {
 	}
 
 	private _render(node: Node | HTMLElement | DocumentFragment | WebComponent, directives: Directive[] = [], handlers: NodeTrack['eventHandlers'] = []) {
-		if (node.nodeName === 'SLOT') {
-			return this._renderSlotNode(node as HTMLSlotElement);
+		// it is possible that the node is already rendered by the parent component
+		// and then picked up by the child component via slot
+		// in that case we do not need to render it again since it will already be
+		// ready to do anything it needs and also prevent it from being tracked again
+		if ((node as ObjectLiteral).__rendered) {
+		  return;
 		}
 
 		if (node.nodeName === '#text') {
@@ -401,6 +406,12 @@ export class WebComponent extends HTMLElement {
 					executables: []
 				});
 			}
+
+			return;
+		}
+
+		if (node.nodeName === 'SLOT') {
+			return this._renderSlotNode(node as HTMLSlotElement);
 		}
 
 		// process element nodes https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
@@ -462,6 +473,9 @@ export class WebComponent extends HTMLElement {
 				return;
 			}
 		}
+
+		// mark the node as rendered so it gets skipped if picked via slot
+		(node as ObjectLiteral).__rendered = true;
 
 		if (node.nodeName !== '#comment') {
 			node.childNodes.forEach(child => this._render(child));
