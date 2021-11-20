@@ -20,14 +20,13 @@ export class WebComponent extends HTMLElement {
 	private readonly _root: WebComponent | ShadowRoot;
 	private readonly _trackers: Map<HTMLElement | Node | WebComponent, NodeTrack> = new Map();
 	private _mounted = false;
-	private _parsed = false;
+	protected _parsed = false;
 	private _context: ObjectLiteral = {};
 	private _contextSource: WebComponent | null = null;
 	private _contextSubscribers: Array<ObserverCallback> = [];
 	private _unsubscribeCtx: () => void = () => {
 	};
 	readonly $refs: Refs = Object.create(null);
-	private _childNodes: Array<ChildNode> = [];
 	private _properties: Array<string> = ['$context', '$key', '$item', '$refs'];
 
 	constructor() {
@@ -222,9 +221,6 @@ export class WebComponent extends HTMLElement {
 
 				contentNode = parse(this.template);
 
-				this._childNodes = Array.from(this.childNodes);
-				this.innerHTML = '';
-
 				this._render(contentNode);
 
 				const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
@@ -242,7 +238,6 @@ export class WebComponent extends HTMLElement {
 				this._parsed = true;
 
 				this._root.appendChild(contentNode);
-				this._childNodes = [];
 			}
 
 			this._mounted = true;
@@ -357,39 +352,15 @@ export class WebComponent extends HTMLElement {
 		return null
 	}
 
-	private _renderSlotNode(node: HTMLSlotElement) {
-		const name = node.getAttribute('name');
-		let nodeList: any;
-		let comment = document.createComment(`slotted [${name || ''}]`);
-		node.parentNode?.replaceChild(comment, node);
-
-		if (name) {
-			nodeList = this._childNodes.filter(n => {
-				return n.nodeType === 1 && (n as HTMLElement).getAttribute('slot') === name;
+	protected _renderSlotNode(node: HTMLSlotElement) {
+		node.addEventListener('slotchange', () => {
+			node.assignedNodes().forEach(n => {
+				this._render(n);
 			});
-		} else {
-			nodeList = this._childNodes.filter(n => {
-				return n.nodeType !== 1 || !(n as HTMLElement).hasAttribute('slot');
-			});
-		}
-
-		if (!nodeList.length) {
-			nodeList = node.childNodes;
-		}
-
-		let anchor = comment;
-
-		for (let n of nodeList) {
-			anchor.after(n);
-			anchor = n;
-		}
-
-		for (let n of nodeList) {
-			this._render(n);
-		}
+		})
 	}
 
-	private _render(node: Node | HTMLElement | DocumentFragment | WebComponent, directives: Directive[] = [], handlers: NodeTrack['eventHandlers'] = []) {
+	protected _render(node: Node | HTMLElement | DocumentFragment | WebComponent, directives: Directive[] = [], handlers: NodeTrack['eventHandlers'] = []) {
 		// it is possible that the node is already rendered by the parent component
 		// and then picked up by the child component via slot
 		// in that case we do not need to render it again since it will already be
@@ -922,8 +893,63 @@ export class WebComponent extends HTMLElement {
 	}
 }
 
+export class ContextProvider extends WebComponent {
+	private _childNodes: Array<ChildNode> = [];
+
+	static mode = ShadowRootModeExtended.NONE;
+
+	get template() {
+		return '<slot></slot>';
+	}
+
+	connectedCallback() {
+		if (!super._parsed) {
+			this._childNodes = Array.from(this.childNodes);
+			this.innerHTML = '';
+		}
+
+		super.connectedCallback();
+
+		this._childNodes = [];
+	}
+
+	_renderSlotNode(node: HTMLSlotElement) {
+		const name = node.getAttribute('name');
+		let nodeList: any;
+		let comment = document.createComment(`slotted [${name || ''}]`);
+		node.parentNode?.replaceChild(comment, node);
+
+		if (name) {
+			nodeList = this._childNodes.filter(n => {
+				return n.nodeType === 1 && (n as HTMLElement).getAttribute('slot') === name;
+			});
+		} else {
+			nodeList = this._childNodes.filter(n => {
+				return n.nodeType !== 1 || !(n as HTMLElement).hasAttribute('slot');
+			});
+		}
+
+		if (!nodeList.length) {
+			nodeList = node.childNodes;
+		}
+
+		let anchor = comment;
+
+		for (let n of nodeList) {
+			anchor.after(n);
+			anchor = n;
+		}
+
+		for (let n of nodeList) {
+			super._render(n);
+		}
+	}
+}
+
 // @ts-ignore
 if (window) {
 	// @ts-ignore
 	window.WebComponent = WebComponent;
+	// @ts-ignore
+	window.ContextProvider = ContextProvider;
 }
