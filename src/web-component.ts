@@ -27,7 +27,8 @@ export class WebComponent extends HTMLElement {
 	private _unsubscribeCtx: () => void = () => {
 	};
 	readonly $refs: Refs = Object.create(null);
-	private _childNodes: Array<ChildNode>= []
+	private _childNodes: Array<ChildNode> = [];
+	private _properties: Array<string> = ['$context', '$key', '$item', '$refs'];
 
 	constructor() {
 		super();
@@ -51,14 +52,16 @@ export class WebComponent extends HTMLElement {
 
 		this._context = initialContext;
 
-		setComponentPropertiesFromObservedAttributes(this, observedAttributes,
-			(prop, oldValue, newValue) => {
-				this.forceUpdate();
+		this._properties.push(
+			...setComponentPropertiesFromObservedAttributes(this, observedAttributes,
+				(prop, oldValue, newValue) => {
+					this.forceUpdate();
 
-				if (this.mounted) {
-					this.onUpdate(prop, oldValue, newValue);
-				}
-			});
+					if (this.mounted) {
+						this.onUpdate(prop, oldValue, newValue);
+					}
+				})
+		);
 	}
 
 	/**
@@ -205,13 +208,15 @@ export class WebComponent extends HTMLElement {
 			if (this._parsed) {
 				this.forceUpdate();
 			} else {
-				setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
-					this.forceUpdate();
+				this._properties.push(
+					...setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
+						this.forceUpdate();
 
-					if (this.mounted) {
-						this.onUpdate(prop, oldValue, newValue);
-					}
-				})
+						if (this.mounted) {
+							this.onUpdate(prop, oldValue, newValue);
+						}
+					})
+				)
 
 				let contentNode;
 				this._childNodes = Array.from(this.childNodes);
@@ -506,14 +511,11 @@ export class WebComponent extends HTMLElement {
 			return;
 		}
 
-		const keys = new Set(Object.getOwnPropertyNames(this).filter((n) => !n.startsWith('_') && !directives.has(n as Directive)));
+		const keys = this._properties.slice();
 		const ctx = this.$context;
-		keys.add('$context');
-		keys.add('$item');
-		keys.add('$key');
 
 		Object.getOwnPropertyNames(ctx).forEach(n => {
-			keys.add(n);
+			keys.push(n);
 		})
 
 		const keysArray = Array.from(keys);
@@ -606,7 +608,7 @@ export class WebComponent extends HTMLElement {
 							if (newValue !== (node as ObjectLiteral)[camelName]) {
 								(node as ObjectLiteral)[camelName] = newValue;
 							}
-						} else if((node as HTMLElement).getAttribute(name) !== newValue) {
+						} else if ((node as HTMLElement).getAttribute(name) !== newValue) {
 							(node as HTMLElement).setAttribute(name, newValue);
 						}
 					}

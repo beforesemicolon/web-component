@@ -3,13 +3,21 @@ import {proxify} from './proxify';
 import boolAttr from './boolean-attributes.json';
 import {directives} from "./directives";
 
-export function setComponentPropertiesFromObservedAttributes(component: HTMLElement, observedAttributes: string[], onUpdate: onUpdateCallback) {
+export function setComponentPropertiesFromObservedAttributes(
+	component: HTMLElement,
+	observedAttributes: string[],
+	onUpdate: onUpdateCallback
+): string[] {
+	const properties: string[] = [];
+
 	observedAttributes.forEach(prop => {
 		prop = prop.trim();
 
 		if (!directives.has(prop) && !(prop.startsWith('data-') || prop === 'class' || prop === 'style')) {
 			let value: string | boolean = component.getAttribute(prop) ?? '';
 			prop = turnKebabToCamelCasing(prop);
+
+			properties.push(prop);
 
 			if (value) {
 				try {
@@ -43,4 +51,6 @@ export function setComponentPropertiesFromObservedAttributes(component: HTMLElem
 			})
 		}
 	})
+
+	return properties;
 }

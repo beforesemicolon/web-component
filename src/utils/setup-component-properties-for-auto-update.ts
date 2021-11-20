@@ -2,7 +2,8 @@ import {turnCamelToKebabCasing} from "./turn-camel-to-kebab-casing";
 import {directives} from "./directives";
 import {proxify} from "./proxify";
 
-export function setupComponentPropertiesForAutoUpdate(component: WebComponent, onUpdate: onUpdateCallback) {
+export function setupComponentPropertiesForAutoUpdate(component: WebComponent, onUpdate: onUpdateCallback): string[] {
+	const properties: string[] = [];
 
 	for (let property of Object.getOwnPropertyNames(component)) {
 		const attr = turnCamelToKebabCasing(property);
@@ -10,6 +11,8 @@ export function setupComponentPropertiesForAutoUpdate(component: WebComponent, o
 		// ignore private properties and $ properties as well as attribute properties
 		if (!directives.has(property) && !/\$|_/.test(property[0]) && !(component.constructor as WebComponentConstructor).observedAttributes.includes(attr)) {
 			let value = component[property];
+
+			properties.push(property);
 
 			value = proxify(property, value, () => {
 				onUpdate(property, value, value);
@@ -32,4 +35,6 @@ export function setupComponentPropertiesForAutoUpdate(component: WebComponent, o
 			})
 		}
 	}
+
+	return properties;
 }
