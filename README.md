@@ -163,6 +163,7 @@ require('esbuild').build({
 ### Documentation
 
 - [WebComponent](https://github.com/beforesemicolon/web-component/blob/master/doc/WebComponent.md)
+- [ContextProviderComponent](https://github.com/beforesemicolon/web-component/blob/master/doc/ContextProviderComponent.md)
 - [Configurations](https://github.com/beforesemicolon/web-component/blob/master/doc/configurations.md)
 - [Template](https://github.com/beforesemicolon/web-component/blob/master/doc/template.md)
 - [Events](https://github.com/beforesemicolon/web-component/blob/master/doc/events.md)

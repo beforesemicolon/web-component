@@ -1,4 +1,4 @@
-## Web Component class
+## WebComponent
 The WebComponent class is the only API you need to interact with in order to create your components. 
 That should make things pretty simple to learn.
 
