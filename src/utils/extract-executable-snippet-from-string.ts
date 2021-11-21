@@ -1,6 +1,6 @@
-export function extractExecutableSnippetFromString(str: string) {
+export function extractExecutableSnippetFromString(str: string, [start, end] = ['{', '}']) {
 	const stack = [];
-	const pattern = /[}{]/g;
+	const pattern = new RegExp(`[\\${start}\\${end}]`, 'g');
 	let snippets: Executable[] = [];
 	let match;
 	let startingCurlyIndex: number;
@@ -8,9 +8,9 @@ export function extractExecutableSnippetFromString(str: string) {
 	while ((match = pattern.exec(str)) !== null) {
 		const char = match[0];
 
-		if (char === '{') {
+		if (char === start) {
 			stack.push(match.index);
-		} else if (char === '}' && stack.length) {
+		} else if (char === end && stack.length) {
 			startingCurlyIndex = stack.pop() as number;
 
 			const matchStr = str.slice(startingCurlyIndex + 1, match.index);
@@ -27,7 +27,7 @@ export function extractExecutableSnippetFromString(str: string) {
 				snippets.push({
 					from: startingCurlyIndex,
 					to: match.index,
-					match: `{${matchStr}}`,
+					match: `${start}${matchStr}${end}`,
 					executable: matchStr
 				});
 			}
