@@ -364,7 +364,11 @@ export class WebComponent extends HTMLElement {
 			node.assignedNodes().forEach((n: HTMLElement | Node) => {
 				this._render(n);
 			});
-		})
+		});
+
+		node.childNodes.forEach((n: HTMLElement | Node) => {
+            this._render(n);
+        });
 	}
 
 	private _renderStyle(node: HTMLStyleElement) {
