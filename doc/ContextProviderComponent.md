@@ -185,7 +185,7 @@ class TodoApp extends ContextProviderComponent {
     return `
       <style>
         :host h1 {
-          color: {theme.colors.primary};
+          color: [theme.colors.primary];
         }
       </style>
     `;

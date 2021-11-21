@@ -10,7 +10,6 @@ import {evaluateStringInComponentContext} from './utils/evaluate-string-in-compo
 import {parseNodeDirective} from "./utils/parse-node-directive";
 import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
 import booleanAttr from './utils/boolean-attributes.json';
-import {directives} from "./utils/directives";
 
 /**
  * a extension on the native web component API to simplify and automate most of the pain points
@@ -218,21 +217,27 @@ export class WebComponent extends HTMLElement {
 				)
 
 				let contentNode;
+				const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
+				const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
 
-				contentNode = parse(this.template);
+				contentNode = parse(style + this.template);
 
 				this._render(contentNode);
 
-				const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
+				const {tagName, mode} = (this.constructor as WebComponentConstructor);
 
-				const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
+				if (mode === 'none') {
+					const styles = contentNode.querySelectorAll('style');
 
-				if (style) {
-					if (hasShadowRoot) {
-						this._root.innerHTML = style;
-					} else if (!document.head.querySelector(`style.${(this.constructor as WebComponentConstructor).tagName}`)) {
-						document.head.insertAdjacentHTML('beforeend', style);
-					}
+					styles.forEach((style: HTMLStyleElement) => {
+						const existingStyleElement: HTMLStyleElement | null = document.head.querySelector(`style.${tagName}`);
+
+						if (existingStyleElement) {
+							existingStyleElement.textContent = `${style?.textContent}${existingStyleElement.textContent}`;
+						} else {
+							document.head.appendChild(style);
+						}
+					})
 				}
 
 				this._parsed = true;
@@ -308,7 +313,9 @@ export class WebComponent extends HTMLElement {
 	 * updates any DOM node with data bind reference.
 	 */
 	forceUpdate() {
-		this._trackers.forEach((track: NodeTrack) => this._updateTrackValue(track));
+		this._trackers.forEach((track: NodeTrack) => {
+			this._updateTrackValue(track)
+		});
 	}
 
 	adoptedCallback() {
@@ -354,10 +361,36 @@ export class WebComponent extends HTMLElement {
 
 	protected _renderSlotNode(node: HTMLSlotElement) {
 		node.addEventListener('slotchange', () => {
-			node.assignedNodes().forEach(n => {
+			node.assignedNodes().forEach((n: HTMLElement | Node) => {
 				this._render(n);
 			});
 		})
+	}
+
+	private _renderStyle(node: HTMLStyleElement) {
+		const selectorPattern = /[a-z:#\.*\[][^{}]*[^\s:]\s*(?={){/gmi;
+		const propValueStylePattern = /[a-z][a-z-]*:([^;]*)(;|})/gmi;
+		let styleText = (node.textContent ?? '');
+		let match: RegExpExecArray | null = null;
+		let executables: Array<Executable> = [];
+
+		while ((match = selectorPattern.exec(styleText)) !== null) {
+			let propValueMatch: RegExpExecArray | null = null;
+			let propValue = styleText.slice(selectorPattern.lastIndex);
+
+			while ((propValueMatch = propValueStylePattern.exec(propValue)) !== null) {
+				executables.push(...extractExecutableSnippetFromString(propValueMatch[1], ['[', ']']))
+			}
+
+		}
+
+		if (executables.length) {
+			this._trackNode(node, [], [], [], {
+				name: 'textContent',
+				value: styleText,
+				executables
+			});
+		}
 	}
 
 	protected _render(node: Node | HTMLElement | DocumentFragment | WebComponent, directives: Directive[] = [], handlers: NodeTrack['eventHandlers'] = []) {
@@ -379,6 +412,10 @@ export class WebComponent extends HTMLElement {
 			}
 
 			return;
+		}
+
+		if (node.nodeName === 'STYLE') {
+		    return this._renderStyle(node as HTMLStyleElement);
 		}
 
 		if (node.nodeName === 'SLOT') {
@@ -471,7 +508,7 @@ export class WebComponent extends HTMLElement {
 				eventHandlers
 			};
 
-			if (property?.value.trim()) {
+			if (property?.value.trim() && !property.executables.length) {
 				property.executables = extractExecutableSnippetFromString(property.value)
 			}
 
@@ -491,36 +528,38 @@ export class WebComponent extends HTMLElement {
 		}
 	}
 
-	private _execString(executable: string, node: ObjectLiteral) {
-		if (!executable.trim()) {
-			return;
-		}
-
-		const {$item, $key} = node;
-		const keys = this._properties.slice();
-		const ctx = this.$context;
-
-		Object.getOwnPropertyNames(ctx).forEach(n => {
-			keys.push(n);
-		})
-
-		const keysArray = Array.from(keys);
-
-		const values = keysArray.map(key => {
-			switch (key) {
-				case '$context':
-					return ctx;
-				case '$item':
-					return $item;
-				case '$key':
-					return $key;
+	private _execString(executable: string, nodeData: ObjectLiteral) {
+		try {
+			if (!executable.trim()) {
+				return;
 			}
 
-			// @ts-ignore
-			return this[key] ?? ctx[key];
-		});
+			const {$item, $key} = nodeData;
+			const keys = this._properties.slice();
+			const ctx = this.$context;
 
-		return evaluateStringInComponentContext(executable, this, keysArray, values);
+			Object.getOwnPropertyNames(ctx).forEach(n => {
+				keys.push(n);
+			})
+
+			const values = keys.map(key => {
+				switch (key) {
+					case '$context':
+						return ctx;
+					case '$item':
+						return $item;
+					case '$key':
+						return $key;
+				}
+
+				// @ts-ignore
+				return this[key] ?? ctx[key];
+			});
+
+			return evaluateStringInComponentContext(executable, this, keys, values);
+		} catch(e) {
+			this.onError(e as Error)
+		}
 	}
 
 	private _resolveExecutable(node: Node, {match, executable}: Executable, newValue: string) {
@@ -540,7 +579,7 @@ export class WebComponent extends HTMLElement {
 			}
 		}
 
-		let res = this._execString(executable, node);
+		let res = this._execString(executable, {$item, $key});
 
 		if (res && typeof res === 'object') {
 			try {
@@ -893,6 +932,9 @@ export class WebComponent extends HTMLElement {
 	}
 }
 
+/**
+ * a special WebComponent that handles slot tag differently allowing for render template right into HTML files
+ */
 export class ContextProvider extends WebComponent {
 	private _childNodes: Array<ChildNode> = [];
 
