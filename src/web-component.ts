@@ -364,7 +364,11 @@ export class WebComponent extends HTMLElement {
 			node.assignedNodes().forEach((n: HTMLElement | Node) => {
 				this._render(n);
 			});
-		})
+		});
+
+		node.childNodes.forEach((n: HTMLElement | Node) => {
+            this._render(n);
+        });
 	}
 
 	private _renderStyle(node: HTMLStyleElement) {
@@ -935,7 +939,7 @@ export class WebComponent extends HTMLElement {
 /**
  * a special WebComponent that handles slot tag differently allowing for render template right into HTML files
  */
-export class ContextProvider extends WebComponent {
+export class ContextProviderComponent extends WebComponent {
 	private _childNodes: Array<ChildNode> = [];
 
 	static mode = ShadowRootModeExtended.NONE;
@@ -993,5 +997,5 @@ if (window) {
 	// @ts-ignore
 	window.WebComponent = WebComponent;
 	// @ts-ignore
-	window.ContextProvider = ContextProvider;
+	window.ContextProviderComponent = ContextProviderComponent;
 }
