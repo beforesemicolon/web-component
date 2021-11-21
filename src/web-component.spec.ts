@@ -176,6 +176,8 @@ describe('WebComponent', () => {
 			expect(i.root?.innerHTML).toBeUndefined()
 			expect(document.head.innerHTML).toBe('<style class="i-comp">i-comp {display: inline-block;}</style>')
 		});
+
+		it.todo('should update style when data or context changes')
 	});
 
 	describe('template', () => {
@@ -718,6 +720,8 @@ describe('WebComponent', () => {
 			expect(s.children[0].assignedSlot).toBe(sSlot);
 			expect(s.children[1].assignedSlot).toBe(null);
 		});
+
+		it.todo('should render inner slot content')
 	})
 
 	describe('directives', () => {
