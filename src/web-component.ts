@@ -10,7 +10,6 @@ import {evaluateStringInComponentContext} from './utils/evaluate-string-in-compo
 import {parseNodeDirective} from "./utils/parse-node-directive";
 import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
 import booleanAttr from './utils/boolean-attributes.json';
-import {directives} from "./utils/directives";
 
 /**
  * a extension on the native web component API to simplify and automate most of the pain points
@@ -20,14 +19,14 @@ export class WebComponent extends HTMLElement {
 	private readonly _root: WebComponent | ShadowRoot;
 	private readonly _trackers: Map<HTMLElement | Node | WebComponent, NodeTrack> = new Map();
 	private _mounted = false;
-	private _parsed = false;
+	protected _parsed = false;
 	private _context: ObjectLiteral = {};
 	private _contextSource: WebComponent | null = null;
 	private _contextSubscribers: Array<ObserverCallback> = [];
 	private _unsubscribeCtx: () => void = () => {
 	};
 	readonly $refs: Refs = Object.create(null);
-	private _childNodes: Array<ChildNode>= []
+	private _properties: Array<string> = ['$context', '$key', '$item', '$refs'];
 
 	constructor() {
 		super();
@@ -51,14 +50,16 @@ export class WebComponent extends HTMLElement {
 
 		this._context = initialContext;
 
-		setComponentPropertiesFromObservedAttributes(this, observedAttributes,
-			(prop, oldValue, newValue) => {
-				this.forceUpdate();
+		this._properties.push(
+			...setComponentPropertiesFromObservedAttributes(this, observedAttributes,
+				(prop, oldValue, newValue) => {
+					this.forceUpdate();
 
-				if (this.mounted) {
-					this.onUpdate(prop, oldValue, newValue);
-				}
-			});
+					if (this.mounted) {
+						this.onUpdate(prop, oldValue, newValue);
+					}
+				})
+		);
 	}
 
 	/**
@@ -205,38 +206,43 @@ export class WebComponent extends HTMLElement {
 			if (this._parsed) {
 				this.forceUpdate();
 			} else {
-				setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
-					this.forceUpdate();
+				this._properties.push(
+					...setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
+						this.forceUpdate();
 
-					if (this.mounted) {
-						this.onUpdate(prop, oldValue, newValue);
-					}
-				})
+						if (this.mounted) {
+							this.onUpdate(prop, oldValue, newValue);
+						}
+					})
+				)
 
 				let contentNode;
-				this._childNodes = Array.from(this.childNodes);
-				this.innerHTML = '';
+				const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
+				const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
 
-				contentNode = parse(this.template);
+				contentNode = parse(style + this.template);
 
 				this._render(contentNode);
 
-				const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
+				const {tagName, mode} = (this.constructor as WebComponentConstructor);
 
-				const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
+				if (mode === 'none') {
+					const styles = contentNode.querySelectorAll('style');
 
-				if (style) {
-					if (hasShadowRoot) {
-						this._root.innerHTML = style;
-					} else if (!document.head.querySelector(`style.${(this.constructor as WebComponentConstructor).tagName}`)) {
-						document.head.insertAdjacentHTML('beforeend', style);
-					}
+					styles.forEach((style: HTMLStyleElement) => {
+						const existingStyleElement: HTMLStyleElement | null = document.head.querySelector(`style.${tagName}`);
+
+						if (existingStyleElement) {
+							existingStyleElement.textContent = `${style?.textContent}${existingStyleElement.textContent}`;
+						} else {
+							document.head.appendChild(style);
+						}
+					})
 				}
 
 				this._parsed = true;
 
 				this._root.appendChild(contentNode);
-				this._childNodes = [];
 			}
 
 			this._mounted = true;
@@ -307,7 +313,9 @@ export class WebComponent extends HTMLElement {
 	 * updates any DOM node with data bind reference.
 	 */
 	forceUpdate() {
-		this._trackers.forEach((track: NodeTrack) => this._updateTrackValue(track));
+		this._trackers.forEach((track: NodeTrack) => {
+			this._updateTrackValue(track)
+		});
 	}
 
 	adoptedCallback() {
@@ -351,41 +359,47 @@ export class WebComponent extends HTMLElement {
 		return null
 	}
 
-	private _renderSlotNode(node: HTMLSlotElement) {
-		const name = node.getAttribute('name');
-		let nodeList: any;
-		let comment = document.createComment(`slotted [${name || ''}]`);
-		node.parentNode?.replaceChild(comment, node);
-
-		if (name) {
-			nodeList = this._childNodes.filter(n => {
-				return n.nodeType === 1 && (n as HTMLElement).getAttribute('slot') === name;
+	protected _renderSlotNode(node: HTMLSlotElement) {
+		node.addEventListener('slotchange', () => {
+			node.assignedNodes().forEach((n: HTMLElement | Node) => {
+				this._render(n);
 			});
-		} else {
-			nodeList = this._childNodes.filter(n => {
-				return n.nodeType !== 1 || !(n as HTMLElement).hasAttribute('slot');
+		})
+	}
+
+	private _renderStyle(node: HTMLStyleElement) {
+		const selectorPattern = /[a-z:#\.*\[][^{}]*[^\s:]\s*(?={){/gmi;
+		const propValueStylePattern = /[a-z][a-z-]*:([^;]*)(;|})/gmi;
+		let styleText = (node.textContent ?? '');
+		let match: RegExpExecArray | null = null;
+		let executables: Array<Executable> = [];
+
+		while ((match = selectorPattern.exec(styleText)) !== null) {
+			let propValueMatch: RegExpExecArray | null = null;
+			let propValue = styleText.slice(selectorPattern.lastIndex);
+
+			while ((propValueMatch = propValueStylePattern.exec(propValue)) !== null) {
+				executables.push(...extractExecutableSnippetFromString(propValueMatch[1], ['[', ']']))
+			}
+
+		}
+
+		if (executables.length) {
+			this._trackNode(node, [], [], [], {
+				name: 'textContent',
+				value: styleText,
+				executables
 			});
-		}
-
-		if (!nodeList.length) {
-			nodeList = node.childNodes;
-		}
-
-		let anchor = comment;
-
-		for (let n of nodeList) {
-			anchor.after(n);
-			anchor = n;
-		}
-
-		for (let n of nodeList) {
-			this._render(n);
 		}
 	}
 
-	private _render(node: Node | HTMLElement | DocumentFragment | WebComponent, directives: Directive[] = [], handlers: NodeTrack['eventHandlers'] = []) {
-		if (node.nodeName === 'SLOT') {
-			return this._renderSlotNode(node as HTMLSlotElement);
+	protected _render(node: Node | HTMLElement | DocumentFragment | WebComponent, directives: Directive[] = [], handlers: NodeTrack['eventHandlers'] = []) {
+		// it is possible that the node is already rendered by the parent component
+		// and then picked up by the child component via slot
+		// in that case we do not need to render it again since it will already be
+		// ready to do anything it needs and also prevent it from being tracked again
+		if ((node as ObjectLiteral).__rendered) {
+		  return;
 		}
 
 		if (node.nodeName === '#text') {
@@ -396,6 +410,16 @@ export class WebComponent extends HTMLElement {
 					executables: []
 				});
 			}
+
+			return;
+		}
+
+		if (node.nodeName === 'STYLE') {
+		    return this._renderStyle(node as HTMLStyleElement);
+		}
+
+		if (node.nodeName === 'SLOT') {
+			return this._renderSlotNode(node as HTMLSlotElement);
 		}
 
 		// process element nodes https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
@@ -458,6 +482,9 @@ export class WebComponent extends HTMLElement {
 			}
 		}
 
+		// mark the node as rendered so it gets skipped if picked via slot
+		(node as ObjectLiteral).__rendered = true;
+
 		if (node.nodeName !== '#comment') {
 			node.childNodes.forEach(child => this._render(child));
 		}
@@ -481,7 +508,7 @@ export class WebComponent extends HTMLElement {
 				eventHandlers
 			};
 
-			if (property?.value.trim()) {
+			if (property?.value.trim() && !property.executables.length) {
 				property.executables = extractExecutableSnippetFromString(property.value)
 			}
 
@@ -501,38 +528,38 @@ export class WebComponent extends HTMLElement {
 		}
 	}
 
-	private _execString(executable: string, [$item, $key]: any[] = []) {
-		if (!executable.trim()) {
-			return;
-		}
-
-		const keys = new Set(Object.getOwnPropertyNames(this).filter((n) => !n.startsWith('_') && !directives.has(n as Directive)));
-		const ctx = this.$context;
-		keys.add('$context');
-		keys.add('$item');
-		keys.add('$key');
-
-		Object.getOwnPropertyNames(ctx).forEach(n => {
-			keys.add(n);
-		})
-
-		const keysArray = Array.from(keys);
-
-		const values = keysArray.map(key => {
-			switch (key) {
-				case '$context':
-					return ctx;
-				case '$item':
-					return $item;
-				case '$key':
-					return $key;
+	private _execString(executable: string, nodeData: ObjectLiteral) {
+		try {
+			if (!executable.trim()) {
+				return;
 			}
 
-			// @ts-ignore
-			return this[key] ?? ctx[key];
-		});
+			const {$item, $key} = nodeData;
+			const keys = this._properties.slice();
+			const ctx = this.$context;
 
-		return evaluateStringInComponentContext(executable, this, keysArray, values);
+			Object.getOwnPropertyNames(ctx).forEach(n => {
+				keys.push(n);
+			})
+
+			const values = keys.map(key => {
+				switch (key) {
+					case '$context':
+						return ctx;
+					case '$item':
+						return $item;
+					case '$key':
+						return $key;
+				}
+
+				// @ts-ignore
+				return this[key] ?? ctx[key];
+			});
+
+			return evaluateStringInComponentContext(executable, this, keys, values);
+		} catch(e) {
+			this.onError(e as Error)
+		}
 	}
 
 	private _resolveExecutable(node: Node, {match, executable}: Executable, newValue: string) {
@@ -552,7 +579,7 @@ export class WebComponent extends HTMLElement {
 			}
 		}
 
-		let res = this._execString(executable, [$item, $key]);
+		let res = this._execString(executable, {$item, $key});
 
 		if (res && typeof res === 'object') {
 			try {
@@ -606,7 +633,7 @@ export class WebComponent extends HTMLElement {
 							if (newValue !== (node as ObjectLiteral)[camelName]) {
 								(node as ObjectLiteral)[camelName] = newValue;
 							}
-						} else if((node as HTMLElement).getAttribute(name) !== newValue) {
+						} else if ((node as HTMLElement).getAttribute(name) !== newValue) {
 							(node as HTMLElement).setAttribute(name, newValue);
 						}
 					}
@@ -647,11 +674,9 @@ export class WebComponent extends HTMLElement {
 
 	private _handleIfAttribute(node: WebComponent) {
 		const attr = 'if';
-		// @ts-ignore
-		let {$item, $key} = node;
 		let {value, placeholderNode}: DirectiveValue = (node as ObjectLiteral)[attr][0];
 
-		const shouldRender = this._execString(value, [$item, $key]);
+		const shouldRender = this._execString(value, node);
 
 		(node as ObjectLiteral)[attr][0].prevValue = shouldRender
 
@@ -712,7 +737,7 @@ export class WebComponent extends HTMLElement {
 		const attr = 'repeat';
 		const repeatAttr = 'repeat_id';
 		let {value, placeholderNode}: DirectiveValue = (node as ObjectLiteral)[attr][0];
-		let repeatData = this._execString(value);
+		let repeatData = this._execString(value, node);
 		let index = 0;
 
 		if (!(node as ObjectLiteral)[repeatAttr]) {
@@ -812,12 +837,11 @@ export class WebComponent extends HTMLElement {
 
 		(node as ObjectLiteral)[attr].forEach(({value, prop}: DirectiveValue) => {
 			let [attrName, property] = prop.split('.');
-			let {$item, $key} = node as ObjectLiteral;
 			const commaIdx = value.lastIndexOf(',');
 			let val = commaIdx >= 0 ? value.slice(0, commaIdx).trim() : '';
 			const shouldAdd = this._execString(
 				commaIdx >= 0 ? value.slice(commaIdx + 1).trim() : value,
-				[$item, $key]);
+				node);
 
 			if (val) {
 				extractExecutableSnippetFromString(val).forEach((exc) => {
@@ -884,21 +908,21 @@ export class WebComponent extends HTMLElement {
 					break;
 				default:
 					if (attrName) {
-						const kebabProp = turnCamelToKebabCasing(attrName);
 						if (shouldAdd) {
 							if (booleanAttr.hasOwnProperty(attrName)) {
-								node.setAttribute(kebabProp, '');
+								node.setAttribute(attrName, '');
 							} else {
 								const idealVal = val || shouldAdd;
+								const kebabProp = turnCamelToKebabCasing(attrName);
 
-								if ((node as ObjectLiteral)[attrName] !== undefined) {
-									(node as ObjectLiteral)[attrName] = idealVal;
+								if ((node as ObjectLiteral)[kebabProp] !== undefined) {
+									(node as ObjectLiteral)[kebabProp] = idealVal;
 								} else {
-									node.setAttribute(kebabProp, idealVal.toString());
+									node.setAttribute(attrName, idealVal.toString());
 								}
 							}
 						} else {
-							node.removeAttribute(kebabProp);
+							node.removeAttribute(attrName);
 						}
 					}
 			}
@@ -908,8 +932,66 @@ export class WebComponent extends HTMLElement {
 	}
 }
 
+/**
+ * a special WebComponent that handles slot tag differently allowing for render template right into HTML files
+ */
+export class ContextProvider extends WebComponent {
+	private _childNodes: Array<ChildNode> = [];
+
+	static mode = ShadowRootModeExtended.NONE;
+
+	get template() {
+		return '<slot></slot>';
+	}
+
+	connectedCallback() {
+		if (!super._parsed) {
+			this._childNodes = Array.from(this.childNodes);
+			this.innerHTML = '';
+		}
+
+		super.connectedCallback();
+
+		this._childNodes = [];
+	}
+
+	_renderSlotNode(node: HTMLSlotElement) {
+		const name = node.getAttribute('name');
+		let nodeList: any;
+		let comment = document.createComment(`slotted [${name || ''}]`);
+		node.parentNode?.replaceChild(comment, node);
+
+		if (name) {
+			nodeList = this._childNodes.filter(n => {
+				return n.nodeType === 1 && (n as HTMLElement).getAttribute('slot') === name;
+			});
+		} else {
+			nodeList = this._childNodes.filter(n => {
+				return n.nodeType !== 1 || !(n as HTMLElement).hasAttribute('slot');
+			});
+		}
+
+		if (!nodeList.length) {
+			nodeList = node.childNodes;
+		}
+
+		let anchor = comment;
+
+		for (let n of nodeList) {
+			anchor.after(n);
+			anchor = n;
+		}
+
+		for (let n of nodeList) {
+			super._render(n);
+		}
+	}
+}
+
 // @ts-ignore
 if (window) {
 	// @ts-ignore
 	window.WebComponent = WebComponent;
+	// @ts-ignore
+	window.ContextProvider = ContextProvider;
 }

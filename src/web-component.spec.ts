@@ -1,4 +1,4 @@
-import {WebComponent} from './web-component';
+import {WebComponent, ContextProvider} from './web-component';
 import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
 import {JSDOM} from "jsdom";
 
@@ -508,6 +508,25 @@ describe('WebComponent', () => {
 			expect(s.root?.innerHTML).toBe('some text')
 		});
 
+		it('should take object as attribute value', () => {
+			class SampleE extends WebComponent {
+				static observedAttributes = ['list']
+
+				get template() {
+					return '{list[1]}'
+				}
+			}
+
+			SampleE.register();
+			const s = new SampleE();
+
+			document.body.appendChild(s);
+
+			s.setAttribute('list', '["first", "second"]')
+
+			expect(s.root?.innerHTML).toBe('second')
+		});
+
 		it('should handle textarea text binding', () => {
 			class SampleF extends WebComponent {
 				val = 'some text';
@@ -526,23 +545,35 @@ describe('WebComponent', () => {
 			expect((s.root?.children[0] as HTMLTextAreaElement).value).toBe('some text')
 		});
 
-		it('should take object as attribute value', () => {
-			class SampleE extends WebComponent {
-				static observedAttributes = ['list']
+		it('should bind data to style', () => {
+			class SampleG extends WebComponent {
+				colors = {
+					bg: 'red',
+					active: 'green',
+					dark: '#222',
+				}
 
-				get template() {
-					return '{list[1]}'
+				get stylesheet() {
+					return `
+					<style>
+						:host {background: [colors.bg]}
+						
+						:host(.active) {
+							background: [colors.active] url('./sample.png') no-repeat;
+							color: [colors.dark];
+						}
+					</style>`
 				}
 			}
 
-			SampleE.register();
-			const s = new SampleE();
+			SampleG.register();
+			const s = new SampleG();
 
 			document.body.appendChild(s);
 
-			s.setAttribute('list', '["first", "second"]')
-
-			expect(s.root?.innerHTML).toBe('second')
+			expect(s.root?.innerHTML).toBe("<style class=\"sample-g\"> " +
+				":host {background: red} " +
+				":host(.active) { background: green url('./sample.png') no-repeat; color: #222; } </style>")
 		});
 	})
 
@@ -662,72 +693,30 @@ describe('WebComponent', () => {
 			document.body.innerHTML = '<slot-a><p>one</p><p>two</p></slot-a>';
 
 			const s = document.body.children[0] as WebComponent;
+			const sSlot = s.root?.children[0];
 
-			expect(s.root?.innerHTML).toBe('<!--slotted []--><p>one</p><p>two</p>');
+			expect(sSlot?.outerHTML).toBe('<slot></slot>');
+			expect(s.children[0].assignedSlot).toBe(sSlot);
+			expect(s.children[1].assignedSlot).toBe(sSlot);
 		});
 
-		it('should render plain slot content WITHOUT shadow root', () => {
+		it('should render named slot content with shadow root', () => {
 			class SlotB extends WebComponent {
-				static mode = ShadowRootModeExtended.NONE;
-
 				get template() {
-					return '<slot></slot>'
+					return '<slot name="content"></slot>'
 				}
 			}
 
 			SlotB.register();
 
-			document.body.innerHTML = '<slot-b><p>one</p><p>two</p></slot-b>';
-
-			const s = document.body.children[0] as WebComponent;
-
-			expect(s.innerHTML).toBe('<!--slotted []--><p>one</p><p>two</p>');
-		});
-
-		it('should render named slot content with shadow root', () => {
-			class SlotC extends WebComponent {
-				get template() {
-					return '<slot name="content"></slot>'
-				}
-			}
-
-			SlotC.register();
-
-			document.body.innerHTML = '<slot-c><p>one</p><p>two</p></slot-c>';
+			document.body.innerHTML = '<slot-b><p slot="content">one</p><p>two</p></slot-b>';
 
 			let s = document.body.children[0] as WebComponent;
+			const sSlot = s.root?.children[0];
 
-			expect(s.root?.innerHTML).toBe('<!--slotted [content]-->');
-
-			document.body.innerHTML = '<slot-c><p slot="content">one</p><p>two</p></slot-c>';
-
-			s = document.body.children[0] as WebComponent;
-
-			expect(s.root?.innerHTML).toBe('<!--slotted [content]--><p slot="content">one</p>');
-		});
-
-		it('should render named slot content WITHOUT shadow root', () => {
-			class SlotD extends WebComponent {
-				static mode = ShadowRootModeExtended.NONE;
-
-				get template() {
-					return '<slot name="content"></slot>'
-				}
-			}
-
-			SlotD.register();
-
-			document.body.innerHTML = '<slot-d><p>one</p><p>two</p></slot-d>';
-
-			let s = document.body.children[0] as WebComponent;
-
-			expect(s.innerHTML).toBe('<!--slotted [content]-->');
-
-			document.body.innerHTML = '<slot-d><p slot="content">one</p><p>two</p></slot-d>';
-
-			s = document.body.children[0] as WebComponent;
-
-			expect(s.innerHTML).toBe('<!--slotted [content]--><p slot="content">one</p>');
+			expect(sSlot?.outerHTML).toBe('<slot name="content"></slot>');
+			expect(s.children[0].assignedSlot).toBe(sSlot);
+			expect(s.children[1].assignedSlot).toBe(null);
 		});
 	})
 
@@ -1219,4 +1208,82 @@ describe('WebComponent', () => {
 			});
 		});
 	});
+});
+
+describe('ContextProvider', () => {
+	describe('slot', () => {
+		it('should render plain slot content with shadow root', () => {
+			class SlotC extends ContextProvider {
+				static mode = ShadowRootModeExtended.OPEN;
+			}
+
+			SlotC.register();
+
+			document.body.innerHTML = '<slot-c><p>one</p><p>two</p></slot-c>';
+
+			const s = document.body.children[0] as WebComponent;
+
+			expect(s.root?.innerHTML).toBe('<!--slotted []--><p>one</p><p>two</p>');
+		});
+
+		it('should render plain slot content WITHOUT shadow root', () => {
+			class SlotD extends ContextProvider {}
+
+			SlotD.register();
+
+			document.body.innerHTML = '<slot-d><p>one</p><p>two</p></slot-d>';
+
+			const s = document.body.children[0] as WebComponent;
+
+			expect(s.innerHTML).toBe('<!--slotted []--><p>one</p><p>two</p>');
+		});
+
+		it('should render named slot content with shadow root', () => {
+			class SlotE extends ContextProvider {
+				static mode = ShadowRootModeExtended.OPEN;
+
+				get template() {
+					return '<slot name="content"></slot>'
+				}
+			}
+
+			SlotE.register();
+
+			document.body.innerHTML = '<slot-e><p>one</p><p>two</p></slot-e>';
+
+			let s = document.body.children[0] as WebComponent;
+
+			expect(s.root?.innerHTML).toBe('<!--slotted [content]-->');
+
+			document.body.innerHTML = '<slot-e><p slot="content">one</p><p>two</p></slot-e>';
+
+			s = document.body.children[0] as WebComponent;
+
+			expect(s.root?.innerHTML).toBe('<!--slotted [content]--><p slot="content">one</p>');
+		});
+
+		it('should render named slot content WITHOUT shadow root', () => {
+			class SlotF extends ContextProvider {
+				static mode = ShadowRootModeExtended.NONE;
+
+				get template() {
+					return '<slot name="content"></slot>'
+				}
+			}
+
+			SlotF.register();
+
+			document.body.innerHTML = '<slot-f><p>one</p><p>two</p></slot-f>';
+
+			let s = document.body.children[0] as WebComponent;
+
+			expect(s.innerHTML).toBe('<!--slotted [content]-->');
+
+			document.body.innerHTML = '<slot-f><p slot="content">one</p><p>two</p></slot-f>';
+
+			s = document.body.children[0] as WebComponent;
+
+			expect(s.innerHTML).toBe('<!--slotted [content]--><p slot="content">one</p>');
+		});
+	})
 });
