@@ -1,4 +1,4 @@
-import {WebComponent, ContextProvider} from './web-component';
+import {WebComponent, ContextProviderComponent} from './web-component';
 import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
 import {JSDOM} from "jsdom";
 
@@ -1210,10 +1210,10 @@ describe('WebComponent', () => {
 	});
 });
 
-describe('ContextProvider', () => {
+describe('ContextProviderComponent', () => {
 	describe('slot', () => {
 		it('should render plain slot content with shadow root', () => {
-			class SlotC extends ContextProvider {
+			class SlotC extends ContextProviderComponent {
 				static mode = ShadowRootModeExtended.OPEN;
 			}
 
@@ -1227,7 +1227,7 @@ describe('ContextProvider', () => {
 		});
 
 		it('should render plain slot content WITHOUT shadow root', () => {
-			class SlotD extends ContextProvider {}
+			class SlotD extends ContextProviderComponent {}
 
 			SlotD.register();
 
@@ -1239,7 +1239,7 @@ describe('ContextProvider', () => {
 		});
 
 		it('should render named slot content with shadow root', () => {
-			class SlotE extends ContextProvider {
+			class SlotE extends ContextProviderComponent {
 				static mode = ShadowRootModeExtended.OPEN;
 
 				get template() {
@@ -1263,7 +1263,7 @@ describe('ContextProvider', () => {
 		});
 
 		it('should render named slot content WITHOUT shadow root', () => {
-			class SlotF extends ContextProvider {
+			class SlotF extends ContextProviderComponent {
 				static mode = ShadowRootModeExtended.NONE;
 
 				get template() {
