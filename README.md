@@ -27,7 +27,7 @@ A lightweight and powerful web component framework intended to remove the tediou
 Declare a simple action button component
 ```js
 class ActionButton extends WebComponent {
-  static observedAttributes = ['label', 'type', 'disabled', 'autofocus', 'name'];
+  static observedAttributes = ['type', 'disabled', 'autofocus', 'name'];
   
   get stylesheet() {
     return `
@@ -52,15 +52,10 @@ class ActionButton extends WebComponent {
         attr.disabled="disabled"
         attr.autofocus="autofocus"
         attr.name="name"
-        onclick="handleClick($event)"
         >
-        <slot>{label}</slot>
+        <slot></slot>
       </button>
     `;
-  }
-  
-  handleClick(event) {
-    this.dispatchEvent(new Event('click'));
   }
 }
 
