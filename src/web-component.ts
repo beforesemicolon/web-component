@@ -339,14 +339,18 @@ export class WebComponent extends HTMLElement {
 		console.error(this.constructor.name, error);
 	}
 
-	private _getEventHandlerFunction(node: ObjectLiteral, attribute: Attr) {
-		const props = ['$item', '$key', '$refs', '$context'];
-		const values = [
-			(node as ObjectLiteral).$item,
-			(node as ObjectLiteral).$key,
-			this.$refs,
-			this.$context
-		];
+	private _getEventHandlerFunction(node: Node, attribute: Attr) {
+		const dt = this._getRepeatItemAndKey(node, attribute.value);
+		const props = [...Object.getOwnPropertyNames(dt), '$refs', '$context'];
+		const values = props.map(k => {
+			if (k === '$refs') {
+                return this.$refs;
+            } else if (k === '$context') {
+                return this._context;
+            }
+
+			return dt[k];
+		});
 
 		const fn = getComponentNodeEventListener(this, attribute.name, attribute.value, props, values);
 
@@ -566,7 +570,7 @@ export class WebComponent extends HTMLElement {
 		}
 	}
 
-	private _resolveExecutable(node: Node, {match, executable}: Executable, newValue: string) {
+	private _getRepeatItemAndKey(node: Node, executable: string): ObjectLiteral {
 		let {$item, $key} = node as ObjectLiteral;
 
 		if (/(?:^|\W)\$(index|key|item)(?:$|\W)/.test(executable) && $item === undefined) {
@@ -583,7 +587,11 @@ export class WebComponent extends HTMLElement {
 			}
 		}
 
-		let res = this._execString(executable, {$item, $key});
+		return {$item, $key};
+	}
+
+	private _resolveExecutable(node: Node, {match, executable}: Executable, newValue: string) {
+		let res = this._execString(executable, this._getRepeatItemAndKey(node, executable));
 
 		if (res && typeof res === 'object') {
 			try {

@@ -1054,7 +1054,9 @@ describe('WebComponent', () => {
 					count = 2;
 
 					get template() {
-						return '<li repeat="count" class="item-{$key}" onclick="handleClick($event, $item, $key)">item {$item}</li>'
+						return '<li repeat="count" class="item-{$key}">' +
+							'<span onclick="handleClick($event, $item, $key)">item {$item}</span>' +
+							'</li>'
 					}
 
 					handleClick(...args: any[]) {
@@ -1067,10 +1069,10 @@ describe('WebComponent', () => {
 
 				document.body.appendChild(s);
 
-				expect(s.root?.innerHTML).toBe('<!--repeat: count--><li class="item-0">item 1</li><li class="item-1">item 2</li>');
+				expect(s.root?.innerHTML).toBe('<!--repeat: count--><li class="item-0"><span>item 1</span></li><li class="item-1"><span>item 2</span></li>');
 
-				(s.root?.children[0] as HTMLElement).click();
-				(s.root?.children[1] as HTMLElement).click();
+				(s.root?.children[0].children[0] as HTMLElement).click();
+				(s.root?.children[1].children[0] as HTMLElement).click();
 
 				expect(cb).toHaveBeenCalledTimes(2)
 				expect(cb).toHaveBeenCalledWith(new MouseEvent('click'), 1, 0)
