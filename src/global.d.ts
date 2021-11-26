@@ -18,7 +18,7 @@ export declare global {
 		fn?: EventListenerCallback;
 	};
 
-	export interface NodeTrack {
+	export class NodeTrack {
 		node: HTMLElement | Node | WebComponent;
 		attributes: Array<{
 			name: string;
@@ -32,13 +32,15 @@ export declare global {
 			value: string;
 			executables: Array<Executable>;
 		};
+
+		update: () => void;
 	}
 
 	export type Directive = 'attr' | 'ref' | 'repeat' | 'if';
 
 	export interface DirectiveValue {
 		value: string;
-		prop: string;
+		prop: string | null;
 		placeholderNode?: Comment;
 	}
 
