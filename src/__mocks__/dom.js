@@ -12,5 +12,11 @@ global.customElements = dom.window.customElements;
 global.ShadowRoot = dom.window.ShadowRoot;
 global.MouseEvent = dom.window.MouseEvent;
 global.Event = dom.window.Event;
-global.requestAnimationFrame = dom.window.requestAnimationFrame;
+global.requestAnimationFrame = (callback) => {
+  const id = Date.now();
+  callback(id);
+  
+  return id;
+};
+global.cancelAnimationFrame = () => {};
 global.Event = dom.window.Event;
