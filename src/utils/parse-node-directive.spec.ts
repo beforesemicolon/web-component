@@ -11,23 +11,11 @@ describe('parseNodeDirective', () => {
 			directives.add(parseNodeDirective(node, x.name, x.value));
 		}
 
-		expect(directives).toEqual(new Set(["if", "attr"]));
+		expect(directives).toEqual(new Set([
+			["if", {prop: null, value: "val > 100"}],
+			["attr", {prop: "class", value: "unique, true"}],
+			["attr", {prop: "data-sample", value: "cool, true"}],
+		]));
 		expect(node.outerHTML).toBe('<div></div>');
-		expect(node.if).toEqual([
-			{
-				"prop": null,
-				"value": "val > 100"
-			}
-		]);
-		expect(node.attr).toEqual([
-			{
-				"prop": "class",
-				"value": "unique, true"
-			},
-			{
-				"prop": "data-sample",
-				"value": "cool, true"
-			}
-		]);
 	});
 });

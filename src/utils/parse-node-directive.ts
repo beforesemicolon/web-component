@@ -1,4 +1,4 @@
-export function parseNodeDirective(node: Element, name: string, value: string): Directive {
+export function parseNodeDirective(node: Element, name: string, value: string): [string, DirectiveValue] {
 	const ogName = name;
 	const dot = name.indexOf('.');
 	let prop = null;
@@ -8,14 +8,7 @@ export function parseNodeDirective(node: Element, name: string, value: string): 
 		name = name.slice(0, dot);
 	}
 
-	// @ts-ignore
-	if (node[name] === undefined) {
-		(node as any)[name] = [{value, prop}]
-	} else {
-		(node as any)[name].push({value, prop})
-	}
-
 	node.removeAttribute(ogName);
 
-	return name as Directive;
+	return [name, {value, prop}];
 }
