@@ -53,6 +53,10 @@ export class NodeTrack {
 		return this.#empty;
 	}
 
+	get $context() {
+		return metadata.get(this.node).$context;
+	}
+
 	updateNode() {
 		// if a node was rendered before(handled by the component._render function)
 		// and no longer has a parent(removed from the DOM)
@@ -80,10 +84,10 @@ export class NodeTrack {
 
 						let val = handler.parseValue(directive.value, directive.prop);
 						extractExecutableSnippetFromString(val).forEach((exc) => {
-							val = resolveExecutable(this.#component, this.node, exc, val);
+							val = resolveExecutable(this.#component, metadata.get(this.node).$context ?? {}, exc, val);
 						});
 
-						const value = evaluateStringInComponentContext(val, this.#component, metadata.get(this.node)?.$context ?? {});
+						const value = evaluateStringInComponentContext(val, this.#component, this.$context);
 						directiveNode = handler.render(value, this.node, metadata.get(this.node).rawNodeString);
 					} catch(e: any) {
 						this.#component.onError(new Error(`"${directive.name}" on ${(this.node as HTMLElement).outerHTML}: ${e.message}`));
@@ -106,7 +110,7 @@ export class NodeTrack {
 				let newValue = this.property.value;
 
 				this.property.executables.forEach((exc) => {
-					newValue = resolveExecutable(this.#component, this.node, exc, newValue);
+					newValue = resolveExecutable(this.#component, metadata.get(this.node).$context ?? {}, exc, newValue);
 				});
 
 				if (newValue !== (this.node as ObjectLiteral)[this.property.name]) {
@@ -119,7 +123,7 @@ export class NodeTrack {
 					let newValue = value;
 
 					executables.forEach((exc) => {
-						newValue = resolveExecutable(this.#component, this.node, exc, newValue);
+						newValue = resolveExecutable(this.#component, metadata.get(this.node).$context ?? {}, exc, newValue);
 					});
 
 					const camelName = turnKebabToCamelCasing(name);
@@ -248,7 +252,7 @@ export class NodeTrack {
 				(this.node as HTMLElement).removeAttribute(attribute.name);
 
 				if (!fn && !isRepeatedNode) {
-					fn = getEventHandlerFunction(this.#component, this.node, attribute) as EventListenerCallback;
+					fn = getEventHandlerFunction(this.#component, this.$context, attribute) as EventListenerCallback;
 
 					if (fn) {
 						this.node.addEventListener(eventName, fn);

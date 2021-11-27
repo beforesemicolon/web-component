@@ -7,3 +7,10 @@ If.register();
 Ref.register();
 Attr.register();
 Repeat.register();
+
+export const directives = new Set([
+	If.name.toLowerCase(),
+	Ref.name.toLowerCase(),
+	Attr.name.toLowerCase(),
+	Repeat.name.toLowerCase(),
+])

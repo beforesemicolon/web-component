@@ -98,7 +98,7 @@ export declare global {
 		onDestroy: () => void;
 		onAdoption: () => void;
 		onUpdate: (name: string, oldValue: string, newValue: string) => void;
-		onError: (error: Error) => void;
+		onError: (error: any) => void;
 		forceUpdate: () => void;
 
 		[key: string]: any;

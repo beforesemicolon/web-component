@@ -1,5 +1,5 @@
 import {turnCamelToKebabCasing} from "./turn-camel-to-kebab-casing";
-import {directives} from "./directives";
+import {directives} from "../directives";
 import {proxify} from "./proxify";
 
 export function setupComponentPropertiesForAutoUpdate(component: WebComponent, onUpdate: onUpdateCallback): string[] {
