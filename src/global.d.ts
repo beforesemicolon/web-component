@@ -52,7 +52,6 @@ export declare global {
 		protected render: (val: any, node: Node, rawNodeOuterHTML: string) => Node | null;
 		protected setRef: (name: string, node: Node) => void;
 		protected setContext: (node: Node, key: string, value: any) => void;
-
 		protected getContext(node: Node) {}
 
 		[key: string | Directive]: any;
