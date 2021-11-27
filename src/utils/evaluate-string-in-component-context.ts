@@ -1,19 +1,19 @@
 export function evaluateStringInComponentContext(
 	executable: string,
 	component: WebComponent,
-	nodeData: ObjectLiteral
+	nodeData: ObjectLiteral = {}
 ) {
-	try {
-		if (!executable.trim()) {
-			return;
-		}
+	if (!executable.trim()) {
+		return '';
+	}
 
+	try {
 		const ctx = component.$context;
-		const keys = [
+		const keys = Array.from(new Set([
 			...Object.getOwnPropertyNames(nodeData),
 			...Object.getOwnPropertyNames(ctx),
 			...component.$properties
-		];
+		]));
 
 		const values = keys.map((key: string) => {
 			// @ts-ignore
@@ -24,6 +24,6 @@ export function evaluateStringInComponentContext(
 
 		return fn.apply(component, values) ?? '';
 	} catch(e) {
-		component.onError(e as Error)
+		component.onError(e as Error);
 	}
 }
