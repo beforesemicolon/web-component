@@ -269,7 +269,6 @@ export class WebComponent extends HTMLElement {
 		try {
 			this.#contextSource = null;
 			this.#mounted = false;
-			metadata.delete(this);
 			this.#unsubscribeCtx();
 			this.onDestroy();
 		} catch (e) {
