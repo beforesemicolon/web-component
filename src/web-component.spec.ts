@@ -674,7 +674,7 @@ describe('WebComponent', () => {
 				title: 'Updated Text App'
 			});
 
-			expect(target?.root?.innerHTML).toBe('Text App');
+			expect(target?.root?.innerHTML).toBe('');
 
 			// should update the DOM to grab new context and data
 			app.root?.appendChild(target);
@@ -1134,12 +1134,12 @@ describe('WebComponent', () => {
 				const initItemRef = s.$refs.item;
 
 				expect(s.root?.innerHTML).toBe('<!-- <li class="item">my item</li> -->');
-				expect(initItemRef).toBeDefined();
+				expect(initItemRef).toBeUndefined();
 
 				s.condition = true;
 
 				expect(s.root?.innerHTML).toBe('<li class="item">my item</li>');
-				expect(initItemRef === s.$refs.item).toBeTruthy();
+				expect(s.$refs.item).toEqual(s.root?.querySelector('.item'));
 			});
 
 			it('if and attr', () => {

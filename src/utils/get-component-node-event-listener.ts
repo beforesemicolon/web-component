@@ -19,6 +19,7 @@ export function getComponentNodeEventListener(
 			fn = fn.replace(/^this\./, '');
 			const func = new Function('$event', ...props, `"use strict";\n return this.${fn}`);
 
+			// @ts-ignore
 			if (typeof component[fnName] === 'function') {
 				return (event: Event) => func.call(component, event, ...values);
 			}
