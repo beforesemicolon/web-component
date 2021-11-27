@@ -11,6 +11,8 @@ global.CSSStyleDeclaration = dom.window.CSSStyleDeclaration;
 global.customElements = dom.window.customElements;
 global.ShadowRoot = dom.window.ShadowRoot;
 global.MouseEvent = dom.window.MouseEvent;
+global.DocumentFragment = dom.window.DocumentFragment;
+global.DocumentFragment = dom;
 global.Event = dom.window.Event;
 global.requestAnimationFrame = (callback) => {
   const id = Date.now();
