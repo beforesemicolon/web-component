@@ -12,7 +12,7 @@ export class Attr extends Directive {
 		return `["${attrName}", "${property || ''}", ${commaIdx >= 0 ? value.slice(commaIdx + 1).trim() : value}, "${val}"]`;
 	}
 
-	render([attrName, property, shouldAdd, val]: any, node: HTMLElement): Node | null {
+	render([attrName, property, shouldAdd, val]: any, node: HTMLElement): HTMLElement {
 		switch (attrName) {
 			case 'style':
 				if (property) {

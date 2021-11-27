@@ -35,6 +35,8 @@ export declare global {
 		};
 
 		update: () => void;
+		empty: boolean;
+		$context: ObjectLiteral;
 	}
 
 	export interface DirectiveValue {
@@ -47,13 +49,9 @@ export declare global {
 		static register: () => void;
 
 		protected parseValue: (value: string, prop: string | null) => string;
-
 		protected render: (val: any, node: Node, rawNodeOuterHTML: string) => Node | null;
-
 		protected setRef: (name: string, node: Node) => void;
-
 		protected setContext: (node: Node, key: string, value: any) => void;
-
 		protected getContext(node: Node) {}
 
 		[key: string | Directive]: any;

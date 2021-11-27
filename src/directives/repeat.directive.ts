@@ -18,8 +18,7 @@ export class Repeat extends Directive {
 			}
 
 			for (let index = 0; index < times; index++) {
-				const nodeClone = this.cloneRepeatedNode(rawNodeOuterHTML, index, repeatData);
-				frag.appendChild(nodeClone);
+				frag.appendChild(this.cloneRepeatedNode(rawNodeOuterHTML, index, repeatData));
 			}
 		}
 
@@ -38,6 +37,7 @@ export class Repeat extends Directive {
 		clone.removeAttribute('if');
 
 		const [key, value] = list[index] ?? [index, index + 1];
+		// set context so this and inner nodes can catch these values
 		this.setContext(clone, '$key', key);
 		this.setContext(clone, '$item', value);
 
