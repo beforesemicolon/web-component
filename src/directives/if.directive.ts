@@ -1,4 +1,4 @@
-import {Directive} from "../directive";
+import {Directive} from "../Directive";
 
 export class If extends Directive {
 	render(condition: boolean, node: Node) {

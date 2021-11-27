@@ -1,4 +1,4 @@
-import {Directive} from "../directive";
+import {Directive} from "../Directive";
 
 export class Ref extends Directive {
 	parseValue(value: string): string {

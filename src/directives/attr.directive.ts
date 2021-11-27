@@ -1,4 +1,4 @@
-import {Directive} from "../directive";
+import {Directive} from "../Directive";
 import {turnKebabToCamelCasing} from "../utils/turn-kebab-to-camel-casing";
 import {turnCamelToKebabCasing} from "../utils/turn-camel-to-kebab-casing";
 import booleanAttr from "../utils/boolean-attributes.json";

@@ -1,4 +1,4 @@
-import {Directive} from "../directive";
+import {Directive} from "../Directive";
 
 export class Repeat extends Directive {
 	render(repeatData: any, node: Node, rawNodeOuterHTML: string) {
