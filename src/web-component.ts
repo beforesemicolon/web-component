@@ -1,16 +1,16 @@
 import {parse} from './utils/parse';
 import {setComponentPropertiesFromObservedAttributes} from './utils/set-component-properties-from-observed-attributes';
 import {setupComponentPropertiesForAutoUpdate} from './utils/setup-component-properties-for-auto-update';
-import {extractExecutableSnippetFromString} from './utils/extract-executable-snippet-from-string';
 import {turnCamelToKebabCasing} from './utils/turn-camel-to-kebab-casing';
 import {turnKebabToCamelCasing} from './utils/turn-kebab-to-camel-casing';
 import {getStyleString} from './utils/get-style-string';
 import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
 import {NodeTrack} from './node-track';
 import booleanAttr from './utils/boolean-attributes.json';
-import {metadata} from "./metadata";
-import {execString} from "./utils/exec-string";
-import {resolveExecutable} from "./utils/resolve-executable";
+import metadata from "./metadata";
+// simply importing directive here will automatically register them and make them available for
+// anything later on
+import './directives';
 
 /**
  * a extension on the native web component API to simplify and automate most of the pain points
@@ -26,7 +26,7 @@ export class WebComponent extends HTMLElement {
 	#contextSource: WebComponent | null = null;
 	#contextSubscribers: Array<ObserverCallback> = [];
 	#unsubscribeCtx: () => void = () => {};
-	$properties: Array<string> = ['$context', '$key', '$item', '$refs'];
+	$properties: Array<string> = ['$context', '$refs'];
 
 	constructor() {
 		super();
@@ -167,7 +167,7 @@ export class WebComponent extends HTMLElement {
 		// make sure the subscribe method is part of the prototype
 		// so it is hidden unless the prototype is checked
 		return Object.setPrototypeOf({...this.#contextSource?.$context, ...this.#context}, {
-			subscribe: this.#ctxSubscriberHandler.bind(this),
+			subscribe: ctxSubscriberHandler(this.#contextSubscribers),
 		});
 	}
 
@@ -186,7 +186,8 @@ export class WebComponent extends HTMLElement {
 
 	connectedCallback() {
 		try {
-			this.#contextSource = this.#getClosestWebComponentAncestor();
+			// @ts-ignore
+			this.#contextSource = getClosestWebComponentAncestor(this);
 
 			if (this.#contextSource) {
 				// force update the component if the ancestor context gets updated as well
@@ -268,6 +269,7 @@ export class WebComponent extends HTMLElement {
 		try {
 			this.#contextSource = null;
 			this.#mounted = false;
+			metadata.delete(this);
 			this.#unsubscribeCtx();
 			this.onDestroy();
 		} catch (e) {
@@ -368,7 +370,7 @@ export class WebComponent extends HTMLElement {
 		});
 	}
 
-	protected _render(node: Node | HTMLElement | DocumentFragment | WebComponent, directives: Directive[] = [], handlers: NodeTrack['eventHandlers'] = []) {
+	protected _render(node: Node | HTMLElement | DocumentFragment | WebComponent) {
 		// it is possible that the node is already rendered by the parent component
 		// and then picked up by the child component via slot
 		// in that case we do not need to render it again since it will already be
@@ -400,7 +402,7 @@ export class WebComponent extends HTMLElement {
 		const isScript = node.nodeName === 'SCRIPT';
 
 		if ((isElement && !isScript) || (isTextNode && node.nodeValue?.trim())) {
-			const track = new NodeTrack(node, this);
+			const track = new NodeTrack(node, this as WebComponent);
 			if (!track.empty) {
 				this.#trackers.set(node, track);
 				track.updateNode();
@@ -413,209 +415,27 @@ export class WebComponent extends HTMLElement {
 
 		node.childNodes.forEach(child => this._render(child));
 	}
+}
 
-	#getClosestWebComponentAncestor(): WebComponent | null {
-		let parent = this.parentNode;
-
-		while (parent && !(parent instanceof WebComponent)) {
-			if (parent instanceof ShadowRoot) {
-				parent = parent.host;
-			} else {
-				parent = parent.parentNode;
-			}
-		}
-
-		return parent instanceof WebComponent ? parent : null;
-	}
-
-	#ctxSubscriberHandler(cb: ObserverCallback) {
-		this.#contextSubscribers.push(cb);
+function ctxSubscriberHandler(subs: Array<ObserverCallback>) {
+	return (cb: ObserverCallback) => {
+		subs.push(cb);
 		return () => {
-			this.#contextSubscribers = this.#contextSubscribers.filter(c => c !== cb);
+			subs = subs.filter((c: ObserverCallback) => c !== cb);
+		}
+	}
+}
+
+function getClosestWebComponentAncestor(component: WebComponent): WebComponent | null {
+	let parent = component.parentNode;
+
+	while (parent && !(parent instanceof WebComponent)) {
+		if (parent instanceof ShadowRoot) {
+			parent = parent.host;
+		} else {
+			parent = parent.parentNode;
 		}
 	}
 
-	_directiveHandlers: { [attr: string]: (node: WebComponent, metadata: ObjectLiteral, raw?: string) => null | DocumentFragment | HTMLElement | Node } = {
-		'ref': this._handleRefAttribute.bind(this),
-		'if': this._handleIfAttribute.bind(this),
-		'repeat': this._handleRepeatAttribute.bind(this),
-		'attr': this._handleAttrAttribute.bind(this),
-	}
-
-	private _handleIfAttribute(node: WebComponent, metadata: ObjectLiteral): null | HTMLElement {
-		const directive = metadata[0];
-		let {value}: DirectiveValue = directive;
-		const shouldRender = execString(this, value, node);
-
-		if (shouldRender) {
-			return node;
-		}
-
-		return null;
-	}
-
-	private _updateNodeRepeatKeyAndItem(node: WebComponent | HTMLElement, index: number, list: Array<any> = []) {
-		const [key, value] = list[index] ?? [index, index + 1];
-		// @ts-ignore
-		node['$item'] = value;
-		// @ts-ignore
-		node['$key'] = key;
-	}
-
-	private _cloneRepeatedNode(rawNodeOuterHTML: string, repeat: ObjectLiteral, index: number, list: Array<any> = []) {
-		const n = document.createElement('div');
-		n.innerHTML = rawNodeOuterHTML;
-		const clone = n.children[0] as HTMLElement;
-		clone.removeAttribute('repeat');
-		clone.removeAttribute('if');
-
-		this._updateNodeRepeatKeyAndItem(clone as HTMLElement, index, list);
-
-		return clone;
-	}
-
-	private _handleRepeatAttribute(node: WebComponent | HTMLElement, directive: ObjectLiteral, rawNodeOuterHTML: string = ''): DocumentFragment {
-		const frag = document.createDocumentFragment();
-		const repeat = directive[0];
-
-		if (node.nodeType === 1) {
-			let {value}: DirectiveValue = repeat;
-			let repeatData = execString(this, value, node);
-			let times = 0;
-
-			if (Number.isInteger(repeatData)) {
-				times = repeatData;
-			} else {
-				repeatData = repeatData instanceof Set ? Object.entries(Array.from(repeatData))
-					: repeatData instanceof Map ? Array.from(repeatData.entries())
-						: repeatData[Symbol.iterator] ? Object.entries([...repeatData])
-							: Object.entries(repeatData);
-				times = repeatData.length;
-			}
-
-			for (let index = 0; index < times; index++) {
-				const nodeClone = this._cloneRepeatedNode(rawNodeOuterHTML, repeat, index, repeatData);
-				frag.appendChild(nodeClone);
-			}
-		}
-
-		return frag;
-	}
-
-	private _handleRefAttribute(node: WebComponent, directive: ObjectLiteral) {
-		const {value}: DirectiveValue = directive[0];
-
-		if (this.$refs[value] === undefined) {
-			if (/^[a-z$_][a-z0-9$_]*$/i.test(value)) {
-				Object.defineProperty(this.$refs, value, {
-					get() {
-						return node;
-					}
-				})
-				return node;
-			}
-
-			this.onError(new Error(`Invalid "ref" property name "${value}"`))
-		}
-
-		return node;
-	}
-
-	private _handleAttrAttribute(node: WebComponent, attr: ObjectLiteral) {
-		attr.forEach(({value, prop}: DirectiveValue) => {
-			let [attrName, property] = (prop ?? '').split('.');
-			const commaIdx = value.lastIndexOf(',');
-			let val = commaIdx >= 0 ? value.slice(0, commaIdx).trim() : '';
-			const shouldAdd = execString(
-				this,
-				commaIdx >= 0 ? value.slice(commaIdx + 1).trim() : value,
-				node);
-
-			if (val) {
-				extractExecutableSnippetFromString(val).forEach((exc) => {
-					val = resolveExecutable(this, node, exc, val);
-				});
-			}
-
-			switch (attrName) {
-				case 'style':
-					if (property) {
-						property = turnKebabToCamelCasing(property);
-
-						if (shouldAdd) {
-							(node as ObjectLiteral).style[property] = val;
-						} else {
-							(node as ObjectLiteral).style[property] = '';
-						}
-					} else {
-						val
-							.match(/([a-z][a-z-]+)(?=:):([^;]+)/g)
-							?.forEach((style: string) => {
-								let [name, styleValue] = style.split(':');
-								name = name.trim();
-								styleValue = styleValue.trim();
-
-								if (shouldAdd) {
-									node.style.setProperty(name, styleValue);
-								} else {
-									const pattern = new RegExp(`${name}\\s*:\\s*${styleValue};?`, 'g');
-									node.setAttribute(
-										'style',
-										node.style.cssText.replace(pattern, ''))
-								}
-
-							})
-					}
-
-					break;
-				case 'class':
-					if (property) {
-						if (shouldAdd) {
-							node.classList.add(property);
-						} else {
-							node.classList.remove(property);
-						}
-					} else {
-						const classes = val.split(/\s+/g);
-
-						if (shouldAdd) {
-							classes.forEach((cls: string) => node.classList.add(cls));
-						} else {
-							classes.forEach((cls: string) => node.classList.remove(cls));
-						}
-					}
-					break;
-				case 'data':
-					if (property) {
-						if (shouldAdd) {
-							node.dataset[turnKebabToCamelCasing(property)] = val;
-						} else {
-							node.removeAttribute(`data-${turnCamelToKebabCasing(property)}`)
-						}
-					}
-					break;
-				default:
-					if (attrName) {
-						if (shouldAdd) {
-							if (booleanAttr.hasOwnProperty(attrName)) {
-								node.setAttribute(attrName, '');
-							} else {
-								const idealVal = val || shouldAdd;
-								const kebabProp = turnCamelToKebabCasing(attrName);
-
-								if ((node as ObjectLiteral)[kebabProp] !== undefined) {
-									(node as ObjectLiteral)[kebabProp] = idealVal;
-								} else {
-									node.setAttribute(attrName, idealVal.toString());
-								}
-							}
-						} else {
-							node.removeAttribute(attrName);
-						}
-					}
-			}
-		})
-
-		return node;
-	}
+	return parent instanceof WebComponent ? parent : null;
 }

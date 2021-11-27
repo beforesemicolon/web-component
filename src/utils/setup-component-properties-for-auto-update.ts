@@ -10,6 +10,7 @@ export function setupComponentPropertiesForAutoUpdate(component: WebComponent, o
 
 		// ignore private properties and $ properties as well as attribute properties
 		if (!directives.has(property) && !/\$|_/.test(property[0]) && !(component.constructor as WebComponentConstructor).observedAttributes.includes(attr)) {
+			// @ts-ignore
 			let value = component[property];
 
 			properties.push(property);

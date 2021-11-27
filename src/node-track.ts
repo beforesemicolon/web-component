@@ -1,9 +1,12 @@
 import {extractExecutableSnippetFromString} from "./utils/extract-executable-snippet-from-string";
 import {parseNodeDirective} from "./utils/parse-node-directive";
 import {turnKebabToCamelCasing} from "./utils/turn-kebab-to-camel-casing";
-import {metadata} from './metadata';
 import {resolveExecutable} from "./utils/resolve-executable";
 import {getEventHandlerFunction} from "./utils/get-event-handler-function";
+import {directiveRegistry} from './directives/registry';
+import {evaluateStringInComponentContext} from "./utils/evaluate-string-in-component-context";
+import metadata from "./metadata";
+import {defineNodeContextMetadata} from "./utils/define-node-context-metadata";
 
 /**
  * handles all logic related to tracking and updating a tracked node.
@@ -17,7 +20,7 @@ export class NodeTrack {
 		value: string;
 		executables: Array<Executable>;
 	}> = []
-	directives: Array<Directive> = [];
+	directives: Array<DirectiveValue> = [];
 	eventHandlers: Array<EventHandlerTrack> = [];
 	property: null | {
 		name: string;
@@ -38,139 +41,16 @@ export class NodeTrack {
 		this.#anchor = node;
 		this.#component = component;
 
-		this.setTracks();
+		// whether or not the node was replaced by another on render
+		metadata.get(this.node).shadowed = false;
+		metadata.get(this.node).rawNodeString = (this.node as HTMLElement).outerHTML ?? (this.node as Text).nodeValue;
+		defineNodeContextMetadata(node);
+
+		this._setTracks();
 	}
 
 	get empty() {
 		return this.#empty;
-	}
-
-	setTracks() {
-		this.directives = [];
-		this.attributes = [];
-		this.eventHandlers = [];
-		this.property = {
-			name: '',
-			value: '',
-			executables: []
-		};
-
-		const isTextNode = this.node.nodeName === '#text';
-		// whether or not the node was replaced by another on render
-		metadata.get(this.node).shadowed = false;
-
-		if (isTextNode) {
-			metadata.get(this.node).rawNodeString = (this.node as Text).nodeValue;
-			this.property = {
-				name: 'nodeValue',
-				value: this.node.nodeValue || '',
-				executables: []
-			}
-		} else {
-			metadata.get(this.node).rawNodeString = (this.node as HTMLElement).outerHTML;
-
-			const attributes = [];
-			const isRepeatedNode = (this.node as HTMLElement)?.hasAttribute('repeat');
-
-			if ((this.node as HTMLElement).nodeName === 'TEXTAREA') {
-				this.property = {
-					name: 'value',
-					value: this.node.textContent || '',
-					executables: []
-				}
-				this.node.textContent = '';
-			} else if((this.node as HTMLElement).nodeName === 'STYLE') {
-				const selectorPattern = /[a-z:#\.*\[][^{}]*[^\s:]\s*(?={){/gmi;
-				const propValueStylePattern = /[a-z][a-z-]*:([^;]*)(;|})/gmi;
-				let styleText = (this.node.textContent ?? '');
-				let match: RegExpExecArray | null = null;
-				let executables: Array<Executable> = [];
-
-				while ((match = selectorPattern.exec(styleText)) !== null) {
-					let propValueMatch: RegExpExecArray | null = null;
-					let propValue = styleText.slice(selectorPattern.lastIndex);
-
-					while ((propValueMatch = propValueStylePattern.exec(propValue)) !== null) {
-						executables.push(...extractExecutableSnippetFromString(propValueMatch[1], ['[', ']']))
-					}
-				}
-
-				if (executables.length) {
-					this.property = {
-						name: 'textContent',
-						value: styleText,
-						executables
-					}
-				}
-			}
-
-			metadata.get(this.node).directives = {}
-			// @ts-ignore
-			for (let attribute of [...(this.node as HTMLElement).attributes]) {
-				if (/^(attr\.|ref|if|repeat)/.test(attribute.name)) {
-					const [directiveName, directive] = parseNodeDirective(this.node as HTMLElement, attribute.name, attribute.value);
-
-					if (metadata.get(this.node).directives[directiveName] ) {
-						metadata.get(this.node).directives[directiveName].push(directive)
-					} else {
-						metadata.get(this.node).directives[directiveName] = [directive]
-					}
-
-					switch (directiveName) {
-						case 'ref':
-							this.directives[0] = directiveName;
-							break;
-						case 'if':
-							this.directives[1] = directiveName;
-							break;
-						case 'repeat':
-							this.directives[2] = directiveName;
-							break;
-						case 'attr':
-							this.directives[3] = directiveName;
-							break;
-					}
-				} else if (attribute.name.startsWith('on')) {
-					this.eventHandlers.push({
-						eventName: attribute.name.slice(2).toLowerCase(),
-						attribute
-					});
-				} else {
-					attributes.push(attribute)
-				}
-			}
-
-			this.eventHandlers.forEach(({eventName, fn, attribute}) => {
-				(this.node as HTMLElement).removeAttribute(attribute.name);
-
-				if (!fn && !isRepeatedNode) {
-					fn = getEventHandlerFunction(this.#component, this.node, attribute) as EventListenerCallback;
-
-					if (fn) {
-						this.node.addEventListener(eventName, fn);
-					}
-				}
-			});
-
-			for (let attr of attributes) {
-				if (attr.value.trim()) {
-					this.attributes.push({
-						name: attr.name,
-						value: attr.value,
-						executables: extractExecutableSnippetFromString(attr.value)
-					})
-				}
-			}
-		}
-
-		if (this.property?.value.trim() && !this.property.executables.length) {
-			this.property.executables = extractExecutableSnippetFromString(this.property.value)
-		}
-
-		this.#empty = !this.directives.length &&
-			!this.eventHandlers.length &&
-			!this.attributes.length &&
-			!this.property?.executables.length;
 	}
 
 	updateNode() {
@@ -184,13 +64,31 @@ export class NodeTrack {
 
 		let directiveNode: any = this.node;
 
+		const self = this;
 		for (let directive of this.directives) {
 			if (directive) {
-				directiveNode = this.#component._directiveHandlers[directive](
-					directiveNode as WebComponent,
-					metadata.get(this.node).directives[directive],
-					metadata.get(this.node).rawNodeString
-				);
+				const Dir = directiveRegistry[directive.name];
+				if (Dir) {
+					try {
+						// this custom handler will extend the provided one to inject logic
+						// related to updating refs
+						const handler = new (class extends Dir {
+							setRef(name: string, node: Node) {
+								self.#component.$refs[name] = node;
+							}
+						})();
+
+						let val = handler.parseValue(directive.value, directive.prop);
+						extractExecutableSnippetFromString(val).forEach((exc) => {
+							val = resolveExecutable(this.#component, this.node, exc, val);
+						});
+
+						const value = evaluateStringInComponentContext(val, this.#component, metadata.get(this.node)?.$context ?? {});
+						directiveNode = handler.render(value, this.node, metadata.get(this.node).rawNodeString);
+					} catch(e: any) {
+						this.#component.onError(new Error(`"${directive.name}" on ${(this.node as HTMLElement).outerHTML}: ${e.message}`));
+					}
+				}
 
 				if (directiveNode !== this.node) {
 					break;
@@ -200,7 +98,7 @@ export class NodeTrack {
 
 		if (directiveNode === this.node) {
 			metadata.get(this.node).shadowed = false;
-			const childNodes = this.#switchNodeAndAnchor(directiveNode);
+			const childNodes = this._switchNodeAndAnchor(directiveNode);
 
 			this.#anchor = childNodes ?? directiveNode;
 
@@ -252,30 +150,148 @@ export class NodeTrack {
 
 			cancelAnimationFrame(this.#reqAnimationId);
 			this.#reqAnimationId = requestAnimationFrame(() => {
-				const childNodes = this.#switchNodeAndAnchor(directiveNode);
+				const childNodes = this._switchNodeAndAnchor(directiveNode);
 
 				this.#anchor = childNodes ?? directiveNode;
 			});
 		} else {
-			this.#switchNodeAndAnchor(directiveNode);
+			this._switchNodeAndAnchor(directiveNode);
 		}
 	}
 
-	#createDefaultAnchor() {
+	private _setTracks() {
+		this.directives = [];
+		this.attributes = [];
+		this.eventHandlers = [];
+		this.property = {
+			name: '',
+			value: '',
+			executables: []
+		};
+
+		const isTextNode = this.node.nodeName === '#text';
+
+		if (isTextNode) {
+			this.property = {
+				name: 'nodeValue',
+				value: this.node.nodeValue || '',
+				executables: []
+			}
+		} else {
+			const attributes = [];
+			const isRepeatedNode = (this.node as HTMLElement)?.hasAttribute('repeat');
+
+			if ((this.node as HTMLElement).nodeName === 'TEXTAREA') {
+				this.property = {
+					name: 'value',
+					value: this.node.textContent || '',
+					executables: []
+				}
+				this.node.textContent = '';
+			} else if((this.node as HTMLElement).nodeName === 'STYLE') {
+				const selectorPattern = /[a-z:#\.*\[][^{}]*[^\s:]\s*(?={){/gmi;
+				const propValueStylePattern = /[a-z][a-z-]*:([^;]*)(;|})/gmi;
+				let styleText = (this.node.textContent ?? '');
+				let match: RegExpExecArray | null = null;
+				let executables: Array<Executable> = [];
+
+				while ((match = selectorPattern.exec(styleText)) !== null) {
+					let propValueMatch: RegExpExecArray | null = null;
+					let propValue = styleText.slice(selectorPattern.lastIndex);
+
+					while ((propValueMatch = propValueStylePattern.exec(propValue)) !== null) {
+						executables.push(...extractExecutableSnippetFromString(propValueMatch[1], ['[', ']']))
+					}
+				}
+
+				if (executables.length) {
+					this.property = {
+						name: 'textContent',
+						value: styleText,
+						executables
+					}
+				}
+			}
+
+			// @ts-ignore
+			for (let attribute of [...(this.node as HTMLElement).attributes]) {
+				if (/^(attr\.|ref|if|repeat)/.test(attribute.name)) {
+					const directive = parseNodeDirective(this.node as HTMLElement, attribute.name, attribute.value);
+
+					switch (directive.name) {
+						case 'if':
+							this.directives.unshift(directive);
+							break;
+						case 'repeat':
+							if (this.directives[0]?.name === 'if') {
+								this.directives.splice(1, 0, directive);
+							} else {
+								this.directives.unshift(directive);
+							}
+							break;
+						default:
+							this.directives.push(directive);
+					}
+
+					(this.node as Element).removeAttribute(attribute.name);
+				} else if (attribute.name.startsWith('on')) {
+					this.eventHandlers.push({
+						eventName: attribute.name.slice(2).toLowerCase(),
+						attribute
+					});
+				} else {
+					attributes.push(attribute)
+				}
+			}
+
+			this.eventHandlers.forEach(({eventName, fn, attribute}) => {
+				(this.node as HTMLElement).removeAttribute(attribute.name);
+
+				if (!fn && !isRepeatedNode) {
+					fn = getEventHandlerFunction(this.#component, this.node, attribute) as EventListenerCallback;
+
+					if (fn) {
+						this.node.addEventListener(eventName, fn);
+					}
+				}
+			});
+
+			for (let attr of attributes) {
+				if (attr.value.trim()) {
+					this.attributes.push({
+						name: attr.name,
+						value: attr.value,
+						executables: extractExecutableSnippetFromString(attr.value)
+					})
+				}
+			}
+		}
+
+		if (this.property?.value.trim() && !this.property.executables.length) {
+			this.property.executables = extractExecutableSnippetFromString(this.property.value)
+		}
+
+		this.#empty = !this.directives.length &&
+			!this.eventHandlers.length &&
+			!this.attributes.length &&
+			!this.property?.executables.length;
+	}
+
+	private _createDefaultAnchor() {
 		return document.createComment( ` ${this.node.nodeValue ?? (this.node as HTMLElement).outerHTML} `)
 	}
 
-	#switchNodeAndAnchor(directiveNode: Node) {
+	private _switchNodeAndAnchor(directiveNode: Node) {
 		let childNodes = null;
 
 		if (directiveNode instanceof Node) {
 			if (directiveNode.nodeType === 11) {
 				childNodes = directiveNode.childNodes.length
 					? Array.from(directiveNode.childNodes)
-					: [this.#createDefaultAnchor()];
+					: [this._createDefaultAnchor()];
 			}
 		} else {
-			directiveNode = this.#createDefaultAnchor();
+			directiveNode = this._createDefaultAnchor();
 		}
 
 		if (Array.isArray(this.#anchor)) {
