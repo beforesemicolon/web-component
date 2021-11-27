@@ -1,7 +1,7 @@
 import {turnKebabToCamelCasing} from './turn-kebab-to-camel-casing';
 import {proxify} from './proxify';
 import boolAttr from './boolean-attributes.json';
-import {directives} from "./directives";
+import {directives} from "../directives";
 
 export function setComponentPropertiesFromObservedAttributes(
 	component: HTMLElement,

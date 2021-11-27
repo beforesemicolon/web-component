@@ -1,4 +1,5 @@
 import {ShadowRootModeExtended} from './enums/ShadowRootModeExtended.enum';
+import {directiveRegistry} from "./directives/registry";
 
 export declare global {
 	export type onUpdateCallback = (property: string, oldValue: unknown, newValue: unknown) => void;
@@ -18,35 +19,49 @@ export declare global {
 		fn?: EventListenerCallback;
 	};
 
-	export interface NodeTrack {
+	export class NodeTrack {
 		node: HTMLElement | Node | WebComponent;
 		attributes: Array<{
 			name: string;
 			value: string;
 			executables: Array<Executable>;
 		}>;
-		directives: Array<Directive>;
+		directives: Array<DirectiveValue>;
 		eventHandlers: Array<EventHandlerTrack>;
 		property: null | {
 			name: string;
 			value: string;
 			executables: Array<Executable>;
 		};
+
+		update: () => void;
+		empty: boolean;
+		$context: ObjectLiteral;
 	}
 
-	export type Directive = 'attr' | 'ref' | 'repeat' | 'if';
-
 	export interface DirectiveValue {
+		name: string;
 		value: string;
-		prop: string;
-		placeholderNode?: Comment;
+		prop: string | null;
+	}
+
+	export class Directive {
+		static register: () => void;
+
+		protected parseValue: (value: string, prop: string | null) => string;
+		protected render: (val: any, node: Node, rawNodeOuterHTML: string) => Node | null;
+		protected setRef: (name: string, node: Node) => void;
+		protected setContext: (node: Node, key: string, value: any) => void;
+		protected getContext(node: Node) {}
+
+		[key: string | Directive]: any;
 	}
 
 	export type ObjectLiteral = {[key: string]: any};
 
 	export type ObserverCallback = (ctx: ObjectLiteral) => void;
 
-	export type Refs = {[key: string]: HTMLElement};
+	export type Refs = {[key: string]: Node};
 
 	export type Executable = {
 		from: number;
@@ -65,24 +80,26 @@ export declare global {
 		static initialContext: ObjectLiteral;
 		static registerAll: (components: Array<WebComponentConstructor>) => void;
 
-		root: HTMLElement | ShadowRoot | null;
-		mounted: boolean;
-		template: string;
-		stylesheet: string;
+		readonly root: HTMLElement | ShadowRoot | null;
+		readonly mounted: boolean;
+		readonly template: string;
+		readonly stylesheet: string;
 
-		$context: ObjectLiteral;
-		$refs: Refs;
+		readonly $context: ObjectLiteral;
+		readonly $refs: Refs;
+		readonly $properties: Array<string>;
 
 		updateContext: (ctx: ObjectLiteral) => void;
+		untrack: (node: Node) => void;
 
 		onMount: () => void;
 		onDestroy: () => void;
 		onAdoption: () => void;
 		onUpdate: (name: string, oldValue: string, newValue: string) => void;
-		onError: (error: ErrorEvent) => void;
+		onError: (error: any) => void;
 		forceUpdate: () => void;
 
-		[key: string | Directive]: any;
+		[key: string]: any;
 	}
 
 	export interface WebComponentConstructor {

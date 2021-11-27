@@ -166,6 +166,7 @@ require('esbuild').build({
 - [Properties](https://github.com/beforesemicolon/web-component/blob/master/doc/properties.md)
 - [Context](https://github.com/beforesemicolon/web-component/blob/master/doc/context.md)
 - [Directives](https://github.com/beforesemicolon/web-component/blob/master/doc/directives.md)
+- [Custom Directives](https://github.com/beforesemicolon/web-component/blob/master/doc/custom-directives.md)
 - [LiveCycles](https://github.com/beforesemicolon/web-component/blob/master/doc/livecycles.md)
 - [Styling](https://github.com/beforesemicolon/web-component/blob/master/doc/stylesheet.md)
 - [Error Handling](https://github.com/beforesemicolon/web-component/blob/master/doc/errors.md)
