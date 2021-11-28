@@ -140,4 +140,4 @@ MyButton.register();
 ```
 
 
-#### Recommended next: [Properties](https://github.com/beforesemicolon/web-component/blob/master/doc/properties.md)
+#### Recommended next: [Properties](https://github.com/beforesemicolon/web-component/blob/master/docs/properties.md)

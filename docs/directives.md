@@ -332,4 +332,4 @@ with the format of:
     attr.data.[data-name]="[value], [condition]"
 
 
-#### Recommended next: [LiveCycles](https://github.com/beforesemicolon/web-component/blob/master/doc/livecycles.md)
+#### Recommended next: [LiveCycles](https://github.com/beforesemicolon/web-component/blob/master/docs/livecycles.md)

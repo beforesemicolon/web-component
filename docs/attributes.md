@@ -33,7 +33,7 @@ class StatusIndicator extends WebComponent {
 }
 ```
 
-Since attributes are mapped to be properties, they also work like [properties](https://github.com/beforesemicolon/web-component/blob/master/doc/properties.md).
+Since attributes are mapped to be properties, they also work like [properties](https://github.com/beforesemicolon/web-component/blob/master/docs/properties.md).
 
 They will also update the DOM if changed.
 
@@ -109,4 +109,4 @@ You should prefer attributes whenever you are expecting data to be set directly 
 <flat-list list="{items}"></flat-list>
 ```
 
-#### Recommended next: [LiveCycles](https://github.com/beforesemicolon/web-component/blob/master/doc/livecycles.md)
+#### Recommended next: [LiveCycles](https://github.com/beforesemicolon/web-component/blob/master/docs/livecycles.md)

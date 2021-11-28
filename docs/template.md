@@ -227,4 +227,4 @@ WebComponent.registerAll([
 ])
 ```
 
-#### Recommended next: [Events](https://github.com/beforesemicolon/web-component/blob/master/doc/events.md)
+#### Recommended next: [Events](https://github.com/beforesemicolon/web-component/blob/master/docs/events.md)

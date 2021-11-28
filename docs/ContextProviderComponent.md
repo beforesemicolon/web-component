@@ -1,7 +1,7 @@
 ## ContextProviderComponent
 
 The ContextProviderComponent class is a
-special [WebComponent](https://github.com/beforesemicolon/web-component/blob/master/doc/WebComponent.md)
+special [WebComponent](https://github.com/beforesemicolon/web-component/blob/master/docs/WebComponent.md)
 in a sense that it allows you to define the template right in your HTML file with it serving as the data provider for
 your template.
 
@@ -89,7 +89,7 @@ TodoApp.register();
 ```
 
 You can render the `todo-item` tag inside the `todo-app` tag and it will be placed where the slot tag is defined using
-the [repeat directive](https://github.com/beforesemicolon/web-component/blob/master/doc/directives.md#repeat) to repeat
+the [repeat directive](https://github.com/beforesemicolon/web-component/blob/master/docs/directives.md#repeat) to repeat
 for every todo item.
 
 ```html
@@ -138,7 +138,7 @@ need to specify data as context.
 
 ### Context
 ContextProviderComponent is like any other WebComponent and therefore, it may contain 
-[context data](https://github.com/beforesemicolon/web-component/blob/master/doc/context.md).
+[context data](https://github.com/beforesemicolon/web-component/blob/master/docs/context.md).
 
 This is the only way you can provide data inside the descendents component templates and it is excellent
 for data you want to share deeply for all components.
@@ -205,4 +205,4 @@ One thing to know is that the [::slotted selector](https://developer.mozilla.org
 will not work because the way the ContextProviderComponent handles the slot tags no matter what the mode
 of the component.
 
-#### Recommended next: [Configurations](https://github.com/beforesemicolon/web-component/blob/master/doc/directives.md)
+#### Recommended next: [Configurations](https://github.com/beforesemicolon/web-component/blob/master/docs/directives.md)

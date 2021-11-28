@@ -92,7 +92,7 @@ document.body.appendChild(new CounterWidget())
 #### forceUpdate
 The `forceUpdate` is a NOT recommended way to force the component DOM Nodes to be updated.
 
-It will not cause the [onUpdate](https://github.com/beforesemicolon/web-component/blob/master/doc/livecycles.md#onupdate) livecycle method to be called.
+It will not cause the [onUpdate](https://github.com/beforesemicolon/web-component/blob/master/docs/livecycles.md#onupdate) livecycle method to be called.
 
 We can *"fix"* the example above with the `forceUpdate` like so:
 
@@ -132,4 +132,4 @@ One thing to know is that they do not trigger DOM update when they are updated.
   - try to re-assign rather than making deep updates 
   - split your component into even smaller components to handle the data snippets 
 
-#### Recommended next: [Context](https://github.com/beforesemicolon/web-component/blob/master/doc/context.md)
+#### Recommended next: [Context](https://github.com/beforesemicolon/web-component/blob/master/docs/context.md)

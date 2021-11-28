@@ -54,8 +54,8 @@ btn.remove() // will trigger onDestroy call
 
 ### onUpdate
 This livecycle function is called right after the DOM gets updated by 
-[property](https://github.com/beforesemicolon/web-component/blob/master/doc/properties.md) or an 
-observed [attribute](https://github.com/beforesemicolon/web-component/blob/master/doc/attributes.md) is updated.
+[property](https://github.com/beforesemicolon/web-component/blob/master/docs/properties.md) or an 
+observed [attribute](https://github.com/beforesemicolon/web-component/blob/master/docs/attributes.md) is updated.
 
 It will also get called soon after the first render if there are some observed attributes placed on the 
 component tag.
@@ -94,4 +94,4 @@ This livecycle function is called when the component element is moved from one d
 if the element is removed from a iFrame document to the current window document.
 
 
-#### Recommended next: [Styling](https://github.com/beforesemicolon/web-component/blob/master/doc/stylesheet.md)
+#### Recommended next: [Styling](https://github.com/beforesemicolon/web-component/blob/master/docs/stylesheet.md)

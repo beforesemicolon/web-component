@@ -58,7 +58,7 @@ Yes! It will update on data changes. This means that you may not need to define 
 on data changes to update the style.
 
 Take the following button component as example. It is referring to the `theme` of the app which can be just coming
-from some [context provider component](https://github.com/beforesemicolon/web-component/blob/master/doc/ContextProviderComponent.md), 
+from some [context provider component](https://github.com/beforesemicolon/web-component/blob/master/docs/ContextProviderComponent.md), 
 and it is falling back to some other color in case those do not exist.
 
 ```js
@@ -106,4 +106,4 @@ We can then use the `ThemeProvider` component to provide the theme to the `MyBut
 </theme-provider>
 ```
 
-#### Recommended next: [Template](https://github.com/beforesemicolon/web-component/blob/master/doc/template.md)
+#### Recommended next: [Template](https://github.com/beforesemicolon/web-component/blob/master/docs/template.md)

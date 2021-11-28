@@ -108,4 +108,4 @@ class MyButton extends WebComponent {
 This feature is great for small code execution and should not be used for complex handling.
 
 
-#### Recommended next: [Properties](https://github.com/beforesemicolon/web-component/blob/master/doc/properties.md)
+#### Recommended next: [Properties](https://github.com/beforesemicolon/web-component/blob/master/docs/properties.md)
