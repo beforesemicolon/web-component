@@ -4,15 +4,15 @@
 	<meta charset="UTF-8">
 	<title>Code Editor</title>
 
-	<script src="_editor/codemirror.js"></script>
-	<script src="_editor/modes/javascript.js"></script>
-	<script src="_editor/modes/htmlmixed.js"></script>
-	<script src="_editor/modes/css.js"></script>
-	<link rel="stylesheet" href="_editor/codemirror.css">
-	<link rel="stylesheet" href="_editor/themes/dracula.css">
-	<link rel="stylesheet" href="_editor/themes/shadowfox.css">
-	<link rel="stylesheet" href="_editor/themes/base16-light.css">
-	<link rel="stylesheet" href="_editor/themes/neo.css">
+	<script src="examples/_editor/codemirror.js"></script>
+	<script src="examples/_editor/modes/javascript.js"></script>
+	<script src="examples/_editor/modes/htmlmixed.js"></script>
+	<script src="examples/_editor/modes/css.js"></script>
+	<link rel="stylesheet" href="examples/_editor/codemirror.css">
+	<link rel="stylesheet" href="examples/_editor/themes/dracula.css">
+	<link rel="stylesheet" href="examples/_editor/themes/shadowfox.css">
+	<link rel="stylesheet" href="examples/_editor/themes/base16-light.css">
+	<link rel="stylesheet" href="examples/_editor/themes/neo.css">
 
 	<style>
 		body {
@@ -328,7 +328,7 @@
             })
 
         function loadExample(fileName) {
-          fetch(`./${fileName}`)
+          fetch(`./examples/${fileName}`)
             .then(res => res.text())
             .then(res => {
               editorView.srcdoc = res;
