@@ -6,5 +6,6 @@ tsconfig.json
 doc
 **.tgz
 coverage
+examples
 jest.config.js
 .github
