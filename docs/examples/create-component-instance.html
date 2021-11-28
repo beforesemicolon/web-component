@@ -14,22 +14,20 @@
 <script id="app-js">
 const {WebComponent} = window;
 
-class SiteLogo extends WebComponent {
-	static observedAttributes = ['text'];
-
+class SiteName extends WebComponent {
 	get template() {
 	  return `<h1>Before Semicolon</h1>`
 	}
 }
 
 // you must register before you start using otherwise
-// you will get illegal constructor error which
+// you will get illegal constructor error from the browser which
 // indicates that the element is not yet registered
-SiteLogo.register();
+SiteName.register();
 
 // you can create the element simply by initializing the class
-// manipulate and attach it to the DOM like any other element
-const logo = new SiteLogo();
+// manipulating and attaching it to the DOM like any other element
+const logo = new SiteName();
 
 document.body.appendChild(logo)
 </script>

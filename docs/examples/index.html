@@ -44,7 +44,7 @@
 			margin-top: 50px;
 			position: relative;
 			display: flex;
-			height: 800px;
+			height: 90vh;
 		}
 
 		#examples-selector {
@@ -55,13 +55,16 @@
 
 		#examples-nav {
 			width: 250px;
+			max-width: 250px;
+			min-width: 250px;
+			overflow: auto;
 		}
 
 		#examples-nav h2 {
 			font-size: 16px;
 			padding: 0 10px;
-			margin: 5px 0;
-			color: #777;
+			margin: 25px 0 5px;
+			color: #aaa;
 		}
 
 		#examples-nav ul {
@@ -71,7 +74,7 @@
 		}
 
 		#examples-nav ul li {
-			padding: 5px 5px 5px 10px;
+			padding: 5px 10px;
 			font-size: 12px;
 			font-weight: 500;
 			cursor: pointer;
@@ -114,12 +117,19 @@
 			color: #fff;
 		}
 
+		#editor-tabs .wrapper {
+			position: relative;
+			height: 100%;
+			width: 100%;
+		}
+
 		textarea + .CodeMirror {
-			display: none;
+			position: absolute;
+			visibility: hidden;
 		}
 
 		textarea.active + .CodeMirror {
-			display: block;
+			visibility: visible;
 		}
 
 		#editor-view {
@@ -175,19 +185,35 @@
 
 	<main>
 		<nav id="examples-nav">
-			<h2>Creation</h2>
+			<h2>Create</h2>
 			<ul>
-				<li data-file="instance.html" class="active">Create Component Instance</li>
+				<li data-file="create-component.html" class="active">Create Component</li>
+				<li data-file="create-component-instance.html">Create Component Instance</li>
+			</ul>
+
+			<h2>Register</h2>
+			<ul>
+				<li data-file="register.html">Register Component</li>
+				<li data-file="register-custom-name.html">Register Custom Named Component</li>
+				<li data-file="register-all.html">Register All Components at once</li>
+			</ul>
+
+			<h2>Template</h2>
+			<ul>
+				<li data-file="template.html">Define Component Template</li>
+				<li data-file="template-string-data.html">Dynamically Generate Template</li>
 			</ul>
 		</nav>
 
 		<div id="editor-tabs">
 			<label for="js-editor" class="active">app.js</label>
 			<label for="html-editor">index.html</label>
-			<label for="css-editor">app.css</label>
-			<textarea id="js-editor" class="active"></textarea>
-			<textarea id="html-editor"></textarea>
-			<textarea id="css-editor"></textarea>
+			<label for="css-editor">style.css</label>
+			<div class="wrapper">
+				<textarea id="js-editor" class="active"></textarea>
+				<textarea id="html-editor"></textarea>
+				<textarea id="css-editor"></textarea>
+			</div>
 		</div>
 
 		<iframe id="editor-view"></iframe>
@@ -308,9 +334,9 @@
               editorView.srcdoc = res;
               editorView.onload = () => {
                 const doc = editorView.contentDocument || editorView.contentWindow.document;
-                jsEditor.setValue(doc.getElementById('app-js')?.textContent.trim());
-                cssEditor.setValue(doc.getElementById('app-css')?.textContent.trim());
-                htmlEditor.setValue(doc.getElementById('app-html')?.innerHTML.trim());
+                jsEditor.setValue(doc.getElementById('app-js')?.textContent);
+                cssEditor.setValue(doc.getElementById('app-css')?.textContent);
+                htmlEditor.setValue(doc.getElementById('app-html')?.innerHTML);
                 editorView.onload = null;
               }
             })
