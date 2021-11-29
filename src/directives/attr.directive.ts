@@ -76,14 +76,7 @@ export class Attr extends Directive {
 						if (booleanAttr.hasOwnProperty(attrName)) {
 							node.setAttribute(attrName, '');
 						} else {
-							const idealVal = val || shouldAdd;
-							const kebabProp = turnCamelToKebabCasing(attrName);
-
-							if ((node as ObjectLiteral)[kebabProp] !== undefined) {
-								(node as ObjectLiteral)[kebabProp] = idealVal;
-							} else {
-								node.setAttribute(attrName, idealVal.toString());
-							}
+							node.setAttribute(attrName, `${val || shouldAdd}`);
 						}
 					} else {
 						node.removeAttribute(attrName);
