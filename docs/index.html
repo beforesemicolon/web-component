@@ -3,7 +3,8 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Code Editor</title>
-
+	<meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<script src="./examples/editor/codemirror.js"></script>
 	<script src="./examples/editor/modes/javascript.js"></script>
 	<script src="./examples/editor/modes/xml.js"></script>
@@ -118,6 +119,10 @@
 			color: #fff;
 		}
 
+		#editor-tabs label[for="editor-view"] {
+			display: none;
+		}
+
 		#editor-tabs .wrapper {
 			position: relative;
 			height: 100%;
@@ -161,13 +166,35 @@
 			#editor-tabs,
 			#editor-view {
 				width: 100%;
-				height: 40vh;
+				height: 90vh;
 			}
 
 			#editor-tabs {
 				margin-top: 0;
 				border-bottom: 5px;
 			}
+
+			#editor-tabs label {
+				padding: 5px 10px;
+				font-size: 12px;
+			}
+
+			#editor-tabs label[for="editor-view"] {
+				display: inline-block;
+			}
+
+			#editor-view {
+				height: 82vh;
+				position: absolute;
+				z-index: 1000;
+				top: 96px;
+				visibility: hidden;
+			}
+
+			#editor-view.active {
+				visibility: visible;
+			}
+
 		}
 	</style>
 </head>
@@ -210,6 +237,7 @@
 			<label for="js-editor" class="active">app.js</label>
 			<label for="html-editor">index.html</label>
 			<label for="css-editor">style.css</label>
+			<label for="editor-view">result</label>
 			<div class="wrapper">
 				<textarea id="js-editor" class="active"></textarea>
 				<textarea id="html-editor"></textarea>
@@ -244,7 +272,7 @@
 
         const editorTabs = document.getElementById('editor-tabs');
         const editorView = document.getElementById('editor-view');
-        const [jsTab, htmlTab, cssTab] = editorTabs.children;
+        const [jsTab, htmlTab, cssTab, resultTab] = editorTabs.children;
         const themeSelector = document.getElementById('theme-selector');
         const exampleNav = document.getElementById('examples-nav');
 
@@ -255,12 +283,20 @@
           tab.addEventListener('click', () => {
             currentActiveTab.classList.remove('active');
             currentActiveEditor.classList.remove('active');
+            editorView.classList.remove('active');
             currentActiveTab = tab;
 
             currentActiveTab.classList.add('active');
             currentActiveEditor = document.getElementById(tab.getAttribute('for'));
             currentActiveEditor.classList.add('active');
           })
+        }
+
+        resultTab.onclick = () => {
+          editorView.classList.toggle('active');
+          resultTab.classList.toggle('active');
+          currentActiveTab.classList.toggle('active');
+          currentActiveTab = resultTab;
         }
 
         [jsEditor, cssEditor, htmlEditor].forEach(editor => {
@@ -310,6 +346,10 @@
                 currentGroup.appendChild(opt);
               })
 			}
+        })
+
+        exampleSelector.addEventListener('change', (e) => {
+          loadExample(e.target.value)
         })
 
         exampleNav.before(exampleSelector);
