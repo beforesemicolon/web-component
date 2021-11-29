@@ -59,14 +59,14 @@ class CountApp extends ContextProviderComponent {
     get stylesheet() {
       return `
         <style>
-            /**
-            * it is recommended that you always refer to :host
-            * as the style will be placed in the head tag of the document
-            * when mode is "none" and may affect things outside of the template
-            *
-            * By using :host, the framework will replace it with the name
-            * of the tag when placing the style in the head of the document
-            */
+			<!--
+             it is recommended that you always refer to :host
+             as the style will be placed in the head tag of the document
+             when mode is "none" and may affect things outside of the template
+
+             By using :host, the framework will replace it with the name
+             of the tag when placing the style in the head of the document
+            -->
             :host button {
                 appearance: none;
                 padding: 5px 8px;
