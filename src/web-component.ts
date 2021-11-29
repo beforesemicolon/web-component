@@ -460,10 +460,7 @@ export class WebComponent extends HTMLElement {
 			handlers.forEach(({eventName, fn, attribute}) => {
 				if (!fn && !isRepeatedNode) {
 					fn = this._getEventHandlerFunction(node, attribute) as EventListenerCallback;
-					console.log('-- fn', eventName, node, fn, attribute.value);
-					node.addEventListener(eventName, () => {
-						console.log('-- called');
-					});
+					node.addEventListener(eventName, fn as EventListenerCallback);
 				}
 
 				(node as HTMLElement).removeAttribute(attribute.name);
