@@ -26,6 +26,25 @@
 			font-weight: 300;
 		}
 
+		#loading-indicator {
+			position: fixed;
+			background: rgba(0,0,0,0.8);
+			justify-content: center;
+			align-items: center;
+			width: 100vw;
+			height: 100vh;
+			z-index: 10000;
+			top: 0;
+			left: 0;
+			color: #fff;
+			font-size: 2rem;
+			display: none;
+		}
+
+		#loading-indicator.active {
+			display: flex;
+		}
+
 		* {
 			box-sizing: border-box;
 		}
@@ -184,10 +203,12 @@
 			}
 
 			#editor-view {
-				height: 82vh;
+				height: calc(100% - 92px);
+				width: calc(100% - 20px);
 				position: absolute;
 				z-index: 1000;
 				top: 96px;
+				left: 10px;
 				visibility: hidden;
 			}
 
@@ -199,11 +220,12 @@
 	</style>
 </head>
 <body>
+	<div id="loading-indicator">loading...</div>
 	<div class="controls">
 		<label>
 			<span>Theme:</span>
 			<select name="theme" id="theme-selector">
-				<option value="neo" selected>Neo</option>
+				<option value="neo">Neo</option>
 				<option value="dracula">Dracula</option>
 				<option value="shadowfox">Shadow Fox</option>
 				<option value="base16-light">Base 16 Light</option>
@@ -215,8 +237,9 @@
 		<nav id="examples-nav">
 			<h2>Create</h2>
 			<ul>
-				<li data-file="create-component.html" class="active">Create Component</li>
+				<li data-file="create-component.html">Create Component</li>
 				<li data-file="create-component-instance.html">Create Component Instance</li>
+				<li data-file="create-context-provider-component.html">Create Context Provider Component</li>
 			</ul>
 
 			<h2>Register</h2>
@@ -272,9 +295,11 @@
 
         const editorTabs = document.getElementById('editor-tabs');
         const editorView = document.getElementById('editor-view');
+        const loadingIndicator = document.getElementById('loading-indicator');
         const [jsTab, htmlTab, cssTab, resultTab] = editorTabs.children;
         const themeSelector = document.getElementById('theme-selector');
         const exampleNav = document.getElementById('examples-nav');
+        let loading = false;
 
         let currentActiveTab = jsTab;
         let currentActiveEditor = document.getElementById(jsTab.getAttribute('for'));
@@ -303,6 +328,9 @@
           editor.setSize('100%', '100%')
           let timer = null;
           editor.on('change', () => {
+            if (loading) {
+                return;
+            }
             const doc = editorView.contentDocument || editorView.contentWindow.document;
 
             clearTimeout(timer);
@@ -328,10 +356,20 @@
           cssEditor.setOption('theme', e.target.value);
         })
 
-        let currentActiveItem = null;
 
         const exampleSelector = document.createElement('select');
+        let currentExample = localStorage.getItem('current-example');
+        let currentActiveItem = document.querySelector(`[data-file="${currentExample}"]`);
+
+        if (!currentActiveItem) {
+          currentActiveItem = document.querySelector('#examples-nav li');
+          currentExample = currentActiveItem.dataset.file;
+          localStorage.setItem('current-example', currentActiveItem.dataset.file);
+        }
+
+        currentActiveItem.classList.add('active');
         exampleSelector.id = 'examples-selector';
+
         let currentGroup = null;
         [...exampleNav.children].forEach(el => {
 			if (el.nodeName === 'H2') {
@@ -348,7 +386,10 @@
 			}
         })
 
+        exampleSelector.value = currentExample;
+
         exampleSelector.addEventListener('change', (e) => {
+          localStorage.setItem('current-example', e.target.value)
           loadExample(e.target.value)
         })
 
@@ -356,19 +397,18 @@
 
         exampleNav.querySelectorAll('li')
             .forEach(item => {
-              if (item.classList.contains('active')) {
-                currentActiveItem = item;
-              }
-
               item.addEventListener('click', (e) => {
                 currentActiveItem.classList.remove('active')
                 item.classList.add('active');
                 currentActiveItem = item;
+                localStorage.setItem('current-example', item.dataset.file)
                 loadExample(item.dataset.file)
               })
             })
 
         function loadExample(fileName) {
+          loading = true;
+          loadingIndicator.classList.add('active');
           fetch(`./examples/${fileName}`)
             .then(res => res.text())
             .then(res => {
@@ -379,11 +419,13 @@
                 cssEditor.setValue(doc.getElementById('app-css')?.textContent);
                 htmlEditor.setValue(doc.getElementById('app-html')?.innerHTML);
                 editorView.onload = null;
+                loading = false;
+                loadingIndicator.classList.remove('active');
               }
             })
         }
 
-        loadExample(currentActiveItem.dataset.file);
+        loadExample(currentExample);
       })()
 	</script>
 </body>

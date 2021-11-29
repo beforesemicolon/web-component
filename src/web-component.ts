@@ -460,7 +460,10 @@ export class WebComponent extends HTMLElement {
 			handlers.forEach(({eventName, fn, attribute}) => {
 				if (!fn && !isRepeatedNode) {
 					fn = this._getEventHandlerFunction(node, attribute) as EventListenerCallback;
-					node.addEventListener(eventName, fn as EventListenerCallback);
+					console.log('-- fn', eventName, node, fn, attribute.value);
+					node.addEventListener(eventName, () => {
+						console.log('-- called');
+					});
 				}
 
 				(node as HTMLElement).removeAttribute(attribute.name);
@@ -935,7 +938,7 @@ export class WebComponent extends HTMLElement {
 /**
  * a special WebComponent that handles slot tag differently allowing for render template right into HTML files
  */
-export class ContextProvider extends WebComponent {
+export class ContextProviderComponent extends WebComponent {
 	private _childNodes: Array<ChildNode> = [];
 
 	static mode = ShadowRootModeExtended.NONE;
@@ -993,5 +996,5 @@ if (window) {
 	// @ts-ignore
 	window.WebComponent = WebComponent;
 	// @ts-ignore
-	window.ContextProvider = ContextProvider;
+	window.ContextProviderComponent = ContextProviderComponent;
 }
