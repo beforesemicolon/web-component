@@ -412,12 +412,13 @@
           fetch(`./examples/${fileName}`)
             .then(res => res.text())
             .then(res => {
+              const htmlMatch = res.match(/<main\s*id="app-html"\s*>(.*)<\/main>/is);
               editorView.srcdoc = res;
               editorView.onload = () => {
                 const doc = editorView.contentDocument || editorView.contentWindow.document;
                 jsEditor.setValue(doc.getElementById('app-js')?.textContent);
                 cssEditor.setValue(doc.getElementById('app-css')?.textContent);
-                htmlEditor.setValue(doc.getElementById('app-html')?.innerHTML);
+                htmlEditor.setValue(htmlMatch ? htmlMatch[1] : doc.getElementById('app-html')?.innerHTML);
                 editorView.onload = null;
                 loading = false;
                 loadingIndicator.classList.remove('active');
