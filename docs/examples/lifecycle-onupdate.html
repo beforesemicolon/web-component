@@ -25,16 +25,18 @@ class UpdateExample extends WebComponent {
     //  - attributes value on element changes
     //  - attribute are removed or added to element
     //  - context in ancestor or component changes
-    //
-    // NEVER update data, context or observed attributes inside
-    // onUpdate as you will get into an infinite loop.
-    //
+
+	// AVOID update data, context or observed attributes inside
+	// onUpdate as you will get into an infinite loop.
+	// When doing so, implement guards that prevent
+	// continues updates
+
     // onUpdate is meant to react to a changes that
     // already happened and not to trigger changes
 	onUpdate(name, oldValue, newValue) {
         // whenever $context or an object is changed deeply
 	    // the old and new value will be the same
-	    // as tracking these objects are not supported
+	    // since tracking these objects are not supported
 	    //
 	    // for attributes and primitive properties
 	    // old value is actually the old value
