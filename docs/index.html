@@ -250,10 +250,36 @@
 				<li data-file="register-all.html">Register All Components at once</li>
 			</ul>
 
+			<h2>Configuration</h2>
+			<ul>
+				<li data-file="config-component-mode.html">Component Mode</li>
+				<li data-file="config-component-delegates-focus.html">Component Delegates Focus</li>
+			</ul>
+
 			<h2>Template</h2>
 			<ul>
 				<li data-file="template.html">Define Component Template</li>
-				<li data-file="template-string-data.html">Dynamically Generate Template</li>
+				<li data-file="template-string-data.html">Dynamically Generated Template</li>
+				<li data-file="template-data-binding.html">Template Data Binding</li>
+				<li data-file="template-slot.html">Template Slot</li>
+			</ul>
+
+			<h2>Styling</h2>
+
+			<h2>Properties & Attributes</h2>
+
+			<h2>Event Handling</h2>
+
+			<h2>Directives</h2>
+
+			<h2>Lifecycles</h2>
+			<ul>
+				<li data-file="lifecycle-onmount.html">onMount</li>
+				<li data-file="lifecycle-ondestroy.html">onDestroy</li>
+				<li data-file="lifecycle-onupdate.html">onUpdate</li>
+				<li data-file="lifecycle-onadoption.html">onAdoption</li>
+				<li data-file="lifecycle-before-update.html">beforeUpdate</li>
+				<li data-file="lifecycle-onerror.html">onError</li>
 			</ul>
 		</nav>
 
@@ -411,7 +437,13 @@
           loading = true;
           loadingIndicator.classList.add('active');
           fetch(`./examples/${fileName}`)
-            .then(res => res.text())
+            .then(res => {
+              if (res.status !== 200) {
+                throw new Error(`${res.status}: ${res.statusText}`)
+              }
+
+              return res.text();
+            })
             .then(res => {
               const htmlMatch = res.match(/<main\s*id="app-html"\s*>(.*)<\/main>/is);
               editorView.srcdoc = res;
@@ -424,6 +456,10 @@
                 loading = false;
                 loadingIndicator.classList.remove('active');
               }
+            })
+            .catch(() => {
+              loading = false;
+              loadingIndicator.classList.remove('active');
             })
         }
 
