@@ -59,6 +59,9 @@
 		.CodeMirror pre.CodeMirror-line-like {
 			font-family: monospace;
 			font-size: 14px;
+			font-weight: 500;
+			line-height: 1.4375;
+			letter-spacing: 0.035rem;
 		}
 
 		main {
@@ -266,7 +269,22 @@
 
 <!--			<h2>Styling</h2>-->
 
-<!--			<h2>Properties & Attributes</h2>-->
+			<h2>Attributes</h2>
+			<ul>
+				<li data-file="attr-definition.html">Define Observed Attributes (Props)</li>
+				<li data-file="attr-access.html">Access Observed Attributes</li>
+				<li data-file="attr-default.html">Define Default Attributes Values</li>
+			</ul>
+
+<!--			<h2>Properties</h2>-->
+<!--			<ul>-->
+<!--				<li data-file="properties.html">Public Properties</li>-->
+<!--				<li data-file="properties-private.html">Private Properties</li>-->
+<!--				<li data-file="properties-readonly.html">ReadOnly Properties</li>-->
+<!--				<li data-file="properties-shallow-update.html">Shallow Properties Update</li>-->
+<!--				<li data-file="properties-deep-update.html">Deep Properties Update</li>-->
+<!--				<li data-file="properties-type-check.html">Check Properties type</li>-->
+<!--			</ul>-->
 
 <!--			<h2>Event Handling</h2>-->
 
@@ -458,6 +476,10 @@
               }
             })
             .catch(() => {
+              jsEditor.setValue('');
+              cssEditor.setValue('');
+              htmlEditor.setValue('');
+              editorView.srcdoc = '';
               loading = false;
               loadingIndicator.classList.remove('active');
             })
