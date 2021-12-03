@@ -292,7 +292,7 @@ export class WebComponent extends HTMLElement {
 					newValue = this.hasAttribute(name);
 				} else if (typeof newValue === 'string') {
 					try {
-						newValue = JSON.parse(newValue);
+						newValue = JSON.parse(newValue.replace(/['`]/g, '"'));
 					} catch (e) {
 					}
 				}
@@ -408,8 +408,136 @@ export class WebComponent extends HTMLElement {
 			}
 		}
 
+<<<<<<< Updated upstream
 		if (isCommentNode || isTextNode || !node.childNodes.length || isRepeatedNode || isTextArea || isScript || isStyle) {
 			return;
+=======
+	private _execString(executable: string, nodeData: ObjectLiteral) {
+		try {
+			if (!executable.trim()) {
+				return;
+			}
+
+			const {$item, $key} = nodeData;
+			const keys = this._properties.slice();
+			const ctx = this.$context;
+
+			Object.getOwnPropertyNames(ctx).forEach(n => {
+				keys.push(n);
+			})
+
+			const values = keys.map(key => {
+				switch (key) {
+					case '$context':
+						return ctx;
+					case '$item':
+						return $item;
+					case '$key':
+						return $key;
+				}
+
+				// @ts-ignore
+				return this[key] ?? ctx[key];
+			});
+
+			return evaluateStringInComponentContext(executable, this, keys, values);
+		} catch(e) {
+			this.onError(e as Error)
+		}
+	}
+
+	private _resolveExecutable(node: Node, {match, executable}: Executable, newValue: string) {
+		let {$item, $key} = node as ObjectLiteral;
+
+		if (/(?:^|\W)\$(index|key|item)(?:$|\W)/.test(executable) && $item === undefined) {
+			let parent: any = node.parentNode;
+
+			while (parent && !(parent instanceof ShadowRoot) && parent !== this) {
+				if (parent['$item'] !== undefined) {
+					$item = parent['$item'];
+					$key = parent['$key'];
+					break;
+				}
+
+				parent = parent.parentNode;
+			}
+		}
+
+		let res = this._execString(executable, {$item, $key});
+
+		if (res && typeof res === 'object') {
+			try {
+				res = JSON.stringify(res)
+			} catch (e) {
+			}
+		}
+
+		return newValue.replace(match, res);
+	}
+
+	private _updateTrackValue(track: NodeTrack) {
+		if (track) {
+			try {
+				const {node, attributes, directives, property} = track;
+
+				for (let directive of directives) {
+					const res = this._directiveHandlers[directive](node as WebComponent);
+
+					if (!res) return;
+				}
+
+				if (property?.executables.length) {
+					let newValue = property.value;
+
+					property.executables.forEach((exc) => {
+						newValue = this._resolveExecutable(node, exc, newValue);
+					});
+
+					if (newValue !== (node as ObjectLiteral)[property.name]) {
+						(node as ObjectLiteral)[property.name] = newValue;
+					}
+				}
+
+				for (let {name, value, executables} of attributes) {
+					if (executables.length) {
+						let newValue = value;
+
+						executables.forEach((exc) => {
+							newValue = this._resolveExecutable(node, exc, newValue);
+						});
+
+						const camelName = turnKebabToCamelCasing(name);
+
+						if ((node as ObjectLiteral)[camelName] !== undefined) {
+							try {
+								newValue = JSON.parse(newValue.replace(/['`]/g, '"'));
+							} catch (e) {
+							}
+
+							if (newValue !== (node as ObjectLiteral)[camelName]) {
+								(node as ObjectLiteral)[camelName] = newValue;
+							}
+						} else if ((node as HTMLElement).getAttribute(name) !== newValue) {
+							(node as HTMLElement).setAttribute(name, newValue);
+						}
+					}
+				}
+			} catch (e) {
+				this.onError(e as ErrorEvent)
+			}
+		}
+	}
+
+	private _getClosestWebComponentAncestor(): WebComponent | null {
+		let parent = this.parentNode;
+
+		while (parent && !(parent instanceof WebComponent)) {
+			if (parent instanceof ShadowRoot) {
+				parent = parent.host;
+			} else {
+				parent = parent.parentNode;
+			}
+>>>>>>> Stashed changes
 		}
 
 		node.childNodes.forEach(child => this._render(child));
