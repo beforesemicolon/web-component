@@ -288,6 +288,15 @@
 				<li data-file="properties-shallow-update.html">Shallow Properties Update</li>
 				<li data-file="properties-deep-update.html">Deep Properties Update</li>
 			</ul>
+			
+			<h2>Context</h2>
+			<ul>
+				<li data-file="context.html">Define initial context</li>
+				<li data-file="context-access.html">Access context</li>
+				<li data-file="context-update.html">Update context</li>
+				<li data-file="context-provider.html">Context Provider Component</li>
+				<li data-file="context-provider-nesting.html">Context Provider Component Nesting</li>
+			</ul>
 
 			<h2>Styling</h2>
 			<ul>
@@ -342,7 +351,8 @@
       (() => {
         const commonOptions = {
           theme: 'neo',
-          lineNumbers: true
+          lineNumbers: true,
+	        tabSize: 2,
         };
 
         const jsEditor = CodeMirror.fromTextArea(document.getElementById('js-editor'), {
