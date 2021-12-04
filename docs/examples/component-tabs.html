@@ -12,16 +12,16 @@
 <main id="app-html">
 
 <tabs-container>
-	<tab-head active="true">Image 1</tab-head>
-	<tab-content>
+	<tab-head id="tab-img1" content-id="img1" active="true">Image 1</tab-head>
+	<tab-content id="img1" tab-id="tab-img1">
 		<img src="https://wallpaperaccess.com/full/1406844.png" alt="" width="100%">
 	</tab-content>
-	<tab-head>Image 2</tab-head>
-	<tab-content>
+	<tab-head id="tab-img2" content-id="img2">Image 2</tab-head>
+	<tab-content id="img2" tab-id="tab-img2">
 		<img src="https://wallpaperaccess.com/full/1406842.jpg" alt="" width="100%">
 	</tab-content>
-	<tab-head>Image 3</tab-head>
-	<tab-content>
+	<tab-head id="tab-img3" content-id="img3">Image 3</tab-head>
+	<tab-content id="img3" tab-id="tab-img3">
 		<img src="https://c4.wallpaperflare.com/wallpaper/58/483/756/digital-digital-art-artwork-illustration-romain-trystram-hd-wallpaper-preview.jpg" alt="" width="100%">
 	</tab-content>
 </tabs-container>
@@ -68,12 +68,12 @@ class TabsContainer extends WebComponent {
 			this.activateTab(headContainer.children[1])
 		}
 		
-		contentContainer.children[this.currentTabInfo.index].setAttribute('active', 'true');
+		this.root.getElementById(this.currentTabInfo.node.contentId).setAttribute('active', 'true');
 	}
 	
 	activateTab(el) {
 		this.currentTabInfo.node?.setAttribute('active', 'false');
-		this.$refs.contentContainer.children[this.currentTabInfo.index]?.setAttribute('active', 'false');
+		this.root.getElementById(this.currentTabInfo.node.contentId).setAttribute('active', 'false');
 		el.setAttribute('active', 'true');
 		this.currentTabInfo = {
 			node: el,
@@ -81,7 +81,7 @@ class TabsContainer extends WebComponent {
 			width: el.offsetWidth + 'px',
 			left: el.offsetLeft + 'px',
 		}
-		this.$refs.contentContainer.children[this.currentTabInfo.index]?.setAttribute('active', 'true');
+		this.root.getElementById(el.contentId).setAttribute('active', 'true');
 	}
 	
 	get stylesheet() {
@@ -118,7 +118,7 @@ class TabsContainer extends WebComponent {
 	
 	get template() {
 		return `
-			<div class="tabs-header" ref="headContainer">
+			<div class="tabs-header" ref="headContainer" role="tablist">
 				<span class="current-tab-indicator"></span>
 			</div>
 			<div class="tabs-content-container" ref="contentContainer"></div>
@@ -126,32 +126,13 @@ class TabsContainer extends WebComponent {
 	}
 }
 
-class TabContent extends WebComponent {
+class TabHead extends WebComponent {
 	static observedAttributes = [
-		'active'
+		'active',
+		'id',
+		'content-id'
 	];
 	
-	get stylesheet() {
-		return `
-			<style>
-				:host {
-					display: inline-block;
-				}
-				
-				:host .tab-content {
-					display: none;
-					padding: 10px 0;
-				}
-			</style>
-		`;
-	}
-	
-	get template() {
-		return `<div class="tab-content" attr.style.display="block, active"><slot></slot></div>`
-	}
-}
-
-class TabHead extends WebComponent {
 	get stylesheet() {
 		return `
 			<style>
@@ -171,9 +152,13 @@ class TabHead extends WebComponent {
 					letter-spacing: 0.03rem;
 					font-weight: 300;
 					transition: color 0.3s ease, font-weight 0.3s ease;
+					-moz-appearance: none;
+					-webkit-appearance: none;
+					appearance: none;
+					border: none;
 				}
 				
-				:host([active="true"]) .tab-head {
+				:host .tab-head[aria-selected="true"] {
 					font-weight: 500;
 					color: #111;
 				}
@@ -182,7 +167,45 @@ class TabHead extends WebComponent {
 	}
 	
 	get template() {
-		return `<div class="tab-head"><slot></slot></div>`
+		return `<button
+			class="tab-head"
+			role="tab"
+			aria-selected="{active}"
+			aria-controls="{contentId}"
+			attr.tabindex="-1, !active"
+			><slot></slot></button>`
+	}
+}
+
+class TabContent extends WebComponent {
+	static observedAttributes = [
+		'active',
+		'id',
+		'tab-id',
+	];
+	
+	get stylesheet() {
+		return `
+			<style>
+				:host {
+					display: inline-block;
+				}
+				
+				:host .tab-content {
+					padding: 10px 0;
+				}
+			</style>
+		`;
+	}
+	
+	get template() {
+		return `<div
+			class="tab-content"
+			tabindex="0"
+			role="tabpanel"
+			id="{id}"
+			aria-labelledby="{tabId}"
+			attr.hidden="!active"><slot></slot></div>`
 	}
 }
 
