@@ -11,10 +11,10 @@
 
 <main id="app-html">
 <post-card
-	link="https://betterprogramming.pub/how-experience-made-me-enjoy-writing-code-documentation-and-comments-7c4b697ec7bf?source=user_profile---------0-------------------------------"
-	thumbnail="https://miro.medium.com/max/1400/0*m3LRkgwPVjw-RgNN"
-	title="How Experience Made Me Enjoy Writing Code Documentation and Comments"
-	description="Nowadays, when I hear developers talking against writing documentation and comments I can’t help to think that maybe they lack some coding experience"
+   link="https://javascript.plainenglish.io/intro-to-web-components-full-walkthrough-623023d365f1?source=user_profile---------6-------------------------------"
+   thumbnail="https://miro.medium.com/max/1400/1*DOgKD_B5fYSuv9K5-DJ_tQ@2x.jpeg"
+   title="Introduction to Web Components — Deep Dive"
+   description="With broader and better support, Web Components has gained popularity and has become my and many others’ favorite way of building web views."
 ></post-card>
 <hr>
 <div style="display: flex; gap: 20px; margin-top: 20px">
@@ -54,10 +54,10 @@
    title="Why does One Want to learn Web Components with React, Angular, VueJs, and Svelte Around?"
 ></post-card>
 <post-card style="margin-top: 20px"
-   direction="rtl"
-   link="https://javascript.plainenglish.io/intro-to-web-components-full-walkthrough-623023d365f1?source=user_profile---------6-------------------------------"
-   thumbnail="https://miro.medium.com/max/1400/1*DOgKD_B5fYSuv9K5-DJ_tQ@2x.jpeg"
-   title="Introduction to Web Components — Deep Dive"
+  direction="rtl"
+	link="https://betterprogramming.pub/how-experience-made-me-enjoy-writing-code-documentation-and-comments-7c4b697ec7bf?source=user_profile---------0-------------------------------"
+	thumbnail="https://miro.medium.com/max/1400/0*m3LRkgwPVjw-RgNN"
+	title="How Experience Made Me Enjoy Writing Code Documentation and Comments"
 ></post-card>
 </main>
 
@@ -66,6 +66,7 @@ class PostCard extends WebComponent {
 	static observedAttributes = [
 		'link',
 		'title',
+		'link-target',
 		'description',
 		'thumbnail',
 		'thumbnail-alt',
@@ -73,6 +74,25 @@ class PostCard extends WebComponent {
 		'direction',
 		'title-size',
 	];
+	
+	get template() {
+		return `
+			<a href="{link}" class="{direction}" target="{linkTarget || '_blank'}">
+				<slot name="thumbnail">
+					<figure class="thumb">
+						<img src="{thumbnail}" alt="{thumbnailAlt}">
+					</figure>
+				</slot>
+				<div class="details">
+					<slot name="title">
+						<h3 attr.style.font-size="{titleSize}, titleSize">{title}</h3>
+					</slot>
+					<slot name="description">
+						<p>{description}</p>
+					</slot>
+				</div>
+			</a>`;
+	}
 	
 	get stylesheet() {
 		return `
@@ -181,25 +201,6 @@ class PostCard extends WebComponent {
 				}
 			</style>
 		`;
-	}
-	
-	get template() {
-		return `
-			<a href="{link}" class="{direction}">
-				<slot name="thumbnail">
-					<figure class="thumb">
-						<img src="{thumbnail}" alt="{thumbnailAlt}">
-					</figure>
-				</slot>
-				<div class="details">
-					<slot name="title">
-						<h3 attr.style.font-size="{titleSize}, titleSize">{title}</h3>
-					</slot>
-					<slot name="description">
-						<p>{description}</p>
-					</slot>
-				</div>
-			</a>`;
 	}
 }
 
