@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Component Instance</title>
+	<script src="https://unpkg.com/@beforesemicolon/web-component/dist/web-component.min.js"
+	        type="text/javascript"></script>
+	<style id="app-css"></style>
+</head>
+<body>
+
+<main id="app-html">
+
+<tabs-container>
+	<tab-head active="true">Image 1</tab-head>
+	<tab-content>
+		<img src="https://wallpaperaccess.com/full/1406844.png" alt="" width="100%">
+	</tab-content>
+	<tab-head>Image 2</tab-head>
+	<tab-content>
+		<img src="https://wallpaperaccess.com/full/1406842.jpg" alt="" width="100%">
+	</tab-content>
+	<tab-head>Image 3</tab-head>
+	<tab-content>
+		<img src="https://c4.wallpaperflare.com/wallpaper/58/483/756/digital-digital-art-artwork-illustration-romain-trystram-hd-wallpaper-preview.jpg" alt="" width="100%">
+	</tab-content>
+</tabs-container>
+
+</main>
+
+<script id="app-js">
+class TabsContainer extends WebComponent {
+	currentTabInfo = {
+		node: null,
+		index: 0,
+		width: 0,
+		left: 0,
+	}
+	
+	onMount() {
+		const {headContainer, contentContainer} = this.$refs;
+		
+		let index = 0;
+		for (let el of Array.from(this.children)) {
+			if (el.nodeName.toLowerCase() === 'tab-head') {
+				headContainer.appendChild(el);
+				
+				if (el.getAttribute('active') === 'true') {
+					this.currentTabInfo = {
+						node: el,
+						index: index,
+						width: el.offsetWidth + 'px',
+						left: el.offsetLeft + 'px',
+					}
+				}
+				
+				el.dataset.index = index;
+				el.addEventListener('click', () => this.activateTab(el));
+				
+				index += 1;
+			} else if (el.nodeName.toLowerCase() === 'tab-content') {
+				contentContainer.appendChild(el);
+				el.setAttribute('active', 'false');
+			}
+		}
+		
+		if (!this.currentTabInfo.node) {
+			this.activateTab(headContainer.children[1])
+		}
+		
+		contentContainer.children[this.currentTabInfo.index].setAttribute('active', 'true');
+	}
+	
+	activateTab(el) {
+		this.currentTabInfo.node?.setAttribute('active', 'false');
+		this.$refs.contentContainer.children[this.currentTabInfo.index]?.setAttribute('active', 'false');
+		el.setAttribute('active', 'true');
+		this.currentTabInfo = {
+			node: el,
+			index: Number(el.dataset.index),
+			width: el.offsetWidth + 'px',
+			left: el.offsetLeft + 'px',
+		}
+		this.$refs.contentContainer.children[this.currentTabInfo.index]?.setAttribute('active', 'true');
+	}
+	
+	get stylesheet() {
+		return `
+			<style>
+				:host {
+					display: block;
+				}
+				
+				:host * {
+					box-sizing: border-box;
+				}
+				
+				:host .tabs-header {
+					position: relative;
+					display: flex;
+					gap: 5px;
+					border-bottom: 1px solid #e5e5e5;
+				}
+				
+				:host .current-tab-indicator {
+					display: inline-block;
+					height: 2px;
+					width: [currentTabInfo.width];
+					background: #222;
+					position: absolute;
+					bottom: 0;
+					left: [currentTabInfo.left];
+					transition: left 0.3s ease, width 0.3s ease;
+				}
+			</style>
+		`;
+	}
+	
+	get template() {
+		return `
+			<div class="tabs-header" ref="headContainer">
+				<span class="current-tab-indicator"></span>
+			</div>
+			<div class="tabs-content-container" ref="contentContainer"></div>
+		`;
+	}
+}
+
+class TabContent extends WebComponent {
+	static observedAttributes = [
+		'active'
+	];
+	
+	get stylesheet() {
+		return `
+			<style>
+				:host {
+					display: inline-block;
+				}
+				
+				:host .tab-content {
+					display: none;
+					padding: 10px 0;
+				}
+			</style>
+		`;
+	}
+	
+	get template() {
+		return `<div class="tab-content" attr.style.display="block, active"><slot></slot></div>`
+	}
+}
+
+class TabHead extends WebComponent {
+	get stylesheet() {
+		return `
+			<style>
+				:host {
+					display: inline-block;
+				}
+				
+				:host .tab-head {
+					padding: 5px 18px;
+					background: #e8e8e8;
+					color: #666;
+					border-top-left-radius: 3px;
+					border-top-right-radius: 3px;
+					cursor: pointer;
+					font-size: 0.9rem;
+					font-family: sans-serif;
+					letter-spacing: 0.03rem;
+					font-weight: 300;
+					transition: color 0.3s ease, font-weight 0.3s ease;
+				}
+				
+				:host([active="true"]) .tab-head {
+					font-weight: 500;
+					color: #111;
+				}
+			</style>
+		`;
+	}
+	
+	get template() {
+		return `<div class="tab-head"><slot></slot></div>`
+	}
+}
+
+TabHead.register();
+TabContent.register();
+TabsContainer.register();
+
+</script>
+</body>
+</html>
