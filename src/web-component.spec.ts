@@ -933,7 +933,7 @@ describe('WebComponent', () => {
 
 				s.check = false;
 
-				expect(s.root?.innerHTML).toBe('<!-- <button>click me</button> -->');
+				expect(s.root?.innerHTML).toBe('<!-- if: false -->');
 
 				s.check = true;
 
@@ -955,7 +955,7 @@ describe('WebComponent', () => {
 
 				document.body.appendChild(s);
 
-				expect(s.root?.innerHTML).toBe('<button>click me <!-- <span>{icon}</span> --></button>');
+				expect(s.root?.innerHTML).toBe('<button>click me <!-- if:  --></button>');
 
 				s.icon = 'star';
 
@@ -1098,7 +1098,7 @@ describe('WebComponent', () => {
 
 				document.body.appendChild(s);
 
-				expect(s.root?.innerHTML).toBe('<!-- <li class="item-{$key}">item {$item}</li> -->');
+				expect(s.root?.innerHTML).toBe('<!-- if: false -->');
 
 				s.condition = true;
 
@@ -1106,11 +1106,11 @@ describe('WebComponent', () => {
 
 				s.condition = false;
 
-				expect(s.root?.innerHTML).toBe('<!-- <li class="item-{$key}">item {$item}</li> -->');
+				expect(s.root?.innerHTML).toBe('<!-- if: false -->');
 
 				s.count = 2;
 
-				expect(s.root?.innerHTML).toBe('<!-- <li class="item-{$key}">item {$item}</li> -->');
+				expect(s.root?.innerHTML).toBe('<!-- if: false -->');
 
 				s.condition = true;
 
@@ -1133,7 +1133,7 @@ describe('WebComponent', () => {
 
 				const initItemRef = s.$refs.item;
 
-				expect(s.root?.innerHTML).toBe('<!-- <li class="item">my item</li> -->');
+				expect(s.root?.innerHTML).toBe('<!-- if: false -->');
 				expect(initItemRef).toBeUndefined();
 
 				s.condition = true;
@@ -1156,7 +1156,7 @@ describe('WebComponent', () => {
 
 				document.body.appendChild(s);
 
-				expect(s.root?.innerHTML).toBe('<!-- <li>my item</li> -->');
+				expect(s.root?.innerHTML).toBe('<!-- if: false -->');
 
 				s.condition = true;
 
