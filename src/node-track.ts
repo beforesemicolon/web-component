@@ -44,7 +44,7 @@ export class NodeTrack {
 		// whether or not the node was replaced by another on render
 		metadata.get(this.node).shadowed = false;
 		metadata.get(this.node).rawNodeString = (this.node as HTMLElement).outerHTML ?? (this.node as Text).nodeValue;
-		defineNodeContextMetadata(node);
+		defineNodeContextMetadata(node, component);
 
 		this._setTracks();
 	}
@@ -214,6 +214,11 @@ export class NodeTrack {
 						directive.handler = new (class extends Dir {
 							setRef(name: string, node: Node) {
 								self.#component.$refs[name] = node;
+							}
+							
+							setContext(node: Node, key: string, value: any) {
+								defineNodeContextMetadata(node, self.#component);
+								super.setContext(node, key, value);
 							}
 						})() as any;
 					}

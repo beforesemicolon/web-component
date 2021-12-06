@@ -1,6 +1,6 @@
 import metadata from "../metadata";
 
-export function defineNodeContextMetadata(node: Node) {
+export function defineNodeContextMetadata(node: Node, component: WebComponent) {
 	if (metadata.get(node)?.$context) {
 		return;
 	}
@@ -21,5 +21,7 @@ export function defineNodeContextMetadata(node: Node) {
 
 	metadata.get(node).updateContext = (key: string, val: any) => {
 		ctx[key] = val;
+		component.updateNode(node);
+		node.childNodes.forEach(child => metadata.get(child)?.updateContext());
 	}
 }

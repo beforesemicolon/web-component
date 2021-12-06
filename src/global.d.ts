@@ -42,7 +42,7 @@ export declare global {
 	export interface directiveRenderOptions {
 		element: HTMLElement,
 		rawElementOuterHTML: string,
-		anchorNode: Text | Comment | HTMLElement
+		anchorNode: Text | Comment | HTMLElement | Array<HTMLElement> | null
 	}
 
 	export interface DirectiveValue {
@@ -56,7 +56,7 @@ export declare global {
 		static register: () => void;
 
 		parseValue: (value: string, prop: string | null) => string;
-		render: (val: any, options: directiveRenderOptions) => directiveRenderOptions['anchorNode'] | Array<directiveRenderOptions['anchorNode']> | null;
+		render: (val: any, options: directiveRenderOptions) => Pick<directiveRenderOptions, 'anchorNode'>;
 		setContext: (node: Node, key: string, value: any) => void;
 		getContext(node: Node) {}
 
@@ -97,6 +97,7 @@ export declare global {
 
 		updateContext: (ctx: ObjectLiteral) => void;
 		untrack: (node: Node) => void;
+		updateNode: (node: Node) => void;
 
 		onMount: () => void;
 		onDestroy: () => void;

@@ -1,5 +1,4 @@
 import {directiveRegistry} from "./directives/registry";
-import {defineNodeContextMetadata} from "./utils/define-node-context-metadata";
 import metadata from "./metadata";
 
 export class Directive {
@@ -26,7 +25,6 @@ export class Directive {
 	}
 
 	setContext(node: Node, key: string, value: any) {
-		defineNodeContextMetadata(node);
 		metadata.get(node).updateContext(key, value);
 	}
 }

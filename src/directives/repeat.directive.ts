@@ -2,6 +2,7 @@ import {Directive} from "../directive";
 
 export class Repeat extends Directive {
 	render(repeatData: any, {element, rawElementOuterHTML, anchorNode}: directiveRenderOptions) {
+		anchorNode = (anchorNode ?? []) as Array<HTMLElement>;
 		const list: Array<HTMLElement> = [];
 
 		if (element.nodeType === 1) {
@@ -18,14 +19,28 @@ export class Repeat extends Directive {
 			}
 
 			for (let index = 0; index < times; index++) {
-				list.push(this.cloneRepeatedNode(rawElementOuterHTML, index, repeatData));
+				if (anchorNode[index]) {
+					this.updateNodeContext(anchorNode[index], index, repeatData);
+					list.push(anchorNode[index]);
+				} else {
+					const el = this.cloneRepeatedNode(rawElementOuterHTML);
+					this.updateNodeContext(el, index, repeatData)
+					list.push(el);
+				}
 			}
 		}
 
 		return list;
 	}
+	
+	updateNodeContext(el: Node, index: number, list: Array<any> = []) {
+		const [key, value] = list[index] ?? [index, index + 1];
+		// set context so this and inner nodes can catch these values
+		this.setContext(el, '$key', key);
+		this.setContext(el, '$item', value);
+	}
 
-	cloneRepeatedNode(rawElementOuterHTML: string, index: number, list: Array<any> = []): HTMLElement {
+	cloneRepeatedNode(rawElementOuterHTML: string): HTMLElement {
 		const n = document.createElement('div');
 		n.innerHTML = rawElementOuterHTML;
 		const clone = n.children[0] as HTMLElement;
@@ -35,12 +50,7 @@ export class Repeat extends Directive {
 		// which means if the node reached the repeat, it was already processed by possibly
 		// existing if directive
 		clone.removeAttribute('if');
-
-		const [key, value] = list[index] ?? [index, index + 1];
-		// set context so this and inner nodes can catch these values
-		this.setContext(clone, '$key', key);
-		this.setContext(clone, '$item', value);
-
+		
 		return clone;
 	}
 }

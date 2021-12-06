@@ -324,6 +324,10 @@ export class WebComponent extends HTMLElement {
 			track.updateNode()
 		});
 	}
+	
+	updateNode(node: Node) {
+		this.#trackers.get(node)?.updateNode();
+	}
 
 	/**
 	 * make so a node will stop being updated when new changes are made
