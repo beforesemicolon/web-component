@@ -21,7 +21,7 @@ export function defineNodeContextMetadata(node: Node, component: WebComponent) {
 
 	metadata.get(node).updateContext = (key: string, val: any) => {
 		ctx[key] = val;
-		component.updateNode(node);
+		metadata.get(component).trackers.get(node)?.updateNode();
 		node.childNodes.forEach(child => metadata.get(child)?.updateContext());
 	}
 }

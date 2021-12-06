@@ -31,15 +31,15 @@ export class NodeTrack {
 		value: '',
 		executables: []
 	};
-	readonly #component: WebComponent;
-	#anchor: HTMLElement | Node | Comment | Array<Element>;
-	#empty = false;
-	#dirAnchors = new WeakMap();
+	readonly component: WebComponent;
+	anchor: HTMLElement | Node | Comment | Array<Element>;
+	empty = false;
+	readonly dirAnchors = new WeakMap();
 
 	constructor(node: HTMLElement | Node, component: WebComponent) {
 		this.node = node;
-		this.#anchor = node;
-		this.#component = component;
+		this.anchor = node;
+		this.component = component;
 
 		// whether or not the node was replaced by another on render
 		metadata.get(this.node).shadowed = false;
@@ -47,10 +47,6 @@ export class NodeTrack {
 		defineNodeContextMetadata(node, component);
 
 		this._setTracks();
-	}
-
-	get empty() {
-		return this.#empty;
 	}
 
 	get $context() {
@@ -63,7 +59,7 @@ export class NodeTrack {
 		// and it is is not being shadowed(temporarily removed from the DOM by a directive)
 		// the node no longer needs to be tracked so it can be discarded
 		if (metadata.get(this.node).__rendered && !this.node.parentNode && !metadata.get(this.node).shadowed) {
-			return this.#component.untrack(this.node);
+			return this._unTrackNode(this.node);
 		}
 
 		let directiveNode: any = this.node;
@@ -75,39 +71,39 @@ export class NodeTrack {
 					
 					let val = handler.parseValue(directive.value, directive.prop);
 					extractExecutableSnippetFromString(val).forEach((exc) => {
-						val = resolveExecutable(this.#component, metadata.get(this.node).$context ?? {}, exc, val);
+						val = resolveExecutable(this.component, metadata.get(this.node).$context ?? {}, exc, val);
 					});
 					
-					const value = evaluateStringInComponentContext(val, this.#component, this.$context);
+					const value = evaluateStringInComponentContext(val, this.component, this.$context);
 					directiveNode = handler.render(value, {
 						element: this.node,
-						anchorNode: this.#dirAnchors.get(directive) ?? null,
+						anchorNode: this.dirAnchors.get(directive) ?? null,
 						rawElementOuterHTML: metadata.get(this.node).rawNodeString
 					} as directiveRenderOptions);
 					
 					if (directiveNode !== this.node) {
-						this.#dirAnchors.set(directive, directiveNode)
+						this.dirAnchors.set(directive, directiveNode)
 						break;
 					}
 					
 				} catch(e: any) {
-					this.#component.onError(new Error(`"${directive.name}" on ${(this.node as HTMLElement).outerHTML}: ${e.message}`));
+					this.component.onError(new Error(`"${directive.name}" on ${(this.node as HTMLElement).outerHTML}: ${e.message}`));
 				}
 				
-				this.#dirAnchors.set(directive, null)
+				this.dirAnchors.set(directive, null)
 			}
 		}
 
 		if (directiveNode === this.node) {
 			metadata.get(this.node).shadowed = false;
 			
-			this.#anchor = this._switchNodeAndAnchor(directiveNode);
+			this.anchor = this._switchNodeAndAnchor(directiveNode);
 
 			if (this.property?.executables.length) {
 				let newValue = this.property.value;
 
 				this.property.executables.forEach((exc) => {
-					newValue = resolveExecutable(this.#component, metadata.get(this.node).$context ?? {}, exc, newValue);
+					newValue = resolveExecutable(this.component, metadata.get(this.node).$context ?? {}, exc, newValue);
 				});
 
 				if (newValue !== (this.node as ObjectLiteral)[this.property.name]) {
@@ -120,7 +116,7 @@ export class NodeTrack {
 					let newValue = value;
 
 					executables.forEach((exc) => {
-						newValue = resolveExecutable(this.#component, metadata.get(this.node).$context ?? {}, exc, newValue);
+						newValue = resolveExecutable(this.component, metadata.get(this.node).$context ?? {}, exc, newValue);
 					});
 
 					const camelName = turnKebabToCamelCasing(name);
@@ -145,7 +141,13 @@ export class NodeTrack {
 
 		metadata.get(this.node).shadowed = true;
 		
-		this.#anchor = this._switchNodeAndAnchor(directiveNode);
+		this.anchor = this._switchNodeAndAnchor(directiveNode);
+	}
+	
+	private _unTrackNode(node: Node) {
+		metadata.get(this.component).trackers.delete(node);
+		metadata.delete(node);
+		node.childNodes.forEach(n => this._unTrackNode(n))
 	}
 
 	private _setTracks() {
@@ -213,11 +215,11 @@ export class NodeTrack {
 						const Dir = directiveRegistry[directive.name];
 						directive.handler = new (class extends Dir {
 							setRef(name: string, node: Node) {
-								self.#component.$refs[name] = node;
+								self.component.$refs[name] = node;
 							}
 							
 							setContext(node: Node, key: string, value: any) {
-								defineNodeContextMetadata(node, self.#component);
+								defineNodeContextMetadata(node, self.component);
 								super.setContext(node, key, value);
 							}
 						})() as any;
@@ -253,7 +255,7 @@ export class NodeTrack {
 				(this.node as HTMLElement).removeAttribute(attribute.name);
 
 				if (!fn && !isRepeatedNode) {
-					fn = getEventHandlerFunction(this.#component, this.$context, attribute) as EventListenerCallback;
+					fn = getEventHandlerFunction(this.component, this.$context, attribute) as EventListenerCallback;
 
 					if (fn) {
 						this.node.addEventListener(eventName, fn);
@@ -276,7 +278,7 @@ export class NodeTrack {
 			this.property.executables = extractExecutableSnippetFromString(this.property.value)
 		}
 
-		this.#empty = !this.directives.length &&
+		this.empty = !this.directives.length &&
 			!this.eventHandlers.length &&
 			!this.attributes.length &&
 			!this.property?.executables.length;
@@ -291,15 +293,15 @@ export class NodeTrack {
 			directiveNode = this._createDefaultAnchor();
 		}
 		
-		const anchorIsArray = Array.isArray(this.#anchor);
+		const anchorIsArray = Array.isArray(this.anchor);
 		const dirIsArray = Array.isArray(directiveNode);
 		const anchorEl = document.createComment('')
 		let nextEl: Element | Comment | Text = anchorEl;
 		
 		if (anchorIsArray) {
-			(this.#anchor as Array<Element>)[0].parentNode?.insertBefore(nextEl, (this.#anchor as Array<Element>)[0]);
+			(this.anchor as Array<Element>)[0].parentNode?.insertBefore(nextEl, (this.anchor as Array<Element>)[0]);
 		} else {
-			(this.#anchor as HTMLElement).before(nextEl);
+			(this.anchor as HTMLElement).before(nextEl);
 		}
 		
 		if (dirIsArray) {
@@ -307,7 +309,7 @@ export class NodeTrack {
 				if (!el.isConnected) {
 					nextEl.after(el);
 					// @ts-ignore
-					this.#component._render(el);
+					this.component._render(el);
 				}
 				
 				nextEl = el;
@@ -319,20 +321,20 @@ export class NodeTrack {
 		anchorEl.parentNode?.removeChild(anchorEl);
 
 		if (anchorIsArray) {
-			for (let el of (this.#anchor as Array<Element>)) {
+			for (let el of (this.anchor as Array<Element>)) {
 				if (!dirIsArray) {
 					el.parentNode?.removeChild(el);
-					this.#component.untrack(el);
+					this._unTrackNode(el);
 				} else if(!(directiveNode as Array<Element>).includes(el)) {
 					el.parentNode?.removeChild(el);
-					this.#component.untrack(el);
+					this._unTrackNode(el);
 				}
 			}
-		} else if(this.#anchor !== directiveNode) {
-			(this.#anchor as Node).parentNode?.removeChild(this.#anchor as Node);
+		} else if(this.anchor !== directiveNode) {
+			(this.anchor as Node).parentNode?.removeChild(this.anchor as Node);
 		}
 
-		this.#anchor = directiveNode;
+		this.anchor = directiveNode;
 
 		return directiveNode;
 	}
