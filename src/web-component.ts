@@ -17,21 +17,22 @@ import './directives';
  * when it comes to creating and working with web components on the browser
  */
 export class WebComponent extends HTMLElement {
-	readonly #root: WebComponent | ShadowRoot;
-	readonly #trackers: Map<HTMLElement | Node | WebComponent, NodeTrack> = new Map();
 	readonly $refs: Refs = Object.create(null);
-	#mounted = false;
-	#parsed = false;
-	#context: ObjectLiteral = {};
-	#contextSource: WebComponent | null = null;
-	#contextSubscribers: Array<ObserverCallback> = [];
-	#unsubscribeCtx: () => void = () => {};
 	$properties: Array<string> = ['$context', '$refs'];
 
 	constructor() {
 		super();
 
-		this.#root = this;
+		metadata.set(this, {
+			root: this,
+			trackers: new Map(),
+			mounted: false,
+			parsed: false,
+			context: {},
+			contextSource: null,
+			contextSubscribers: [],
+			unsubscribeCtx: () => {},
+		} as WebComponentMetadata);
 
 		// @ts-ignore
 		let {name, mode, observedAttributes, delegatesFocus, initialContext} = this.constructor;
@@ -41,14 +42,14 @@ export class WebComponent extends HTMLElement {
 		}
 
 		if (mode !== 'none') {
-			this.#root = this.attachShadow({mode, delegatesFocus});
+			metadata.get(this).root = this.attachShadow({mode, delegatesFocus});
 		}
 
 		if (!Array.isArray(observedAttributes) || observedAttributes.some(a => typeof a !== 'string')) {
 			throw new Error(`${name}: "observedAttributes" must be an array of attribute strings.`)
 		}
 
-		this.#context = initialContext;
+		metadata.get(this).context = initialContext;
 
 		this.$properties.push(
 			...setComponentPropertiesFromObservedAttributes(this, observedAttributes,
@@ -136,7 +137,7 @@ export class WebComponent extends HTMLElement {
 	 * @returns {*}
 	 */
 	get root(): HTMLElement | ShadowRoot | null {
-		return (this.constructor as WebComponentConstructor).mode === 'open' ? this.#root : null;
+		return (this.constructor as WebComponentConstructor).mode === 'closed' ? null : metadata.get(this).root;
 	}
 
 	/**
@@ -144,7 +145,7 @@ export class WebComponent extends HTMLElement {
 	 * @returns {boolean}
 	 */
 	get mounted() {
-		return this.#mounted;
+		return metadata.get(this).mounted;
 	}
 
 	/**
@@ -166,39 +167,40 @@ export class WebComponent extends HTMLElement {
 	get $context(): ObjectLiteral {
 		// make sure the subscribe method is part of the prototype
 		// so it is hidden unless the prototype is checked
-		return Object.setPrototypeOf({...this.#contextSource?.$context, ...this.#context}, {
-			subscribe: ctxSubscriberHandler(this.#contextSubscribers),
+		return Object.setPrototypeOf({...metadata.get(this).contextSource?.$context, ...metadata.get(this).context}, {
+			subscribe: ctxSubscriberHandler(metadata.get(this).contextSubscribers),
 		});
 	}
 
 	get parsed() {
-		return this.#parsed;
+		return metadata.get(this).parsed;
 	}
 
 	updateContext(ctx: ObjectLiteral) {
-		this.#context = {...this.#context, ...ctx};
+		metadata.get(this).context = {...metadata.get(this).context, ...ctx};
 
 		if (this.mounted) {
 			this.forceUpdate();
-			this.#contextSubscribers.forEach(cb => cb(this.#context));
+			metadata.get(this).contextSubscribers.forEach((cb: (ctx: {}) => void) => cb(metadata.get(this).context));
 		}
 	}
 
 	connectedCallback() {
+		const {parsed} = metadata.get(this);
 		try {
 			// @ts-ignore
-			this.#contextSource = getClosestWebComponentAncestor(this);
+			metadata.get(this).contextSource = getClosestWebComponentAncestor(this);
 
-			if (this.#contextSource) {
+			if (metadata.get(this).contextSource) {
 				// force update the component if the ancestor context gets updated as well
-				this.#unsubscribeCtx = this.#contextSource.$context.subscribe((newContext: ObjectLiteral) => {
+				metadata.get(this).unsubscribeCtx = metadata.get(this).contextSource.$context.subscribe((newContext: ObjectLiteral) => {
 					this.forceUpdate();
 
 					if (this.mounted) {
-						this.onUpdate('$context', this.#context, newContext)
+						this.onUpdate('$context', metadata.get(this).context, newContext)
 					}
-
-					this.#contextSubscribers.forEach(cb => cb(newContext));
+					
+					metadata.get(this).contextSubscribers.forEach((cb: (ctx: {}) => void) => cb(newContext));
 				})
 			}
 
@@ -208,7 +210,7 @@ export class WebComponent extends HTMLElement {
 			this will make sure that if the element is removed from the dom and mounted again
 			all that needs to be done if update the DOM to grab the possible new context and updated data
 			 */
-			if (this.#parsed) {
+			if (parsed) {
 				this.forceUpdate();
 			} else {
 				this.$properties.push(
@@ -246,13 +248,13 @@ export class WebComponent extends HTMLElement {
 						}
 					})
 				}
-
-				this.#parsed = true;
-
-				this.#root.appendChild(contentNode);
+				
+				metadata.get(this).parsed = true;
+				
+				metadata.get(this).root.appendChild(contentNode);
 			}
-
-			this.#mounted = true;
+			
+			metadata.get(this).mounted = true;
 			this.onMount();
 		} catch (e) {
 			this.onError(e as ErrorEvent);
@@ -267,9 +269,9 @@ export class WebComponent extends HTMLElement {
 
 	disconnectedCallback() {
 		try {
-			this.#contextSource = null;
-			this.#mounted = false;
-			this.#unsubscribeCtx();
+			metadata.get(this).contextSource = null;
+			metadata.get(this).mounted = false;
+			metadata.get(this).unsubscribeCtx();
 			this.onDestroy();
 		} catch (e) {
 			this.onError(e as Error)
@@ -320,13 +322,13 @@ export class WebComponent extends HTMLElement {
 	 * updates any already tracked node with current component data including context and node level data.
 	 */
 	forceUpdate() {
-		this.#trackers.forEach((track: NodeTrack) => {
+		metadata.get(this).trackers.forEach((track: NodeTrack) => {
 			track.updateNode()
 		});
 	}
 	
 	updateNode(node: Node) {
-		this.#trackers.get(node)?.updateNode();
+		metadata.get(this).trackers.get(node)?.updateNode();
 	}
 
 	/**
@@ -334,7 +336,7 @@ export class WebComponent extends HTMLElement {
 	 * @param node
 	 */
 	untrack(node: Node) {
-		this.#trackers.delete(node);
+		metadata.get(this).trackers.delete(node);
 		metadata.delete(node);
 		node.childNodes.forEach(n => this.untrack(n))
 	}
@@ -406,7 +408,7 @@ export class WebComponent extends HTMLElement {
 		if ((isElement && !isScript) || (isTextNode && node.nodeValue?.trim())) {
 			const track = new NodeTrack(node, this as WebComponent);
 			if (!track.empty) {
-				this.#trackers.set(node, track);
+				metadata.get(this).trackers.set(node, track);
 				track.updateNode();
 			}
 		}

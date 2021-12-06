@@ -75,6 +75,17 @@ export declare global {
 		match: string;
 		executable: string;
 	}
+	
+	export interface WebComponentMetadata {
+		root: WebComponent | ShadowRoot;
+		trackers: Map;
+		mounted: boolean;
+		parsed: boolean;
+		context: object;
+		contextSource: WebComponent | null;
+		contextSubscribers: Array<(ctx: object) => void>;
+		unsubscribeCtx: (ctx: object) => void;
+	}
 
 	export class WebComponent extends HTMLElement {
 		static tagName: string;

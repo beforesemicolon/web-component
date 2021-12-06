@@ -29,7 +29,7 @@ describe('WebComponent', () => {
 			AComp.mode = ShadowRootModeExtended.NONE;
 			a = new AComp();
 
-			expect(a.root).toEqual(null);
+			expect(a.root).toEqual(a);
 		});
 
 		it('should throw error if invalid observed attributes', () => {
@@ -173,7 +173,7 @@ describe('WebComponent', () => {
 
 			document.body.appendChild(i);
 
-			expect(i.root?.innerHTML).toBeUndefined()
+			expect(i.root?.innerHTML).toBe('')
 			expect(document.head.innerHTML).toBe('<style class="i-comp">i-comp {display: inline-block;}</style>')
 		});
 
