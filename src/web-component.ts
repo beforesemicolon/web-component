@@ -326,20 +326,6 @@ export class WebComponent extends HTMLElement {
 			track.updateNode()
 		});
 	}
-	
-	updateNode(node: Node) {
-		metadata.get(this).trackers.get(node)?.updateNode();
-	}
-
-	/**
-	 * make so a node will stop being updated when new changes are made
-	 * @param node
-	 */
-	untrack(node: Node) {
-		metadata.get(this).trackers.delete(node);
-		metadata.delete(node);
-		node.childNodes.forEach(n => this.untrack(n))
-	}
 
 	adoptedCallback() {
 		try {

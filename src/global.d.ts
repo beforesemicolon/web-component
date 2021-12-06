@@ -107,8 +107,6 @@ export declare global {
 		readonly $properties: Array<string>;
 
 		updateContext: (ctx: ObjectLiteral) => void;
-		untrack: (node: Node) => void;
-		updateNode: (node: Node) => void;
 
 		onMount: () => void;
 		onDestroy: () => void;
