@@ -1,8 +1,8 @@
 import {Directive} from "../directive";
 
 export class Repeat extends Directive {
-	render(repeatData: any, {element, rawElementOuterHTML}: directiveRenderOptions) {
-		const frag = document.createDocumentFragment();
+	render(repeatData: any, {element, rawElementOuterHTML, anchorNode}: directiveRenderOptions) {
+		const list: Array<HTMLElement> = [];
 
 		if (element.nodeType === 1) {
 			let times: number;
@@ -18,14 +18,14 @@ export class Repeat extends Directive {
 			}
 
 			for (let index = 0; index < times; index++) {
-				frag.appendChild(this.cloneRepeatedNode(rawElementOuterHTML, index, repeatData));
+				list.push(this.cloneRepeatedNode(rawElementOuterHTML, index, repeatData));
 			}
 		}
 
-		return frag;
+		return list;
 	}
 
-	cloneRepeatedNode(rawElementOuterHTML: string, index: number, list: Array<any> = []) {
+	cloneRepeatedNode(rawElementOuterHTML: string, index: number, list: Array<any> = []): HTMLElement {
 		const n = document.createElement('div');
 		n.innerHTML = rawElementOuterHTML;
 		const clone = n.children[0] as HTMLElement;

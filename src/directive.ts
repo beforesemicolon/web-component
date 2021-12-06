@@ -15,7 +15,7 @@ export class Directive {
 		return value;
 	}
 
-	render(val: unknown, {element}: directiveRenderOptions): Node | null {
+	render(val: unknown, {element}: directiveRenderOptions): directiveRenderOptions['anchorNode'] | Array<directiveRenderOptions['anchorNode']> | null {
 		return element;
 	}
 

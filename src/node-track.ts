@@ -32,8 +32,7 @@ export class NodeTrack {
 		executables: []
 	};
 	readonly #component: WebComponent;
-	#anchor: HTMLElement | Node | Array<Node>;
-	#reqAnimationId: number = -1;
+	#anchor: HTMLElement | Node | Comment | Array<Element>;
 	#empty = false;
 	#dirAnchors = new WeakMap();
 
@@ -101,9 +100,8 @@ export class NodeTrack {
 
 		if (directiveNode === this.node) {
 			metadata.get(this.node).shadowed = false;
-			const childNodes = this._switchNodeAndAnchor(directiveNode);
-
-			this.#anchor = childNodes ?? directiveNode;
+			
+			this.#anchor = this._switchNodeAndAnchor(directiveNode);
 
 			if (this.property?.executables.length) {
 				let newValue = this.property.value;
@@ -146,20 +144,8 @@ export class NodeTrack {
 		}
 
 		metadata.get(this.node).shadowed = true;
-
-		if(directiveNode instanceof Node) {
-			// @ts-ignore
-			this.#component._render(directiveNode);
-
-			cancelAnimationFrame(this.#reqAnimationId);
-			this.#reqAnimationId = requestAnimationFrame(() => {
-				const childNodes = this._switchNodeAndAnchor(directiveNode);
-
-				this.#anchor = childNodes ?? directiveNode;
-			});
-		} else {
-			this._switchNodeAndAnchor(directiveNode);
-		}
+		
+		this.#anchor = this._switchNodeAndAnchor(directiveNode);
 	}
 
 	private _setTracks() {
@@ -295,34 +281,54 @@ export class NodeTrack {
 		return document.createComment( ` ${this.node.nodeValue ?? (this.node as HTMLElement).outerHTML} `)
 	}
 
-	private _switchNodeAndAnchor(directiveNode: Node) {
-		let childNodes = null;
-
-		if (directiveNode instanceof Node) {
-			if (directiveNode.nodeType === 11) {
-				childNodes = directiveNode.childNodes.length
-					? Array.from(directiveNode.childNodes)
-					: [this._createDefaultAnchor()];
-			}
-		} else {
+	private _switchNodeAndAnchor(directiveNode: HTMLElement | Node | Comment | Array<Element>) {
+		if (!Array.isArray(directiveNode) && !(/[831]/.test(`${(directiveNode as Node).nodeType}`))) {
 			directiveNode = this._createDefaultAnchor();
 		}
-
-		if (Array.isArray(this.#anchor)) {
-			const anchor = document.createComment('');
-
-			this.#anchor[0].parentNode?.insertBefore(anchor, this.#anchor[0]);
-			this.#anchor.forEach(n => {
-				n.parentNode?.removeChild(n);
-				this.#component.untrack(n);
-			})
-			anchor.parentNode?.replaceChild(directiveNode, anchor);
+		
+		const anchorIsArray = Array.isArray(this.#anchor);
+		const dirIsArray = Array.isArray(directiveNode);
+		const anchorEl = document.createComment('')
+		let nextEl: Element | Comment | Text = anchorEl;
+		
+		if (anchorIsArray) {
+			(this.#anchor as Array<Element>)[0].parentNode?.insertBefore(nextEl, (this.#anchor as Array<Element>)[0]);
 		} else {
-			(this.#anchor as Node).parentNode?.replaceChild(directiveNode, this.#anchor as Node);
+			(this.#anchor as HTMLElement).before(nextEl);
+		}
+		
+		if (dirIsArray) {
+			for (let el of (directiveNode as Array<Element>)) {
+				if (!el.isConnected) {
+					nextEl.after(el);
+					// @ts-ignore
+					this.#component._render(el);
+				}
+				
+				nextEl = el;
+			}
+		} else {
+			nextEl.after(directiveNode as Node);
+		}
+		
+		anchorEl.parentNode?.removeChild(anchorEl);
+
+		if (anchorIsArray) {
+			for (let el of (this.#anchor as Array<Element>)) {
+				if (!dirIsArray) {
+					el.parentNode?.removeChild(el);
+					this.#component.untrack(el);
+				} else if(!(directiveNode as Array<Element>).includes(el)) {
+					el.parentNode?.removeChild(el);
+					this.#component.untrack(el);
+				}
+			}
+		} else if(this.#anchor !== directiveNode) {
+			(this.#anchor as Node).parentNode?.removeChild(this.#anchor as Node);
 		}
 
 		this.#anchor = directiveNode;
 
-		return childNodes;
+		return directiveNode;
 	}
 }
