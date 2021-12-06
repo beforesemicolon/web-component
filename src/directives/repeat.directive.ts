@@ -1,10 +1,10 @@
 import {Directive} from "../directive";
 
 export class Repeat extends Directive {
-	render(repeatData: any, node: Node, rawNodeOuterHTML: string) {
+	render(repeatData: any, {element, rawElementOuterHTML}: directiveRenderOptions) {
 		const frag = document.createDocumentFragment();
 
-		if (node.nodeType === 1) {
+		if (element.nodeType === 1) {
 			let times: number;
 
 			if (Number.isInteger(repeatData)) {
@@ -18,16 +18,16 @@ export class Repeat extends Directive {
 			}
 
 			for (let index = 0; index < times; index++) {
-				frag.appendChild(this.cloneRepeatedNode(rawNodeOuterHTML, index, repeatData));
+				frag.appendChild(this.cloneRepeatedNode(rawElementOuterHTML, index, repeatData));
 			}
 		}
 
 		return frag;
 	}
 
-	cloneRepeatedNode(rawNodeOuterHTML: string, index: number, list: Array<any> = []) {
+	cloneRepeatedNode(rawElementOuterHTML: string, index: number, list: Array<any> = []) {
 		const n = document.createElement('div');
-		n.innerHTML = rawNodeOuterHTML;
+		n.innerHTML = rawElementOuterHTML;
 		const clone = n.children[0] as HTMLElement;
 		// remove the repeat node to avoid infinite loop where the clone node also repeat
 		clone.removeAttribute('repeat');

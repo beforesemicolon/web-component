@@ -38,21 +38,28 @@ export declare global {
 		empty: boolean;
 		$context: ObjectLiteral;
 	}
+	
+	export interface directiveRenderOptions {
+		element: HTMLElement,
+		rawElementOuterHTML: string,
+		anchorNode: Node | HTMLElement | DocumentFragment
+	}
 
 	export interface DirectiveValue {
 		name: string;
 		value: string;
 		prop: string | null;
+		handler?: Directive;
 	}
 
 	export class Directive {
 		static register: () => void;
 
-		protected parseValue: (value: string, prop: string | null) => string;
-		protected render: (val: any, node: Node, rawNodeOuterHTML: string) => Node | null;
-		protected setRef: (name: string, node: Node) => void;
-		protected setContext: (node: Node, key: string, value: any) => void;
-		protected getContext(node: Node) {}
+		parseValue: (value: string, prop: string | null) => string;
+		render: (val: any, options: directiveRenderOptions) => Node | null;
+		setRef: (name: string, node: Node) => void;
+		setContext: (node: Node, key: string, value: any) => void;
+		getContext(node: Node) {}
 
 		[key: string | Directive]: any;
 	}

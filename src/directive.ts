@@ -11,21 +11,21 @@ export class Directive {
 		}
 	}
 
-	protected parseValue(value: string, prop: string | null) {
+	parseValue(value: string, prop: string | null) {
 		return value;
 	}
 
-	protected render(val: any, node: Node, rawNodeOuterHTML: string): Node | null {
-		return node;
+	render(val: unknown, {element}: directiveRenderOptions): Node | null {
+		return element;
 	}
 
-	protected setRef(name: string, node: Node) {}
+	setRef(name: string, node: Node) {}
 
-	protected getContext(node: Node) {
+	getContext(node: Node) {
 		return metadata.get(node).$context ?? null;
 	}
 
-	protected setContext(node: Node, key: string, value: any) {
+	setContext(node: Node, key: string, value: any) {
 		defineNodeContextMetadata(node);
 		metadata.get(node).updateContext(key, value);
 	}

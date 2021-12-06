@@ -12,16 +12,16 @@ export class Attr extends Directive {
 		return `["${attrName}", "${property || ''}", ${commaIdx >= 0 ? value.slice(commaIdx + 1).trim() : value}, "${val}"]`;
 	}
 
-	render([attrName, property, shouldAdd, val]: any, node: HTMLElement): HTMLElement {
+	render([attrName, property, shouldAdd, val]: any, {element}: directiveRenderOptions): HTMLElement {
 		switch (attrName) {
 			case 'style':
 				if (property) {
 					property = turnKebabToCamelCasing(property);
 
 					if (shouldAdd) {
-						(node as ObjectLiteral).style[property] = val;
+						element.style[property] = val;
 					} else {
-						(node as ObjectLiteral).style[property] = '';
+						element.style[property] = '';
 					}
 				} else {
 					val
@@ -32,12 +32,12 @@ export class Attr extends Directive {
 							styleValue = styleValue.trim();
 
 							if (shouldAdd) {
-								node.style.setProperty(name, styleValue);
+								element.style.setProperty(name, styleValue);
 							} else {
 								const pattern = new RegExp(`${name}\\s*:\\s*${styleValue};?`, 'g');
-								node.setAttribute(
+								element.setAttribute(
 									'style',
-									node.style.cssText.replace(pattern, ''))
+									element.style.cssText.replace(pattern, ''))
 							}
 
 						})
@@ -47,26 +47,26 @@ export class Attr extends Directive {
 			case 'class':
 				if (property) {
 					if (shouldAdd) {
-						node.classList.add(property);
+						element.classList.add(property);
 					} else {
-						node.classList.remove(property);
+						element.classList.remove(property);
 					}
 				} else {
 					const classes = val.split(/\s+/g);
 
 					if (shouldAdd) {
-						classes.forEach((cls: string) => node.classList.add(cls));
+						classes.forEach((cls: string) => element.classList.add(cls));
 					} else {
-						classes.forEach((cls: string) => node.classList.remove(cls));
+						classes.forEach((cls: string) => element.classList.remove(cls));
 					}
 				}
 				break;
 			case 'data':
 				if (property) {
 					if (shouldAdd) {
-						node.dataset[turnKebabToCamelCasing(property)] = val;
+						element.dataset[turnKebabToCamelCasing(property)] = val;
 					} else {
-						node.removeAttribute(`data-${turnCamelToKebabCasing(property)}`)
+						element.removeAttribute(`data-${turnCamelToKebabCasing(property)}`)
 					}
 				}
 				break;
@@ -74,16 +74,16 @@ export class Attr extends Directive {
 				if (attrName) {
 					if (shouldAdd) {
 						if (booleanAttr.hasOwnProperty(attrName)) {
-							node.setAttribute(attrName, '');
+							element.setAttribute(attrName, '');
 						} else {
 							node.setAttribute(attrName, `${val || shouldAdd}`);
 						}
 					} else {
-						node.removeAttribute(attrName);
+						element.removeAttribute(attrName);
 					}
 				}
 		}
 
-		return node;
+		return element;
 	}
 }

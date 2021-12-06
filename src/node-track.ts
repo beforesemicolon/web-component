@@ -35,6 +35,7 @@ export class NodeTrack {
 	#anchor: HTMLElement | Node | Array<Node>;
 	#reqAnimationId: number = -1;
 	#empty = false;
+	#dirAnchors = new WeakMap();
 
 	constructor(node: HTMLElement | Node, component: WebComponent) {
 		this.node = node;
@@ -68,35 +69,33 @@ export class NodeTrack {
 
 		let directiveNode: any = this.node;
 
-		const self = this;
 		for (let directive of this.directives) {
-			if (directive) {
-				const Dir = directiveRegistry[directive.name];
-				if (Dir) {
-					try {
-						// this custom handler will extend the provided one to inject logic
-						// related to updating refs
-						const handler = new (class extends Dir {
-							setRef(name: string, node: Node) {
-								self.#component.$refs[name] = node;
-							}
-						})();
-
-						let val = handler.parseValue(directive.value, directive.prop);
-						extractExecutableSnippetFromString(val).forEach((exc) => {
-							val = resolveExecutable(this.#component, metadata.get(this.node).$context ?? {}, exc, val);
-						});
-
-						const value = evaluateStringInComponentContext(val, this.#component, this.$context);
-						directiveNode = handler.render(value, this.node, metadata.get(this.node).rawNodeString);
-					} catch(e: any) {
-						this.#component.onError(new Error(`"${directive.name}" on ${(this.node as HTMLElement).outerHTML}: ${e.message}`));
+			if (directive && directive.handler) {
+				try {
+					const {handler} = directive;
+					
+					let val = handler.parseValue(directive.value, directive.prop);
+					extractExecutableSnippetFromString(val).forEach((exc) => {
+						val = resolveExecutable(this.#component, metadata.get(this.node).$context ?? {}, exc, val);
+					});
+					
+					const value = evaluateStringInComponentContext(val, this.#component, this.$context);
+					directiveNode = handler.render(value, {
+						element: this.node,
+						anchorNode: this.#dirAnchors.get(directive) ?? null,
+						rawElementOuterHTML: metadata.get(this.node).rawNodeString
+					} as directiveRenderOptions);
+					
+					if (directiveNode !== this.node) {
+						this.#dirAnchors.set(directive, directiveNode)
+						break;
 					}
+					
+				} catch(e: any) {
+					this.#component.onError(new Error(`"${directive.name}" on ${(this.node as HTMLElement).outerHTML}: ${e.message}`));
 				}
-
-				if (directiveNode !== this.node) {
-					break;
-				}
+				
+				this.#dirAnchors.set(directive, null)
 			}
 		}
 
@@ -217,10 +216,21 @@ export class NodeTrack {
 				}
 			}
 
+			const self = this;
+			
 			// @ts-ignore
 			for (let attribute of [...(this.node as HTMLElement).attributes]) {
 				if (/^(attr\.|ref|if|repeat)/.test(attribute.name)) {
 					const directive = parseNodeDirective(this.node as HTMLElement, attribute.name, attribute.value);
+					
+					if (directiveRegistry[directive.name]) {
+						const Dir = directiveRegistry[directive.name];
+						directive.handler = new (class extends Dir {
+							setRef(name: string, node: Node) {
+								self.#component.$refs[name] = node;
+							}
+						})() as any;
+					}
 
 					switch (directive.name) {
 						case 'if':
