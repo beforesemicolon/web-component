@@ -1117,7 +1117,6 @@ describe('WebComponent', () => {
 					'<li>item-1</li><li>item-2</li>\n' +
 					'</ul>\n' +
 					'<button type="button">add to list</button>');
-
 			});
 		});
 
