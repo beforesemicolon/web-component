@@ -3,7 +3,7 @@ node_module
 src
 webpack.config.js
 tsconfig.json
-doc
+docs
 **.tgz
 coverage
 examples
