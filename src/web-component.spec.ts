@@ -722,7 +722,25 @@ describe('WebComponent', () => {
 			expect(s.children[1].assignedSlot).toBe(null);
 		});
 
-		it.todo('should render inner slot content')
+		it('should render inner default slot content', () => {
+			class SlotC extends WebComponent {
+				backup = "content";
+
+				get template() {
+					return '<slot>{backup}</slot>'
+				}
+			}
+
+			SlotC.register();
+
+			document.body.innerHTML = '<slot-c></slot-c>';
+
+			let s = document.body.children[0] as WebComponent;
+			const sSlot = s.root?.children[0];
+
+			expect(sSlot?.outerHTML).toBe('<slot>content</slot>')
+			expect(sSlot?.innerHTML).toBe('content')
+		})
 	})
 
 	describe('directives', () => {
