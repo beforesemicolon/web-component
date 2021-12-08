@@ -1,7 +1,11 @@
 import {defineNodeContextMetadata} from "./define-node-context-metadata";
 import metadata from "../metadata";
+import {WebComponent} from "../web-component";
 
 describe('defineNodeContextMetadata', () => {
+	class TestComp extends WebComponent {}
+	TestComp.register();
+
 	const node = document.createElement('div');
 
 	beforeEach(() => {
@@ -11,7 +15,7 @@ describe('defineNodeContextMetadata', () => {
 	it('should set node $context', () => {
 		expect(metadata.has(node)).toBeFalsy();
 
-		defineNodeContextMetadata(node);
+		defineNodeContextMetadata(node, new TestComp());
 
 		expect(metadata.has(node)).toBeTruthy();
 		expect(metadata.get(node).$context).toEqual({})
@@ -19,7 +23,7 @@ describe('defineNodeContextMetadata', () => {
 	});
 
 	it('should return if already exists', () => {
-		defineNodeContextMetadata(node);
+		defineNodeContextMetadata(node, new TestComp());
 
 		expect(metadata.has(node)).toBeTruthy();
 
@@ -27,7 +31,7 @@ describe('defineNodeContextMetadata', () => {
 
 		expect(metadata.get(node).test).toBe(true);
 
-		defineNodeContextMetadata(node);
+		defineNodeContextMetadata(node, new TestComp());
 
 		expect(metadata.get(node).test).toBe(true);
 	});
@@ -36,8 +40,8 @@ describe('defineNodeContextMetadata', () => {
 		const parent = document.createElement('div');
 		parent.appendChild(node);
 
-		defineNodeContextMetadata(parent);
-		defineNodeContextMetadata(node);
+		defineNodeContextMetadata(parent, new TestComp());
+		defineNodeContextMetadata(node, new TestComp());
 
 		metadata.get(parent).updateContext('parent', 'content');
 

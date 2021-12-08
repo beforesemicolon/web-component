@@ -1,16 +1,20 @@
 import {Repeat} from './repeat.directive';
+import {WebComponent} from "../web-component";
 
 describe('Repeat Directive', () => {
-	const dir = new Repeat();
+	class TestComp extends WebComponent {}
+	TestComp.register();
+
+	const dir = new Repeat(new TestComp());
 	// @ts-ignore
 	const setContextSpy = jest.spyOn(dir, 'setContext');
-	let node: HTMLElement;
+	let element: HTMLElement;
 
 	beforeEach(() => {
-		node = document.createElement('div');
-		node.className = 'item-{$key}';
-		node.innerHTML = 'item {$item}';
-		node.setAttribute('if', 'true');
+		element = document.createElement('div');
+		element.className = 'item-{$key}';
+		element.innerHTML = 'item {$item}';
+		element.setAttribute('if', 'true');
 	})
 
 	afterEach(() => {
@@ -22,60 +26,54 @@ describe('Repeat Directive', () => {
 		setContextSpy.mockRestore();
 	})
 
-	it('should repeat node with numbers', () => {
-		node.setAttribute('repeat', '3');
-		const res = dir.render(3, node, node.outerHTML);
+	it('should repeat element with numbers', () => {
+		element.setAttribute('repeat', '3');
+		const res = dir.render(3, {element, rawElementOuterHTML: element.outerHTML} as any);
 
-		expect(res.nodeName).toBe('#document-fragment')
-		expect(res.childNodes.length).toBe(3)
-		expect(node.outerHTML).toBe('<div class="item-{$key}" if="true" repeat="3">item {$item}</div>')
-		expect(res.children[0].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
-		expect(res.children[1].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
-		expect(res.children[2].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
+		expect(res).toEqual(expect.any(Array));
+		expect(res.length).toBe(3)
+		expect(element.outerHTML).toBe('<div class="item-{$key}" if="true" repeat="3">item {$item}</div>')
+		expect(res[0].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
+		expect(res[1].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
+		expect(res[2].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
 		expect(setContextSpy).toHaveBeenCalledTimes(6)
-		// @ts-ignore
-		expect(dir.getContext(res.children[0])).toEqual({$item: 1, $key: 0})
-		// @ts-ignore
-		expect(dir.getContext(res.children[1])).toEqual({$item: 2, $key: 1})
-		// @ts-ignore
-		expect(dir.getContext(res.children[2])).toEqual({$item: 3, $key: 2})
+		expect(dir.getContext(res[0])).toEqual({$item: 1, $key: 0})
+		expect(dir.getContext(res[1])).toEqual({$item: 2, $key: 1})
+		expect(dir.getContext(res[2])).toEqual({$item: 3, $key: 2})
 	});
 
-	it('should repeat node with array', () => {
-		node.setAttribute('repeat', '[2, 4, 6]');
-		const res = dir.render([2, 4, 6], node, node.outerHTML);
+	it('should repeat element with array', () => {
+		element.setAttribute('repeat', '[2, 4, 6]');
+		const res = dir.render([2, 4, 6], {element, rawElementOuterHTML: element.outerHTML} as any);
 
-		expect(res.nodeName).toBe('#document-fragment')
-		expect(res.childNodes.length).toBe(3)
-		expect(node.outerHTML).toBe('<div class="item-{$key}" if="true" repeat="[2, 4, 6]">item {$item}</div>')
-		expect(res.children[0].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
-		expect(res.children[1].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
-		expect(res.children[2].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
+		expect(res).toEqual(expect.any(Array));
+		expect(res.length).toBe(3)
+		expect(element.outerHTML).toBe('<div class="item-{$key}" if="true" repeat="[2, 4, 6]">item {$item}</div>')
+		expect(res[0].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
+		expect(res[1].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
+		expect(res[2].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
 		expect(setContextSpy).toHaveBeenCalledTimes(6)
-		// @ts-ignore
-		expect(dir.getContext(res.children[0])).toEqual({$item: 2, $key: "0"})
-		// @ts-ignore
-		expect(dir.getContext(res.children[1])).toEqual({$item: 4, $key: "1"})
-		// @ts-ignore
-		expect(dir.getContext(res.children[2])).toEqual({$item: 6, $key: "2"})
+		expect(dir.getContext(res[0])).toEqual({$item: 2, $key: "0"})
+		expect(dir.getContext(res[1])).toEqual({$item: 4, $key: "1"})
+		expect(dir.getContext(res[2])).toEqual({$item: 6, $key: "2"})
 	});
 
-	it('should repeat node with object', () => {
-		node.setAttribute('repeat', '{a: 100, b: 200, c: 300}');
-		const res = dir.render({a: 100, b: 200, c: 300}, node, node.outerHTML);
+	it('should repeat element with object', () => {
+		element.setAttribute('repeat', '{a: 100, b: 200, c: 300}');
+		const res = dir.render({a: 100, b: 200, c: 300}, {element, rawElementOuterHTML: element.outerHTML} as any);
 
-		expect(res.nodeName).toBe('#document-fragment')
-		expect(res.childNodes.length).toBe(3)
-		expect(node.outerHTML).toBe('<div class="item-{$key}" if="true" repeat="{a: 100, b: 200, c: 300}">item {$item}</div>')
-		expect(res.children[0].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
-		expect(res.children[1].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
-		expect(res.children[2].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
+		expect(res).toEqual(expect.any(Array));
+		expect(res.length).toBe(3)
+		expect(element.outerHTML).toBe('<div class="item-{$key}" if="true" repeat="{a: 100, b: 200, c: 300}">item {$item}</div>')
+		expect(res[0].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
+		expect(res[1].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
+		expect(res[2].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
 		expect(setContextSpy).toHaveBeenCalledTimes(6)
 		// @ts-ignore
-		expect(dir.getContext(res.children[0])).toEqual({$item: 100, $key: "a"})
+		expect(dir.getContext(res[0])).toEqual({$item: 100, $key: "a"})
 		// @ts-ignore
-		expect(dir.getContext(res.children[1])).toEqual({$item: 200, $key: "b"})
+		expect(dir.getContext(res[1])).toEqual({$item: 200, $key: "b"})
 		// @ts-ignore
-		expect(dir.getContext(res.children[2])).toEqual({$item: 300, $key: "c"})
+		expect(dir.getContext(res[2])).toEqual({$item: 300, $key: "c"})
 	});
 });
