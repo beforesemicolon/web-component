@@ -1,12 +1,16 @@
 ## Directives
-Directives are simply hashed attributes which are meant to help you do tedious things in HTML template that
-often times requires you to do DOM manipulations to achieve.
+Directives are HTML attributes not specific to any tag. 
 
-There are only 4 directives and all of them do something specific on the element it is attached to. As of now
-you cannot create custom directives.
+The idea of a directive is already built-in into HTML. For example, the attributes [draggable](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/draggable) 
+and [contenteditable](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/contenteditable) are directives.
+They can be placed in any HTML tag to allow that tag to gain special capabilities.
+
+The idea is same here and with Web Components you have a few special built-in ones, and you can also [create a custom
+one](https://github.com/beforesemicolon/web-component/blob/master/doc/custom-directives.md) for your need.
 
 One thing in common for all directives is that you don't need to use the curly braces to specify data or logic.
-Their value are already understood to be information to be executed for a result.
+Their value are already understood to be information to be executed for a result. When creating a custom one,
+you have a change to handle parsing the value yourself, so you can take values in whatever format you want.
 
 ### if
 The `if` directive will simply add or remove a node element from the DOM.
@@ -192,7 +196,7 @@ class InputField extends WebComponent {
 InputField.register();
 ```
 
-⚠️ You can only use the `ref` directive once per element ,and it will not work if you use it with a `repeat` directive.
+⚠️ You can only use the `ref` directive once per element ,and it does not work well with `repeat` and `if` directives.
 
 
 ### attr
@@ -332,4 +336,4 @@ with the format of:
     attr.data.[data-name]="[value], [condition]"
 
 
-#### Recommended next: [LiveCycles](https://github.com/beforesemicolon/web-component/blob/master/docs/livecycles.md)
+#### Recommended next: [Custom Directives](https://github.com/beforesemicolon/web-component/blob/master/doc/custom-directives.md)

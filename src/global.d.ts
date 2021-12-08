@@ -1,4 +1,5 @@
 import {ShadowRootModeExtended} from './enums/ShadowRootModeExtended.enum';
+import {directiveRegistry} from "./directives/registry";
 
 export declare global {
 	export type onUpdateCallback = (property: string, oldValue: unknown, newValue: unknown) => void;
@@ -18,41 +19,72 @@ export declare global {
 		fn?: EventListenerCallback;
 	};
 
-	export interface NodeTrack {
+	export class NodeTrack {
 		node: HTMLElement | Node | WebComponent;
 		attributes: Array<{
 			name: string;
 			value: string;
 			executables: Array<Executable>;
 		}>;
-		directives: Array<Directive>;
+		directives: Array<DirectiveValue>;
 		eventHandlers: Array<EventHandlerTrack>;
 		property: null | {
 			name: string;
 			value: string;
 			executables: Array<Executable>;
 		};
+
+		update: () => void;
+		empty: boolean;
+		$context: ObjectLiteral;
+	}
+	
+	export interface directiveRenderOptions {
+		element: HTMLElement,
+		rawElementOuterHTML: string,
+		anchorNode: Text | Comment | HTMLElement | Array<HTMLElement> | null
 	}
 
-	export type Directive = 'attr' | 'ref' | 'repeat' | 'if';
-
 	export interface DirectiveValue {
+		name: string;
 		value: string;
-		prop: string;
-		placeholderNode?: Comment;
+		prop: string | null;
+		handler?: Directive;
+	}
+
+	export class Directive {
+		static register: () => void;
+
+		parseValue: (value: string, prop: string | null) => string;
+		render: (val: any, options: directiveRenderOptions) => Pick<directiveRenderOptions, 'anchorNode'>;
+		setContext: (node: Node, key: string, value: any) => void;
+		getContext(node: Node) {}
+
+		[key: string | Directive]: any;
 	}
 
 	export type ObjectLiteral = {[key: string]: any};
 
 	export type ObserverCallback = (ctx: ObjectLiteral) => void;
 
-	export type Refs = {[key: string]: HTMLElement};
+	export type Refs = {[key: string]: Node};
 
 	export type Executable = {
 		from: number;
 		to: number;
 		match: string;
 		executable: string;
+	}
+	
+	export interface WebComponentMetadata {
+		root: WebComponent | ShadowRoot;
+		trackers: Map;
+		mounted: boolean;
+		parsed: boolean;
+		context: object;
+		contextSource: WebComponent | null;
+		contextSubscribers: Array<(ctx: object) => void>;
+		unsubscribeCtx: (ctx: object) => void;
 	}
 
 	export class WebComponent extends HTMLElement {
@@ -65,13 +97,14 @@ export declare global {
 		static initialContext: ObjectLiteral;
 		static registerAll: (components: Array<WebComponentConstructor>) => void;
 
-		root: HTMLElement | ShadowRoot | null;
-		mounted: boolean;
-		template: string;
-		stylesheet: string;
+		readonly root: HTMLElement | ShadowRoot | null;
+		readonly mounted: boolean;
+		readonly template: string;
+		readonly stylesheet: string;
 
-		$context: ObjectLiteral;
-		$refs: Refs;
+		readonly $context: ObjectLiteral;
+		readonly $refs: Refs;
+		readonly $properties: Array<string>;
 
 		updateContext: (ctx: ObjectLiteral) => void;
 
@@ -79,10 +112,10 @@ export declare global {
 		onDestroy: () => void;
 		onAdoption: () => void;
 		onUpdate: (name: string, oldValue: string, newValue: string) => void;
-		onError: (error: ErrorEvent) => void;
+		onError: (error: any) => void;
 		forceUpdate: () => void;
 
-		[key: string | Directive]: any;
+		[key: string]: any;
 	}
 
 	export interface WebComponentConstructor {

@@ -1,7 +1,7 @@
 import selfClosingTags from './self-closing-tags.json';
 
 export function parse(markup: string) {
-	const tagCommentPattern = /<!--([^]*?)-->|<(\/|!)?([a-z][\w-.:]*)((?:\s+[a-z][\w-.:]*(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)+\s*|\s*)(\/?)>/ig;
+	const tagCommentPattern = /<!--([^]*?)-->|<(\/|!)?([a-z][\w-.:]*)((?:\s*[a-z][\w-.:]*(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)+\s*|\s*)(\/?)>/ig;
 	const root = document.createDocumentFragment();
 	const stack: Array<DocumentFragment | HTMLElement> = [root];
 	let match: RegExpExecArray | null = null;

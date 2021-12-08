@@ -27,7 +27,7 @@ A lightweight and powerful web component framework intended to remove the tediou
 Declare a simple action button component
 ```js
 class ActionButton extends WebComponent {
-  static observedAttributes = ['label', 'type', 'disabled', 'autofocus', 'name'];
+  static observedAttributes = ['type', 'disabled', 'autofocus', 'name'];
   
   get stylesheet() {
     return `
@@ -52,15 +52,10 @@ class ActionButton extends WebComponent {
         attr.disabled="disabled"
         attr.autofocus="autofocus"
         attr.name="name"
-        onclick="handleClick($event)"
         >
-        <slot>{label}</slot>
+        <slot></slot>
       </button>
     `;
-  }
-  
-  handleClick(event) {
-    this.dispatchEvent(new Event('click'));
   }
 }
 
@@ -162,15 +157,16 @@ require('esbuild').build({
 
 ### Documentation
 
-- [WebComponent](https://github.com/beforesemicolon/web-component/blob/master/docs/WebComponent.md)
-- [ContextProviderComponent](https://github.com/beforesemicolon/web-component/blob/master/docs/ContextProviderComponent.md)
-- [Configurations](https://github.com/beforesemicolon/web-component/blob/master/docs/configurations.md)
-- [Template](https://github.com/beforesemicolon/web-component/blob/master/docs/template.md)
-- [Events](https://github.com/beforesemicolon/web-component/blob/master/docs/events.md)
-- [Attributes](https://github.com/beforesemicolon/web-component/blob/master/docs/attributes.md)
-- [Properties](https://github.com/beforesemicolon/web-component/blob/master/docs/properties.md)
-- [Context](https://github.com/beforesemicolon/web-component/blob/master/docs/context.md)
-- [Directives](https://github.com/beforesemicolon/web-component/blob/master/docs/directives.md)
-- [LiveCycles](https://github.com/beforesemicolon/web-component/blob/master/docs/livecycles.md)
-- [Styling](https://github.com/beforesemicolon/web-component/blob/master/docs/stylesheet.md)
-- [Error Handling](https://github.com/beforesemicolon/web-component/blob/master/docs/errors.md)
+- [WebComponent](https://github.com/beforesemicolon/web-component/blob/master/doc/WebComponent.md)
+- [ContextProviderComponent](https://github.com/beforesemicolon/web-component/blob/master/doc/ContextProviderComponent.md)
+- [Configurations](https://github.com/beforesemicolon/web-component/blob/master/doc/configurations.md)
+- [Template](https://github.com/beforesemicolon/web-component/blob/master/doc/template.md)
+- [Events](https://github.com/beforesemicolon/web-component/blob/master/doc/events.md)
+- [Attributes](https://github.com/beforesemicolon/web-component/blob/master/doc/attributes.md)
+- [Properties](https://github.com/beforesemicolon/web-component/blob/master/doc/properties.md)
+- [Context](https://github.com/beforesemicolon/web-component/blob/master/doc/context.md)
+- [Directives](https://github.com/beforesemicolon/web-component/blob/master/doc/directives.md)
+- [Custom Directives](https://github.com/beforesemicolon/web-component/blob/master/doc/custom-directives.md)
+- [LiveCycles](https://github.com/beforesemicolon/web-component/blob/master/doc/livecycles.md)
+- [Styling](https://github.com/beforesemicolon/web-component/blob/master/doc/stylesheet.md)
+- [Error Handling](https://github.com/beforesemicolon/web-component/blob/master/doc/errors.md)
