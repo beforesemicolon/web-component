@@ -1080,6 +1080,45 @@ describe('WebComponent', () => {
 				expect(cb).toHaveBeenCalledWith(new MouseEvent('click'), 2, 1)
 
 			});
+			
+			it('should render list and update items on click', () => {
+				class NumberList extends WebComponent {
+					list = [1];
+					
+					get template() {
+						return '<ul>\n' +
+							'<li repeat="list">item-{$item}</li>\n' +
+							'</ul>\n' +
+							'<button type="button" onclick="addItem()">add to list</button>'
+					}
+					
+					addItem() {
+						this.list.push(this.list.length + 1)
+					}
+				}
+				
+				NumberList.register();
+
+				const btn = new NumberList();
+
+				document.body.appendChild(btn);
+
+				const addBtn = btn.root?.querySelector('button') as HTMLButtonElement;
+
+				expect(addBtn.outerHTML).toEqual('<button type="button">add to list</button>')
+				expect(btn.root?.innerHTML).toEqual('<ul>\n' +
+					'<li>item-1</li>\n' +
+					'</ul>\n' +
+					'<button type="button">add to list</button>');
+
+				addBtn.click();
+
+				expect(btn.root?.innerHTML).toEqual('<ul>\n' +
+					'<li>item-1</li><li>item-2</li>\n' +
+					'</ul>\n' +
+					'<button type="button">add to list</button>');
+
+			});
 		});
 
 		describe('should allow mix of hashed attributes', () => {
