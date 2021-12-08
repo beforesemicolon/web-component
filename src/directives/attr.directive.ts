@@ -76,7 +76,7 @@ export class Attr extends Directive {
 						if (booleanAttr.hasOwnProperty(attrName)) {
 							element.setAttribute(attrName, '');
 						} else {
-							node.setAttribute(attrName, `${val || shouldAdd}`);
+							element.setAttribute(attrName, `${val || shouldAdd}`);
 						}
 					} else {
 						element.removeAttribute(attrName);
