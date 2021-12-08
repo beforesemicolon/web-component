@@ -288,11 +288,10 @@ export class WebComponent extends HTMLElement {
 				const prop: any = turnKebabToCamelCasing(name);
 
 				if (booleanAttr.hasOwnProperty(prop)) {
-					console.log('-- change', this.hasAttribute);
 					newValue = this.hasAttribute(name);
 				} else if (typeof newValue === 'string') {
 					try {
-						newValue = JSON.parse(newValue);
+						newValue = JSON.parse(newValue.replace(/['`]/g, '"'));
 					} catch (e) {
 					}
 				}
