@@ -204,8 +204,6 @@ export class NodeTrack {
 				}
 			}
 
-			const self = this;
-			
 			// @ts-ignore
 			for (let attribute of [...(this.node as HTMLElement).attributes]) {
 				if (/^(attr\.|ref|if|repeat)/.test(attribute.name)) {
@@ -213,16 +211,7 @@ export class NodeTrack {
 					
 					if (directiveRegistry[directive.name]) {
 						const Dir = directiveRegistry[directive.name];
-						directive.handler = new (class extends Dir {
-							setRef(name: string, node: Node) {
-								self.component.$refs[name] = node;
-							}
-							
-							setContext(node: Node, key: string, value: any) {
-								defineNodeContextMetadata(node, self.component);
-								super.setContext(node, key, value);
-							}
-						})() as any;
+						directive.handler = new Dir(this.component);
 					}
 
 					switch (directive.name) {
