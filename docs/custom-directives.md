@@ -113,10 +113,12 @@ to how you want the element to render.
 will be rendered instead of the node element but if you return `null` the node will be simply commented out. Returning
 the node received simply means the node will remain rendered.
 
-The `render` method gets called with 3 arguments:
+The `render` method gets called with 2 arguments:
 - **value** (result of parsing the string returned by `parseValue`);
-- the **node** in is current state on the DOM;
-- the **node outerHTML as defined in the template** (useful to create copies of the original form);
+- options containing the 
+  - the **element** the element that the directive is attached to;
+  - the **rawElementOuterHTML** the element's outerHTML as it was defined in the template;
+  - the **anchorNode** the last node or array of node the directive returned;
 
 Continuing with our `wrapper` example, the `render` method should be expecting an array containing the value and the prop
 as first argument, the node itself and its outer HTML as defined in the template.
@@ -129,7 +131,7 @@ class Wrapper extends Directive {
     return `["${value}", "${prop}"]`;
   }
   
-  render([value, prop], node, nodeOuterHTML) {
+  render([value, prop], {element}) {
     const wrapperNode = document.createElement(value);
   
     if(prop) {
@@ -141,7 +143,7 @@ class Wrapper extends Directive {
     // will try to find it in the dom to replace it with wrapperNode
     // and not find it
     // NEVER move the node from the DOM
-    wrapperNode.appendChild(node.clone(true));
+    wrapperNode.appendChild(element.clone(true));
     
     return wrapperNode;
   }
