@@ -8,8 +8,8 @@ export class Directive {
 		metadata.set(this, {component})
 	}
 
-	static register() {
-		const name = this.name.toLowerCase();
+	static register(name: string = '') {
+		name = (name || this.name).toLowerCase();
 
 		if (directiveRegistry[name] === undefined) {
 			directiveRegistry[name] = this;

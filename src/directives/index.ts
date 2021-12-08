@@ -3,10 +3,10 @@ import {Ref} from './ref.directive';
 import {Attr} from './attr.directive';
 import {Repeat} from './repeat.directive';
 
-If.register();
-Ref.register();
-Attr.register();
-Repeat.register();
+If.register('if');
+Ref.register('ref');
+Attr.register('attr');
+Repeat.register('repeat');
 
 export const directives = new Set([
 	If.name.toLowerCase(),
