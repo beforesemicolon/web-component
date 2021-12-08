@@ -96,7 +96,7 @@ export class NodeTrack {
 
 		if (directiveNode === this.node) {
 			metadata.get(this.node).shadowed = false;
-			
+
 			this.anchor = this._switchNodeAndAnchor(directiveNode);
 
 			if (this.property?.executables.length) {
@@ -289,6 +289,10 @@ export class NodeTrack {
 	}
 
 	private _switchNodeAndAnchor(directiveNode: HTMLElement | Node | Comment | Array<Element>) {
+		if (directiveNode === this.anchor) {
+		    return directiveNode;
+		}
+
 		if (!Array.isArray(directiveNode) && !(/[831]/.test(`${(directiveNode as Node).nodeType}`))) {
 			directiveNode = this._createDefaultAnchor();
 		}
