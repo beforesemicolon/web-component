@@ -130,7 +130,7 @@ export class NodeTrack {
 
 					if ((this.node as ObjectLiteral)[camelName] !== undefined) {
 						try {
-							newValue = JSON.parse(newValue)
+							newValue = JSON.parse(newValue.replace(/['`]/g, '"'));
 						} catch (e) {
 						}
 
