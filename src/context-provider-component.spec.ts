@@ -15,7 +15,7 @@ describe('ContextProviderComponent', () => {
 
 			const s = document.body.children[0] as WebComponent;
 
-			expect(s.root?.innerHTML).toBe('<!--slotted []--><p>one</p><p>two</p>');
+			expect(s.root?.innerHTML).toBe('<p>one</p><p>two</p>');
 		});
 
 		it('should render plain slot content WITHOUT shadow root', () => {
@@ -27,7 +27,7 @@ describe('ContextProviderComponent', () => {
 
 			const s = document.body.children[0] as WebComponent;
 
-			expect(s.innerHTML).toBe('<!--slotted []--><p>one</p><p>two</p>');
+			expect(s.innerHTML).toBe('<p>one</p><p>two</p>');
 		});
 
 		it('should render named slot content with shadow root', () => {
@@ -45,13 +45,13 @@ describe('ContextProviderComponent', () => {
 
 			let s = document.body.children[0] as WebComponent;
 
-			expect(s.root?.innerHTML).toBe('<!--slotted [content]-->');
+			expect(s.root?.innerHTML).toBe('');
 
 			document.body.innerHTML = '<slot-e><p slot="content">one</p><p>two</p></slot-e>';
 
 			s = document.body.children[0] as WebComponent;
 
-			expect(s.root?.innerHTML).toBe('<!--slotted [content]--><p slot="content">one</p>');
+			expect(s.root?.innerHTML).toBe('<p slot="content">one</p>');
 		});
 
 		it('should render named slot content WITHOUT shadow root', () => {
@@ -69,13 +69,13 @@ describe('ContextProviderComponent', () => {
 
 			let s = document.body.children[0] as WebComponent;
 
-			expect(s.innerHTML).toBe('<!--slotted [content]-->');
+			expect(s.innerHTML).toBe('');
 
 			document.body.innerHTML = '<slot-f><p slot="content">one</p><p>two</p></slot-f>';
 
 			s = document.body.children[0] as WebComponent;
 
-			expect(s.innerHTML).toBe('<!--slotted [content]--><p slot="content">one</p>');
+			expect(s.innerHTML).toBe('<p slot="content">one</p>');
 		});
 	})
 });

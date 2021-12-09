@@ -11,6 +11,7 @@ import metadata from "./metadata";
 // simply importing directive here will automatically register them and make them available for
 // anything later on
 import './directives';
+import {renderNode} from "./utils/render-node";
 
 /**
  * a extension on the native web component API to simplify and automate most of the pain points
@@ -130,6 +131,14 @@ export class WebComponent extends HTMLElement {
 	static get isRegistered() {
 		return this.tagName !== '' && customElements.get(this.tagName) !== undefined;
 	}
+	
+	/**
+	 * whether or not the component should use the real slot element or mimic its behavior
+	 * when rendering template
+	 */
+	get customSlot() {
+		return false;
+	}
 
 	/**
 	 * the root element. If shadow root present it will be the shadow root otherwise
@@ -230,8 +239,18 @@ export class WebComponent extends HTMLElement {
 				const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
 
 				contentNode = parse(style + this.template);
-
-				this._render(contentNode);
+				
+				let childNodes: Array<Node> = [];
+				
+				if (this.customSlot) {
+					childNodes = Array.from(this.childNodes);
+					this.innerHTML = '';
+				}
+				
+				renderNode(contentNode, this, {
+					customSlot: this.customSlot,
+					customSlotChildNodes: this.customSlot ? childNodes : []
+				});
 
 				const {tagName, mode} = (this.constructor as WebComponentConstructor);
 
@@ -346,64 +365,6 @@ export class WebComponent extends HTMLElement {
 	 */
 	onError(error: ErrorEvent | Error) {
 		console.error(this.constructor.name, error);
-	}
-
-	protected _renderSlotNode(node: HTMLSlotElement) {
-		node.addEventListener('slotchange', () => {
-			node.assignedNodes().forEach((n: HTMLElement | Node) => {
-				this._render(n);
-			});
-		});
-
-		node.childNodes.forEach((n: HTMLElement | Node) => {
-			this._render(n);
-		});
-	}
-
-	protected _render(node: Node | HTMLElement | DocumentFragment | WebComponent) {
-		// it is possible that the node is already rendered by the parent component
-		// and then picked up by the child component via slot
-		// in that case we do not need to render it again since it will already be
-		// ready to do anything it needs and also prevent it from being tracked again
-		if (metadata.get(node)?.__rendered) {
-			return;
-		}
-
-		if (node.nodeName === 'SLOT') {
-			return this._renderSlotNode(node as HTMLSlotElement);
-		}
-
-		// avoid fragments
-		if (node.nodeType !== 11) {
-			if (!metadata.has(node)) {
-				metadata.set(node, Object.create(null));
-			}
-
-			// mark the node as rendered so it gets skipped if picked via slot
-			metadata.get(node).__rendered = true;
-		}
-
-		const isElement = node.nodeType === 1;
-		const isTextNode = !isElement && node.nodeName === '#text';
-		const isCommentNode = !isElement && node.nodeName === '#comment';
-		const isStyle = node.nodeName === 'STYLE';
-		const isTextArea = node.nodeName === 'TEXTAREA';
-		const isRepeatedNode = isElement && (node as HTMLElement).hasAttribute('repeat');
-		const isScript = node.nodeName === 'SCRIPT';
-
-		if ((isElement && !isScript) || (isTextNode && node.nodeValue?.trim())) {
-			const track = new NodeTrack(node, this as WebComponent);
-			if (!track.empty) {
-				metadata.get(this).trackers.set(node, track);
-				track.updateNode();
-			}
-		}
-
-		if (isCommentNode || isTextNode || !node.childNodes.length || isRepeatedNode || isTextArea || isScript || isStyle) {
-			return;
-		}
-
-		node.childNodes.forEach(child => this._render(child));
 	}
 }
 

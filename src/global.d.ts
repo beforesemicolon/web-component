@@ -3,6 +3,11 @@ import {directiveRegistry} from "./directives/registry";
 
 export declare global {
 	export type onUpdateCallback = (property: string, oldValue: unknown, newValue: unknown) => void;
+	
+	export interface renderOptions {
+		customSlot?: boolean;
+		customSlotChildNodes?: Array<Node>;
+	}
 
 	export interface booleanAttributes {
 		[key: string]: {
@@ -101,6 +106,7 @@ export declare global {
 		readonly mounted: boolean;
 		readonly template: string;
 		readonly stylesheet: string;
+		readonly customSlot: boolean;
 
 		readonly $context: ObjectLiteral;
 		readonly $refs: Refs;

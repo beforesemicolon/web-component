@@ -1,8 +1,9 @@
+/** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
-  "roots": ["<rootDir>/src"],
-  "testMatch": ["**/__tests__/**/*.+(ts)", "**/?(*.)+(spec|test).+(ts)"],
-  "transform": {"^.+\\.(ts)$": "ts-jest"},
-  "setupFiles": [
+  roots: ["<rootDir>/src"],
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  setupFiles: [
     "<rootDir>/src/__mocks__/dom.js"
   ],
-}
+};

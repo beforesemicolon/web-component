@@ -7,6 +7,7 @@ import {directiveRegistry} from './directives/registry';
 import {evaluateStringInComponentContext} from "./utils/evaluate-string-in-component-context";
 import metadata from "./metadata";
 import {defineNodeContextMetadata} from "./utils/define-node-context-metadata";
+import {renderNode} from "./utils/render-node";
 
 /**
  * handles all logic related to tracking and updating a tracked node.
@@ -54,7 +55,7 @@ export class NodeTrack {
 	}
 
 	updateNode() {
-		// if a node was rendered before(handled by the component._render function)
+		// if a node was rendered before(handled by the render function)
 		// and no longer has a parent(removed from the DOM)
 		// and it is is not being shadowed(temporarily removed from the DOM by a directive)
 		// the node no longer needs to be tracked so it can be discarded
@@ -301,8 +302,10 @@ export class NodeTrack {
 			for (let el of (directiveNode as Array<Element>)) {
 				if (!el.isConnected) {
 					nextEl.after(el);
-					// @ts-ignore
-					this.component._render(el);
+					renderNode(el, this.component, {
+						customSlot: this.component.customSlot,
+						customSlotChildNodes: Array.from(this.component.childNodes)
+					});
 				}
 				
 				nextEl = el;
