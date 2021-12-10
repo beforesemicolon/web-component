@@ -15,43 +15,43 @@
 
 <script id="app-js">
 class UpdateExample extends WebComponent {
-    count = {
-      value: 0
-    };
-
-    // the onUpdate is called whenever
-    //  - properties change deeply
-    //  - properties are re-assigned
-    //  - attributes value on element changes
-    //  - attribute are removed or added to element
-    //  - context in ancestor or component changes
-
+	count = {
+		value: 0
+	};
+	
+	// the onUpdate is called whenever
+	//  - properties change deeply
+	//  - properties are re-assigned
+	//  - attributes value on element changes
+	//  - attribute are removed or added to element
+	//  - context in ancestor or component changes
+	
 	// AVOID update data, context or observed attributes inside
 	// onUpdate as you will get into an infinite loop.
 	// When doing so, implement guards that prevent
 	// continues updates
-
-    // onUpdate is meant to react to a changes that
-    // already happened and not to trigger changes
+	
+	// onUpdate is meant to react to a changes that
+	// already happened and not to trigger changes
 	onUpdate(name, oldValue, newValue) {
-        // whenever $context or an object is changed deeply
-	    // the old and new value will be the same
-	    // since tracking these objects are not supported
-	    //
-	    // for attributes and primitive properties
-	    // old value is actually the old value
-        alert(`Updated with ${name}, new: ${JSON.stringify(newValue)}`)
+		// whenever $context or an object is changed deeply
+		// the old and new value will be the same
+		// since tracking these objects are not supported
+		//
+		// for attributes and primitive properties
+		// old value is actually the old value
+		alert(`Updated with ${name}, new: ${JSON.stringify(newValue)}`)
 	}
-
-    get template() {
-        return `
-		{count.value}
-		<button type="button" onclick="increaseCountValue()">+</button>`
-    }
-
-    increaseCountValue() {
-      this.count.value += 1
-    }
+	
+	get template() {
+		return `
+{count.value}
+<button type="button" onclick="increaseCountValue()">+</button>`
+	}
+	
+	increaseCountValue() {
+		this.count.value += 1
+	}
 }
 
 UpdateExample.register();

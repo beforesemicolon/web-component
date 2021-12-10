@@ -21,6 +21,10 @@
  * be registered
  */
 class ActionButton extends WebComponent {
+	get template() {
+		return `<button type="button">Do Something</button>`
+	}
+	
 	get stylesheet() {
 		return `<style>
 			:host button {
@@ -35,10 +39,6 @@ class ActionButton extends WebComponent {
 				cursor: pointer;
 			}
 		</style>`
-	}
-	
-	get template() {
-		return `<button type="button">Do Something</button>`
 	}
 }
 

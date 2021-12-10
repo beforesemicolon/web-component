@@ -15,6 +15,10 @@
 
 <script id="app-js">
 class ActionButton extends WebComponent {
+	get template() {
+		return `<button type="button">Do Something</button>`
+	}
+	
 	/**
 	 * Declaring your style is a simple as defining the
 	 * stylesheet getter and return your CSS string
@@ -42,10 +46,6 @@ class ActionButton extends WebComponent {
 				cursor: pointer;
 			}
 		</style>`
-	}
-	
-	get template() {
-		return `<button type="button">Do Something</button>`
 	}
 }
 

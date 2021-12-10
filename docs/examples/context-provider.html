@@ -70,6 +70,15 @@ class ThemeProvider extends ContextProviderComponent {
 }
 
 class DemoApp extends WebComponent {
+	get template() {
+		// you can reference theme context from the template
+		return `
+			<h2 style="color: {color.brand}">Demo App</h2>
+			<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium architecto libero natus officiis repellat rerum.</p>
+			<button type="button">click me</button>
+		`;
+	}
+	
 	// you can reference theme variables from the template
 	get stylesheet() {
 		return `
@@ -93,15 +102,6 @@ class DemoApp extends WebComponent {
 					text-transform: capitalize;
 				}
 			</style>
-		`;
-	}
-	
-	get template() {
-		// you can reference theme context from the template
-		return `
-			<h2 style="color: {color.brand}">Demo App</h2>
-			<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium architecto libero natus officiis repellat rerum.</p>
-			<button type="button">click me</button>
 		`;
 	}
 }

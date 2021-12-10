@@ -24,6 +24,20 @@
 */
 class Button extends WebComponent {
 	static observedAttributes = ['type', 'disabled', 'autofocus', 'name'];
+	
+	get template() {
+		return `
+		  <button
+		    class="btn"
+		    type="{type || 'button'}"
+		    attr.disabled="disabled"
+		    attr.autofocus="autofocus"
+		    attr.name="name"
+		    >
+		    <slot></slot>
+		  </button>
+		`;
+	}
 
 	get stylesheet() {
 		return `
@@ -45,20 +59,6 @@ class Button extends WebComponent {
 		      letter-spacing: 0.05rem;
 		    }
 		  </style>
-		`;
-	}
-
-	get template() {
-		return `
-		  <button
-		    class="btn"
-		    type="{type || 'button'}"
-		    attr.disabled="disabled"
-		    attr.autofocus="autofocus"
-		    attr.name="name"
-		    >
-		    <slot></slot>
-		  </button>
 		`;
 	}
 }

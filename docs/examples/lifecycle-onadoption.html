@@ -17,21 +17,21 @@
 
 <script id="app-js">
 class AdoptionExample extends WebComponent {
-    // the onAdoption is call soon after the element is added
-    // to a new document DOM and it is a great place to do:
-    // - logic for only when the adoption happens
-    // - re-execute anything you did in the constructor function
-    //      since the "constructor" function is not called
-    // - anything you want to do before onMount since when an
-    //      element is adopted the onAdoption is called before
-    //      onMount lifecycle
+	// the onAdoption is call soon after the element is added
+	// to a new document DOM and it is a great place to do:
+	// - logic for only when the adoption happens
+	// - re-execute anything you did in the constructor function
+	//      since the "constructor" function is not called
+	// - anything you want to do before onMount since when an
+	//      element is adopted the onAdoption is called before
+	//      onMount lifecycle
 	onAdoption() {
-        alert('I am being adopted in a new document')
+		alert('I am being adopted in a new document')
 	}
-
-    get template() {
-        return "<p>Click button to adopt me</p>"
-    }
+	
+	get template() {
+		return "<p>Click button to adopt me</p>"
+	}
 }
 
 AdoptionExample.register();
@@ -44,16 +44,16 @@ const doc = iframe.contentDocument || iframe.contentWindow.document;
 
 let moved = false;
 btn.onclick = () => {
-  // move the component between the two document
-  // it will not show up in the iframe document
-  // because the class is not declared there
-  if (moved) {
-    document.body.appendChild(adoptComp);
-    moved = false;
-  } else {
-    doc.body.appendChild(adoptComp);
-    moved = true;
-  }
+	// move the component between the two document
+	// it will not show up in the iframe document
+	// because the class is not declared there
+	if (moved) {
+		document.body.appendChild(adoptComp);
+		moved = false;
+	} else {
+		doc.body.appendChild(adoptComp);
+		moved = true;
+	}
 }
 
 </script>

@@ -58,6 +58,10 @@ class NoneMode extends Mode {
     // which is first changed to the name of the tag
     // so it does not affect other elements
 	static mode = "none";
+	
+	get template() {
+		return `<p style="background: #2ea152">None Mode</p>`
+	}
 
 	get stylesheet() {
 		return `
@@ -67,10 +71,6 @@ class NoneMode extends Mode {
 				padding: 5px;
 			}
 		</style>`;
-	}
-
-	get template() {
-		return `<p style="background: #2ea152">None Mode</p>`
 	}
 }
 

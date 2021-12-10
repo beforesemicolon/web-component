@@ -10,23 +10,23 @@
 <body>
 
 <main id="app-html">
-<action-button></action-button>
+	<action-button></action-button>
 </main>
 
 <script id="app-js">
 class ActionButton extends WebComponent {
-    label = "Do Something";
-
-    onMount() {
-      // a shallow update happens when you re-assign
-      // a property with a new value and that will
-      // trigger the DOM to update and the onUpdate
-      // to be called soon after
-      this.label = "click me"
-    }
-
-    get template() {
-	  return `<button type="button">{label}</button>`
+	label = "Do Something";
+	
+	onMount() {
+		// a shallow update happens when you re-assign
+		// a property with a new value and that will
+		// trigger the DOM to update and the onUpdate
+		// to be called soon after
+		this.label = "click me"
+	}
+	
+	get template() {
+		return `<button type="button">{label}</button>`
 	}
 }
 

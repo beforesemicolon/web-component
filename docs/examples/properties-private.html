@@ -13,25 +13,25 @@
 
 <script id="app-js">
 class ActionButton extends WebComponent {
-    // private properties are just class properties
-    // that can ONLY be accessed inside the class
-    #label = "Do Something";
-
+	// private properties are just class properties
+	// that can ONLY be accessed inside the class
+	#label = "Do Something";
+	
 	onMount() {
 		// changing or re-assigning private properties
 		// will NOT trigger DOM updates
 		this.#label = "click me";
-
-        // Because of this small detail
-	    // use private properties for data
-	    // not meant to be rendered and to avoid
-	    // DOM updates
+		
+		// Because of this small detail
+		// use private properties for data
+		// not meant to be rendered and to avoid
+		// DOM updates
 	}
-
+	
 	get template() {
-	  // private properties CANNOT be accessed inside
-	  // the template or stylesheet
-	  return `<button type="button">{this.#label}</button>`
+		// private properties CANNOT be accessed inside
+		// the template or stylesheet
+		return `<button type="button">{this.#label}</button>`
 	}
 }
 

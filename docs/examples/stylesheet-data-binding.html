@@ -39,6 +39,10 @@ class ActionButton extends WebComponent {
 		console.log(name, oldValue, newValue);
 	}
 	
+	get template() {
+		return `<button type="button">Do Something</button>`
+	}
+	
 	get stylesheet() {
 		return `<style>
 			:host button {
@@ -62,10 +66,6 @@ class ActionButton extends WebComponent {
 				cursor: pointer;
 			}
 		</style>`
-	}
-	
-	get template() {
-		return `<button type="button">Do Something</button>`
 	}
 }
 

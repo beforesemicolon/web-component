@@ -23,6 +23,27 @@ class SearchField extends WebComponent {
 	];
 	static delegatesFocus = true;
 	
+	get template() {
+		return `
+			<label aria-label="search field">
+				<input
+					type="text"
+					value="{value}"
+					attr.placeholder="{placeholder}, placeholder"
+					attr.disabled="disabled"
+					attr.readonly="readonly"
+					oninput="{this.value = $event.target.value}"
+					onchange="{this.dispatchEvent(new Event('change'))}"
+					>
+				<button
+					class="clear-button"
+					if="value.length"
+					type="button"
+					onclick="clear()"
+					>x</button>
+			</label>`;
+	}
+	
 	get stylesheet() {
 		return `
 			<style>
@@ -94,27 +115,6 @@ class SearchField extends WebComponent {
 				}
 			</style>
 		`;
-	}
-
-	get template() {
-		return `
-			<label aria-label="search field">
-				<input
-					type="text"
-					value="{value}"
-					attr.placeholder="{placeholder}, placeholder"
-					attr.disabled="disabled"
-					attr.readonly="readonly"
-					oninput="{this.value = $event.target.value}"
-					onchange="{this.dispatchEvent(new Event('change'))}"
-					>
-				<button
-					class="clear-button"
-					if="value.length"
-					type="button"
-					onclick="clear()"
-					>x</button>
-			</label>`;
 	}
 	
 	onUpdate(name, oldValue, newValue) {

@@ -64,12 +64,12 @@ class AccordionContainer extends WebComponent {
 		}
 	}
 	
-	get stylesheet() {
-		return ':host { display: block; }'
-	}
-	
 	get template() {
 		return '<slot></slot>'
+	}
+	
+	get stylesheet() {
+		return ':host { display: block; }'
 	}
 }
 
@@ -91,6 +91,35 @@ class AccordionContent extends WebComponent {
 		if (name === 'active' && newValue) {
 			this.$refs.content.focus();
 		}
+	}
+	
+	get template() {
+		const id = `content-${Math.floor(Math.random() * 100000)}`;
+		this.headingTag = this.headingTag || 'h3';
+		
+		return `
+			<${this.headingTag} class="accordion-head">
+				<button
+					id="${id}"
+					aria-controls="${id}b"
+					aria-expanded="{active}"
+					aria-disabled="{active}"
+					onclick="activate($event)"
+					>
+					{heading}
+				</button>
+			</${this.headingTag}>
+			<div class="accordion-content"
+				ref="content"
+				id="${id}b"
+				role="region"
+				aria-labelledby="${id}"
+				attr.style.height="{contentHeight}, active"
+				attr.style.margin="10px 0, active"
+				>
+				<slot></slot>
+			</div>
+		`;
 	}
 	
 	get stylesheet() {
@@ -157,35 +186,6 @@ class AccordionContent extends WebComponent {
 				}
 				
 			</style>`;
-	}
-	
-	get template() {
-		const id = `content-${Math.floor(Math.random() * 100000)}`;
-		this.headingTag = this.headingTag || 'h3';
-		
-		return `
-			<${this.headingTag} class="accordion-head">
-				<button
-					id="${id}"
-					aria-controls="${id}b"
-					aria-expanded="{active}"
-					aria-disabled="{active}"
-					onclick="activate($event)"
-					>
-					{heading}
-				</button>
-			</${this.headingTag}>
-			<div class="accordion-content"
-				ref="content"
-				id="${id}b"
-				role="region"
-				aria-labelledby="${id}"
-				attr.style.height="{contentHeight}, active"
-				attr.style.margin="10px 0, active"
-				>
-				<slot></slot>
-			</div>
-		`;
 	}
 	
 	activate(event) {

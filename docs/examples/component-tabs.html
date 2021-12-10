@@ -84,6 +84,15 @@ class TabsContainer extends WebComponent {
 		this.root.getElementById(el.contentId).setAttribute('active', 'true');
 	}
 	
+	get template() {
+		return `
+			<div class="tabs-header" ref="headContainer" role="tablist">
+				<span class="current-tab-indicator"></span>
+			</div>
+			<div class="tabs-content-container" ref="contentContainer"></div>
+		`;
+	}
+	
 	get stylesheet() {
 		return `
 			<style>
@@ -115,15 +124,6 @@ class TabsContainer extends WebComponent {
 			</style>
 		`;
 	}
-	
-	get template() {
-		return `
-			<div class="tabs-header" ref="headContainer" role="tablist">
-				<span class="current-tab-indicator"></span>
-			</div>
-			<div class="tabs-content-container" ref="contentContainer"></div>
-		`;
-	}
 }
 
 class TabHead extends WebComponent {
@@ -132,6 +132,16 @@ class TabHead extends WebComponent {
 		'id',
 		'content-id'
 	];
+	
+	get template() {
+		return `<button
+			class="tab-head"
+			role="tab"
+			aria-selected="{active}"
+			aria-controls="{contentId}"
+			attr.tabindex="-1, !active"
+			><slot></slot></button>`
+	}
 	
 	get stylesheet() {
 		return `
@@ -165,16 +175,6 @@ class TabHead extends WebComponent {
 			</style>
 		`;
 	}
-	
-	get template() {
-		return `<button
-			class="tab-head"
-			role="tab"
-			aria-selected="{active}"
-			aria-controls="{contentId}"
-			attr.tabindex="-1, !active"
-			><slot></slot></button>`
-	}
 }
 
 class TabContent extends WebComponent {
@@ -184,20 +184,6 @@ class TabContent extends WebComponent {
 		'tab-id',
 	];
 	
-	get stylesheet() {
-		return `
-			<style>
-				:host {
-					display: inline-block;
-				}
-				
-				:host .tab-content {
-					padding: 10px 0;
-				}
-			</style>
-		`;
-	}
-	
 	get template() {
 		return `<div
 			class="tab-content"
@@ -206,6 +192,20 @@ class TabContent extends WebComponent {
 			id="{id}"
 			aria-labelledby="{tabId}"
 			attr.hidden="!active"><slot></slot></div>`
+	}
+	
+	get stylesheet() {
+		return `
+			<style>
+				:host {
+					display: block;
+				}
+				
+				:host .tab-content {
+					padding: 10px 0;
+				}
+			</style>
+		`;
 	}
 }
 

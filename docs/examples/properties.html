@@ -13,22 +13,22 @@
 
 <script id="app-js">
 class ActionButton extends WebComponent {
-    // public properties are just class properties
-    // that can be accessed anywhere inside and outside
-    // the class
-    label = "Do Something";
-
-    onMount() {
-      // changing or re-assigning public properties
-      // will trigger a DOM update and onUpdate to
-      // be called soon after
-      this.label = "click me"
-    }
-
-    get template() {
-	  // public properties can be accessed inside
-	  // the template and stylesheet
-	  return `<button type="button">{label}</button>`
+	// public properties are just class properties
+	// that can be accessed anywhere inside and outside
+	// the class
+	label = "Do Something";
+	
+	onMount() {
+		// changing or re-assigning public properties
+		// will trigger a DOM update and onUpdate to
+		// be called soon after
+		this.label = "click me"
+	}
+	
+	get template() {
+		// public properties can be accessed inside
+		// the template and stylesheet
+		return `<button type="button">{label}</button>`
 	}
 }
 

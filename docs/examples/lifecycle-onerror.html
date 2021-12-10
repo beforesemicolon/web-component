@@ -15,29 +15,29 @@
 
 <script id="app-js">
 class ErrorExample extends WebComponent {
-    // the onError is called whenever something goes wrong
-    // processing template, style, and lifecycle of the component
-    //
-    // It can also be used to propagate errors that happen
-    // with your logic as a way to not crash your application
-    //
-    // this is a way to follow HTML silent way to deal with things
-    // without breaking the view and still give you a
-    // way to react to these errors as they are happening
+	// the onError is called whenever something goes wrong
+	// processing template, style, and lifecycle of the component
+	//
+	// It can also be used to propagate errors that happen
+	// with your logic as a way to not crash your application
+	//
+	// this is a way to follow HTML silent way to deal with things
+	// without breaking the view and still give you a
+	// way to react to these errors as they are happening
 	onError(error) {
-        alert(`error ${error.message}`)
+		alert(`error ${error.message}`)
 	}
-
-    get template() {
-        return `<button type="button" onclick="throwError()">throw error</button>`
-    }
-
+	
+	get template() {
+		return `<button type="button" onclick="throwError()">throw error</button>`
+	}
+	
 	throwError() {
-        // this error is silently handled and
-	    // won't crash your component and in case
-	    // you have a global error handler component
-	    // it will be propagate to the top level
-        this.onError(new Error('throwError'))
+		// this error is silently handled and
+		// won't crash your component and in case
+		// you have a global error handler component
+		// it will be propagate to the top level
+		this.onError(new Error('throwError'))
 	}
 }
 

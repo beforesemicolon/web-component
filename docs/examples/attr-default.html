@@ -23,36 +23,36 @@ class ActionButton extends WebComponent {
 		"readonly",
 		"sub-type"
 	];
-
-
+	
+	
 	get template() {
 		/**
-		* Inside the template is a safe place to define your
-		* attribute default values since it won't trigger the
-		* onUpdate lifecycle callback
-		*/
+		 * Inside the template is a safe place to define your
+		 * attribute default values since it won't trigger the
+		 * onUpdate lifecycle callback
+		 */
 		this.subType = this.subType || "primary";
 		this.type = this.type || "button";
-
+		
 		/**
-		* Every attribute with value will be parsed to
-		* their respective Javascript object or primitive value
-		*
-		* If they are not set on the tag their value will be
-		* either an empty string or a boolean(false) in case of known
-		* HTML boolean attributes like "hidden" & "disabled"
-		*/
-
+		 * Every attribute with value will be parsed to
+		 * their respective Javascript object or primitive value
+		 *
+		 * If they are not set on the tag their value will be
+		 * either an empty string or a boolean(false) in case of known
+		 * HTML boolean attributes like "hidden" & "disabled"
+		 */
+		
 		return `
-		<button
-			type="{type}"
-			attr.disabled="disabled"
-			attr.readonly="readonly"
-			attr.class.primary="subType === 'primary'"
-			attr.class.secondary="subType === 'secondary'"
-			>
-			<slot></slot>
-		</button>`
+			<button
+				type="{type}"
+				attr.disabled="disabled"
+				attr.readonly="readonly"
+				attr.class.primary="subType === 'primary'"
+				attr.class.secondary="subType === 'secondary'"
+				>
+				<slot></slot>
+			</button>`
 	}
 }
 
