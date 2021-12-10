@@ -17,7 +17,9 @@
 class ActionButton extends WebComponent {
 	
 	// you can define your component template with
-	// the "template" getter as it is a read-only value
+	// the "template" getter as it is a read-only value.
+	// This is a recommendation but you can also define it
+	// as a normal property as well
 	get template() {
 		return `<button type="button">Do Something</button>`
 	}

@@ -232,11 +232,15 @@ export class WebComponent extends HTMLElement {
 				let contentNode;
 				const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
 				const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
-				const temp = this.templateId
-					? (document.getElementById(this.templateId)?.innerHTML)
-					: null;
+				let temp: string = this.template;
+				
+				if (!temp && this.templateId) {
+					const t = document.getElementById(this.templateId);
+					
+					temp = t?.nodeName === 'TEMPLATE' ? t.innerHTML : temp;
+				}
 
-				contentNode = parse(style + temp ?? this.template);
+				contentNode = parse(style + temp);
 
 				let childNodes: Array<Node> = [];
 

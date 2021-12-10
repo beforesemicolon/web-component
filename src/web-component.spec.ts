@@ -209,6 +209,24 @@ describe('WebComponent', () => {
 
 			expect(l.innerHTML).toBe('<div>test</div>')
 		});
+		
+		it('should use template id', () => {
+			class OComp extends WebComponent {
+				templateId = "sample";
+			}
+			
+			OComp.register();
+			
+			document.body.innerHTML = `
+				<template id="sample"><div>test</div></template>
+			`;
+			
+			const l = new OComp();
+			
+			document.body.appendChild(l);
+			
+			expect(l.root?.innerHTML).toBe('<div>test</div>')
+		});
 	});
 
 	describe('liveCycles', () => {
