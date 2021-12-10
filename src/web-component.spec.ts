@@ -32,23 +32,6 @@ describe('WebComponent', () => {
 			expect(a.root).toEqual(a);
 		});
 
-		it('should throw error if invalid observed attributes', () => {
-			AComp.observedAttributes = [2] as any;
-
-			expect(() => new AComp()).toThrowError('AComp: "observedAttributes" must be an array of attribute strings.')
-
-			AComp.observedAttributes = {} as any;
-
-			expect(() => new AComp()).toThrowError('AComp: "observedAttributes" must be an array of attribute strings.')
-		});
-
-		it('should throw error if invalid mode', () => {
-			// @ts-ignore
-			AComp.mode = '';
-
-			expect(() => new AComp()).toThrowError('AComp: Invalid mode "". Must be one of ["open", "closed", "none"].')
-		});
-
 		it('should map observed attributes to properties', () => {
 			AComp.observedAttributes = ['unique', 'is-valid'];
 

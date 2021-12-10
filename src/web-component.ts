@@ -36,18 +36,10 @@ export class WebComponent extends HTMLElement {
 		} as WebComponentMetadata);
 
 		// @ts-ignore
-		let {name, mode, observedAttributes, delegatesFocus, initialContext} = this.constructor;
-
-		if (!/open|closed|none/.test(mode)) {
-			throw new Error(`${name}: Invalid mode "${mode}". Must be one of ["open", "closed", "none"].`)
-		}
+		let {mode, observedAttributes, delegatesFocus, initialContext} = this.constructor;
 
 		if (mode !== 'none') {
 			metadata.get(this).root = this.attachShadow({mode, delegatesFocus});
-		}
-
-		if (!Array.isArray(observedAttributes) || observedAttributes.some(a => typeof a !== 'string')) {
-			throw new Error(`${name}: "observedAttributes" must be an array of attribute strings.`)
 		}
 
 		metadata.get(this).context = initialContext;
@@ -129,7 +121,7 @@ export class WebComponent extends HTMLElement {
 	 * returns whether the component is registered or not
 	 */
 	static get isRegistered() {
-		return this.tagName !== '' && customElements.get(this.tagName) !== undefined;
+		return customElements.get(this.tagName) !== undefined;
 	}
 	
 	/**
@@ -269,7 +261,6 @@ export class WebComponent extends HTMLElement {
 				}
 				
 				metadata.get(this).parsed = true;
-				
 				metadata.get(this).root.appendChild(contentNode);
 			}
 			
@@ -344,6 +335,8 @@ export class WebComponent extends HTMLElement {
 		metadata.get(this).trackers.forEach((track: NodeTrack) => {
 			track.updateNode()
 		});
+		
+		return true;
 	}
 
 	adoptedCallback() {
@@ -381,11 +374,7 @@ function getClosestWebComponentAncestor(component: WebComponent): WebComponent |
 	let parent = component.parentNode;
 
 	while (parent && !(parent instanceof WebComponent)) {
-		if (parent instanceof ShadowRoot) {
-			parent = parent.host;
-		} else {
-			parent = parent.parentNode;
-		}
+		parent = parent instanceof ShadowRoot ? parent.host : parent.parentNode;
 	}
 
 	return parent instanceof WebComponent ? parent : null;
