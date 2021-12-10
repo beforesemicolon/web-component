@@ -22,11 +22,12 @@ export class Repeat extends Directive {
 				if (anchorNode[index]) {
 					this.updateNodeContext(anchorNode[index], index, repeatData);
 					list.push(anchorNode[index]);
-				} else {
-					const el = this.cloneRepeatedNode(rawElementOuterHTML);
-					this.updateNodeContext(el, index, repeatData)
-					list.push(el);
+					continue
 				}
+
+				const el = this.cloneRepeatedNode(rawElementOuterHTML);
+				this.updateNodeContext(el, index, repeatData)
+				list.push(el);
 			}
 		}
 
