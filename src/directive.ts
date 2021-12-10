@@ -8,8 +8,8 @@ export class Directive {
 		metadata.set(this, {component})
 	}
 
-	static register() {
-		const name = this.name.toLowerCase();
+	static register(name: string = '') {
+		name = (name || this.name).toLowerCase();
 
 		if (directiveRegistry[name] === undefined) {
 			directiveRegistry[name] = this;
@@ -20,7 +20,7 @@ export class Directive {
 		return value;
 	}
 
-	render(val: unknown, {element}: directiveRenderOptions): directiveRenderOptions['anchorNode'] | Array<directiveRenderOptions['anchorNode']> | null {
+	render(val: unknown, {element}: directiveRenderOptions): directiveRenderOptions['anchorNode'] | null {
 		return element;
 	}
 

@@ -174,4 +174,9 @@ class MyButton extends WebComponent {
 }
 ```
 
+### parseHTML
+The HTML string used by this framework will not be parsed correctly by the browser as it allows many illegal symbols
+mixed with HTML in the body or attribute values. Because of this, you should always try to parse HTML string specific
+to this framework using the `WebComponent.parseHTML` static method as it takes in consideration all the special syntax.
+
 #### Recommended next: [Configurations](https://github.com/beforesemicolon/web-component/blob/master/docs/configurations.md)

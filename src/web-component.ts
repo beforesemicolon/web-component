@@ -1,3 +1,8 @@
+// simply importing directive here will automatically register them and make them available for
+// anything later on
+import './directives';
+import booleanAttr from './utils/boolean-attributes.json';
+import metadata from "./metadata";
 import {parse} from './utils/parse';
 import {setComponentPropertiesFromObservedAttributes} from './utils/set-component-properties-from-observed-attributes';
 import {setupComponentPropertiesForAutoUpdate} from './utils/setup-component-properties-for-auto-update';
@@ -6,11 +11,8 @@ import {turnKebabToCamelCasing} from './utils/turn-kebab-to-camel-casing';
 import {getStyleString} from './utils/get-style-string';
 import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
 import {NodeTrack} from './node-track';
-import booleanAttr from './utils/boolean-attributes.json';
-import metadata from "./metadata";
-// simply importing directive here will automatically register them and make them available for
-// anything later on
-import './directives';
+import {trackNode} from "./utils/track-node";
+import {jsonParse} from "./utils/json-parse";
 
 /**
  * a extension on the native web component API to simplify and automate most of the pain points
@@ -19,6 +21,7 @@ import './directives';
 export class WebComponent extends HTMLElement {
 	readonly $refs: Refs = Object.create(null);
 	$properties: Array<string> = ['$context', '$refs'];
+	templateId = '';
 
 	constructor() {
 		super();
@@ -31,22 +34,15 @@ export class WebComponent extends HTMLElement {
 			context: {},
 			contextSource: null,
 			contextSubscribers: [],
-			unsubscribeCtx: () => {},
+			unsubscribeCtx: () => {
+			},
 		} as WebComponentMetadata);
 
 		// @ts-ignore
-		let {name, mode, observedAttributes, delegatesFocus, initialContext} = this.constructor;
-
-		if (!/open|closed|none/.test(mode)) {
-			throw new Error(`${name}: Invalid mode "${mode}". Must be one of ["open", "closed", "none"].`)
-		}
+		let {mode, observedAttributes, delegatesFocus, initialContext} = this.constructor;
 
 		if (mode !== 'none') {
 			metadata.get(this).root = this.attachShadow({mode, delegatesFocus});
-		}
-
-		if (!Array.isArray(observedAttributes) || observedAttributes.some(a => typeof a !== 'string')) {
-			throw new Error(`${name}: "observedAttributes" must be an array of attribute strings.`)
 		}
 
 		metadata.get(this).context = initialContext;
@@ -96,6 +92,14 @@ export class WebComponent extends HTMLElement {
 	 * the initial context data for the component
 	 */
 	static initialContext = {};
+	
+	/**
+	 * parses special template HTML string taking in consideration
+	 * all the additional syntax specific to this framework
+	 */
+	static parseHTML(markup: string): DocumentFragment {
+		return parse(markup)
+	}
 
 	/**
 	 * registers the component with the CustomElementRegistry taking an optional tag name if not
@@ -128,7 +132,15 @@ export class WebComponent extends HTMLElement {
 	 * returns whether the component is registered or not
 	 */
 	static get isRegistered() {
-		return this.tagName !== '' && customElements.get(this.tagName) !== undefined;
+		return customElements.get(this.tagName) !== undefined;
+	}
+
+	/**
+	 * whether or not the component should use the real slot element or mimic its behavior
+	 * when rendering template
+	 */
+	get customSlot() {
+		return false;
 	}
 
 	/**
@@ -199,7 +211,7 @@ export class WebComponent extends HTMLElement {
 					if (this.mounted) {
 						this.onUpdate('$context', metadata.get(this).context, newContext)
 					}
-					
+
 					metadata.get(this).contextSubscribers.forEach((cb: (ctx: {}) => void) => cb(newContext));
 				})
 			}
@@ -228,10 +240,27 @@ export class WebComponent extends HTMLElement {
 				let contentNode;
 				const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
 				const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
+				let temp: string = this.template;
+				
+				if (!temp && this.templateId) {
+					const t = document.getElementById(this.templateId);
+					
+					temp = t?.nodeName === 'TEMPLATE' ? t.innerHTML : temp;
+				}
 
-				contentNode = parse(style + this.template);
+				contentNode = parse(style + temp);
 
-				this._render(contentNode);
+				let childNodes: Array<Node> = [];
+
+				if (this.customSlot) {
+					childNodes = Array.from(this.childNodes);
+					this.innerHTML = '';
+				}
+
+				trackNode(contentNode, this, {
+					customSlot: this.customSlot,
+					customSlotChildNodes: this.customSlot ? childNodes : []
+				});
 
 				const {tagName, mode} = (this.constructor as WebComponentConstructor);
 
@@ -248,12 +277,11 @@ export class WebComponent extends HTMLElement {
 						}
 					})
 				}
-				
+
 				metadata.get(this).parsed = true;
-				
 				metadata.get(this).root.appendChild(contentNode);
 			}
-			
+
 			metadata.get(this).mounted = true;
 			this.onMount();
 		} catch (e) {
@@ -289,17 +317,10 @@ export class WebComponent extends HTMLElement {
 			if (!(name.startsWith('data-') || name === 'class' || name === 'style')) {
 				const prop: any = turnKebabToCamelCasing(name);
 
-				if (booleanAttr.hasOwnProperty(prop)) {
-					newValue = this.hasAttribute(name);
-				} else if (typeof newValue === 'string') {
-					try {
-						newValue = JSON.parse(newValue.replace(/['`]/g, '"'));
-					} catch (e) {
-					}
-				}
-
 				// @ts-ignore
-				this[prop] = newValue;
+				this[prop] = booleanAttr.hasOwnProperty(prop)
+					? this.hasAttribute(name)
+					: jsonParse(newValue);
 			} else {
 				this.forceUpdate();
 
@@ -325,6 +346,8 @@ export class WebComponent extends HTMLElement {
 		metadata.get(this).trackers.forEach((track: NodeTrack) => {
 			track.updateNode()
 		});
+
+		return true;
 	}
 
 	adoptedCallback() {
@@ -347,64 +370,6 @@ export class WebComponent extends HTMLElement {
 	onError(error: ErrorEvent | Error) {
 		console.error(this.constructor.name, error);
 	}
-
-	protected _renderSlotNode(node: HTMLSlotElement) {
-		node.addEventListener('slotchange', () => {
-			node.assignedNodes().forEach((n: HTMLElement | Node) => {
-				this._render(n);
-			});
-		});
-
-		node.childNodes.forEach((n: HTMLElement | Node) => {
-			this._render(n);
-		});
-	}
-
-	protected _render(node: Node | HTMLElement | DocumentFragment | WebComponent) {
-		// it is possible that the node is already rendered by the parent component
-		// and then picked up by the child component via slot
-		// in that case we do not need to render it again since it will already be
-		// ready to do anything it needs and also prevent it from being tracked again
-		if (metadata.get(node)?.__rendered) {
-			return;
-		}
-
-		if (node.nodeName === 'SLOT') {
-			return this._renderSlotNode(node as HTMLSlotElement);
-		}
-
-		// avoid fragments
-		if (node.nodeType !== 11) {
-			if (!metadata.has(node)) {
-				metadata.set(node, Object.create(null));
-			}
-
-			// mark the node as rendered so it gets skipped if picked via slot
-			metadata.get(node).__rendered = true;
-		}
-
-		const isElement = node.nodeType === 1;
-		const isTextNode = !isElement && node.nodeName === '#text';
-		const isCommentNode = !isElement && node.nodeName === '#comment';
-		const isStyle = node.nodeName === 'STYLE';
-		const isTextArea = node.nodeName === 'TEXTAREA';
-		const isRepeatedNode = isElement && (node as HTMLElement).hasAttribute('repeat');
-		const isScript = node.nodeName === 'SCRIPT';
-
-		if ((isElement && !isScript) || (isTextNode && node.nodeValue?.trim())) {
-			const track = new NodeTrack(node, this as WebComponent);
-			if (!track.empty) {
-				metadata.get(this).trackers.set(node, track);
-				track.updateNode();
-			}
-		}
-
-		if (isCommentNode || isTextNode || !node.childNodes.length || isRepeatedNode || isTextArea || isScript || isStyle) {
-			return;
-		}
-
-		node.childNodes.forEach(child => this._render(child));
-	}
 }
 
 function ctxSubscriberHandler(subs: Array<ObserverCallback>) {
@@ -420,11 +385,7 @@ function getClosestWebComponentAncestor(component: WebComponent): WebComponent |
 	let parent = component.parentNode;
 
 	while (parent && !(parent instanceof WebComponent)) {
-		if (parent instanceof ShadowRoot) {
-			parent = parent.host;
-		} else {
-			parent = parent.parentNode;
-		}
+		parent = parent instanceof ShadowRoot ? parent.host : parent.parentNode;
 	}
 
 	return parent instanceof WebComponent ? parent : null;

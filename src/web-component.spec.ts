@@ -1,6 +1,5 @@
 import {WebComponent} from './web-component';
 import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
-import {JSDOM} from "jsdom";
 
 describe('WebComponent', () => {
 
@@ -30,23 +29,6 @@ describe('WebComponent', () => {
 			a = new AComp();
 
 			expect(a.root).toEqual(a);
-		});
-
-		it('should throw error if invalid observed attributes', () => {
-			AComp.observedAttributes = [2] as any;
-
-			expect(() => new AComp()).toThrowError('AComp: "observedAttributes" must be an array of attribute strings.')
-
-			AComp.observedAttributes = {} as any;
-
-			expect(() => new AComp()).toThrowError('AComp: "observedAttributes" must be an array of attribute strings.')
-		});
-
-		it('should throw error if invalid mode', () => {
-			// @ts-ignore
-			AComp.mode = '';
-
-			expect(() => new AComp()).toThrowError('AComp: Invalid mode "". Must be one of ["open", "closed", "none"].')
 		});
 
 		it('should map observed attributes to properties', () => {
@@ -226,6 +208,24 @@ describe('WebComponent', () => {
 
 			expect(l.innerHTML).toBe('<div>test</div>')
 		});
+		
+		it('should use template id', () => {
+			class OComp extends WebComponent {
+				templateId = "sample";
+			}
+			
+			OComp.register();
+			
+			document.body.innerHTML = `
+				<template id="sample"><div>test</div></template>
+			`;
+			
+			const l = new OComp();
+			
+			document.body.appendChild(l);
+			
+			expect(l.root?.innerHTML).toBe('<div>test</div>')
+		});
 	});
 
 	describe('liveCycles', () => {
@@ -280,11 +280,11 @@ describe('WebComponent', () => {
 		});
 
 		it('should trigger onAdoption when move to a different document', () => {
-			const dom = new JSDOM();
-			const doc2 = dom.window.document;
-
-			document.body.appendChild(k);
-			doc2.body.appendChild(k);
+			const iframe = document.createElement('iframe');
+			
+			document.body.appendChild(iframe)
+			
+			iframe.contentDocument?.body.appendChild(k);
 
 			expect(adoptionFn).toHaveBeenCalledTimes(1);
 		});

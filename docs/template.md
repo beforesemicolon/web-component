@@ -30,6 +30,26 @@ class TodoItem extends WebComponent {
 It is important for the template to be read only so it is not changed before render. You should not reply on dynamically
 template update as the future API around this may change.
 
+#### Template ID
+You may also use HTML [template tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template) to set 
+the template of your component and all you have to do is tell the component about the template id.
+
+```html
+<template id="todo-item-template">
+	<div class="todo-item">
+		<h3>My Todo</h3>
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Autem debitis vitae voluptatibus?</p>
+		<p><strong>Status</strong> In Progress</p>
+	</div>
+</template>
+```
+
+```js
+class TodoItem extends WebComponent {
+  templateId = "todo-item-template";
+}
+```
+
 ### Data Binding
 
 You can use curly braces to bind data to your template. Inside the curly braces you can refer to properties from which

@@ -55,6 +55,18 @@ Wrapper.register();
 ⚠️ A good best practices is to register all your directives before your components, so they get picked up when rendering
 the components you create.
 
+You may also specify a name for your directive when you are registering it.
+```js
+class Wrapper extends Directive {
+  // logic inside
+}
+
+Wrapper.register('wrap-in');
+```
+
+⚠️ Simply make sure that the directive name is a valid attribute name and without "dots" as these have special meaning
+for this framework.
+
 ### Parse Value
 The `Directive` class exposes the `parseValue` method you must override to handle parsing the attribute value string
 before it gets changed to a specific data.
@@ -117,7 +129,7 @@ The `render` method gets called with 2 arguments:
 - **value** (result of parsing the string returned by `parseValue`);
 - options containing the 
   - the **element** the element that the directive is attached to;
-  - the **rawElementOuterHTML** the element's outerHTML as it was defined in the template;
+  - the **rawElementOuterHTML** the element's outerHTML as it was defined in the template. Use `WebComponent.parseHTML` to turn into an Element;
   - the **anchorNode** the last node or array of node the directive returned;
 
 Continuing with our `wrapper` example, the `render` method should be expecting an array containing the value and the prop

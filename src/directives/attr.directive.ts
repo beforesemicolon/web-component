@@ -7,9 +7,8 @@ export class Attr extends Directive {
 	parseValue(value: string, prop: string | null): string {
 		let [attrName, property = null] = (prop ?? '').split('.');
 		const commaIdx = value.lastIndexOf(',');
-		let val = commaIdx >= 0 ? value.slice(0, commaIdx).trim() : '';
 
-		return `["${attrName}", "${property || ''}", ${commaIdx >= 0 ? value.slice(commaIdx + 1).trim() : value}, "${val}"]`;
+		return `["${attrName}", "${property || ''}", ${commaIdx >= 0 ? value.slice(commaIdx + 1).trim() : value}, "${commaIdx >= 0 ? value.slice(0, commaIdx).trim() : ''}"]`;
 	}
 
 	render([attrName, property, shouldAdd, val]: any, {element}: directiveRenderOptions): HTMLElement {
@@ -18,26 +17,19 @@ export class Attr extends Directive {
 				if (property) {
 					property = turnKebabToCamelCasing(property);
 
-					if (shouldAdd) {
-						element.style[property] = val;
-					} else {
-						element.style[property] = '';
-					}
+					element.style[property] = shouldAdd ? val : '';
 				} else {
 					val
 						.match(/([a-z][a-z-]+)(?=:):([^;]+)/g)
 						?.forEach((style: string) => {
-							let [name, styleValue] = style.split(':');
-							name = name.trim();
-							styleValue = styleValue.trim();
+							let [name, styleValue] = style.split(':').map(s => s.trim());
 
 							if (shouldAdd) {
 								element.style.setProperty(name, styleValue);
 							} else {
-								const pattern = new RegExp(`${name}\\s*:\\s*${styleValue};?`, 'g');
 								element.setAttribute(
 									'style',
-									element.style.cssText.replace(pattern, ''))
+									element.style.cssText.replace(new RegExp(`${name}\\s*:\\s*${styleValue};?`, 'g'), ''))
 							}
 
 						})
@@ -73,11 +65,8 @@ export class Attr extends Directive {
 			default:
 				if (attrName) {
 					if (shouldAdd) {
-						if (booleanAttr.hasOwnProperty(attrName)) {
-							element.setAttribute(attrName, '');
-						} else {
-							element.setAttribute(attrName, `${val || shouldAdd}`);
-						}
+						element.setAttribute(attrName,
+							booleanAttr.hasOwnProperty(attrName) ? '' : `${val || shouldAdd}`);
 					} else {
 						element.removeAttribute(attrName);
 					}
