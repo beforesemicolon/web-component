@@ -69,28 +69,28 @@ export class NodeTrack {
 			if (directive && directive.handler) {
 				try {
 					const {handler} = directive;
-					
+
 					let val = handler.parseValue(directive.value, directive.prop);
 					extractExecutableSnippetFromString(val).forEach((exc) => {
 						val = resolveExecutable(this.component, metadata.get(this.node).$context ?? {}, exc, val);
 					});
-					
+
 					const value = evaluateStringInComponentContext(val, this.component, this.$context);
 					directiveNode = handler.render(value, {
 						element: this.node,
 						anchorNode: this.dirAnchors.get(directive) ?? null,
 						rawElementOuterHTML: metadata.get(this.node).rawNodeString
 					} as directiveRenderOptions);
-					
+
 					if (directiveNode !== this.node) {
 						this.dirAnchors.set(directive, directiveNode)
 						break;
 					}
-					
-				} catch(e: any) {
+
+				} catch (e: any) {
 					this.component.onError(new Error(`"${directive.name}" on ${(this.node as HTMLElement).outerHTML}: ${e.message}`));
 				}
-				
+
 				this.dirAnchors.set(directive, null)
 			}
 		}
@@ -101,11 +101,10 @@ export class NodeTrack {
 			this.anchor = this._switchNodeAndAnchor(directiveNode);
 
 			if (this.property?.executables.length) {
-				let newValue = this.property.value;
+				const newValue = this.property.executables.reduce((val, exc) => {
+					return resolveExecutable(this.component, metadata.get(this.node).$context ?? {}, exc, val);
+				}, this.property.value)
 
-				this.property.executables.forEach((exc) => {
-					newValue = resolveExecutable(this.component, metadata.get(this.node).$context ?? {}, exc, newValue);
-				});
 
 				if (newValue !== (this.node as ObjectLiteral)[this.property.name]) {
 					(this.node as ObjectLiteral)[this.property.name] = newValue;
@@ -114,11 +113,9 @@ export class NodeTrack {
 
 			for (let {name, value, executables} of this.attributes) {
 				if (executables.length) {
-					let newValue = value;
-
-					executables.forEach((exc) => {
-						newValue = resolveExecutable(this.component, metadata.get(this.node).$context ?? {}, exc, newValue);
-					});
+					let newValue = executables.reduce((val, exc) => {
+						return resolveExecutable(this.component, metadata.get(this.node).$context ?? {}, exc, val);
+					}, value)
 
 					const camelName = turnKebabToCamelCasing(name);
 
@@ -141,10 +138,10 @@ export class NodeTrack {
 		}
 
 		metadata.get(this.node).shadowed = true;
-		
+
 		this.anchor = this._switchNodeAndAnchor(directiveNode);
 	}
-	
+
 	private _unTrackNode(node: Node) {
 		metadata.get(this.component).trackers.delete(node);
 		metadata.delete(node);
@@ -152,38 +149,29 @@ export class NodeTrack {
 	}
 
 	private _setTracks() {
-		this.directives = [];
-		this.attributes = [];
-		this.eventHandlers = [];
-		this.property = {
-			name: '',
-			value: '',
-			executables: []
-		};
+		const {nodeName, nodeValue, textContent, attributes} =  this.node as HTMLElement;
 
-		const isTextNode = this.node.nodeName === '#text';
-
-		if (isTextNode) {
+		if (nodeName === '#text') {
 			this.property = {
 				name: 'nodeValue',
-				value: this.node.nodeValue || '',
+				value: nodeValue || '',
 				executables: []
 			}
 		} else {
-			const attributes = [];
+			const attrs = [];
 			const isRepeatedNode = (this.node as HTMLElement)?.hasAttribute('repeat');
 
-			if ((this.node as HTMLElement).nodeName === 'TEXTAREA') {
+			if (nodeName === 'TEXTAREA') {
 				this.property = {
 					name: 'value',
-					value: this.node.textContent || '',
+					value: textContent || '',
 					executables: []
 				}
 				this.node.textContent = '';
-			} else if((this.node as HTMLElement).nodeName === 'STYLE') {
+			} else if (nodeName === 'STYLE') {
 				const selectorPattern = /[a-z:#\.*\[][^{}]*[^\s:]\s*(?={){/gmi;
 				const propValueStylePattern = /[a-z][a-z-]*:([^;]*)(;|})/gmi;
-				let styleText = (this.node.textContent ?? '');
+				let styleText = (textContent ?? '');
 				let match: RegExpExecArray | null = null;
 				let executables: Array<Executable> = [];
 
@@ -206,10 +194,10 @@ export class NodeTrack {
 			}
 
 			// @ts-ignore
-			for (let attribute of [...(this.node as HTMLElement).attributes]) {
+			for (let attribute of [...attributes]) {
 				if (/^(attr\.|ref|if|repeat)/.test(attribute.name)) {
 					const directive = parseNodeDirective(this.node as HTMLElement, attribute.name, attribute.value);
-					
+
 					if (directiveRegistry[directive.name]) {
 						const Dir = directiveRegistry[directive.name];
 						directive.handler = new Dir(this.component);
@@ -237,7 +225,7 @@ export class NodeTrack {
 						attribute
 					});
 				} else {
-					attributes.push(attribute)
+					attrs.push(attribute)
 				}
 			}
 
@@ -253,7 +241,7 @@ export class NodeTrack {
 				}
 			});
 
-			for (let attr of attributes) {
+			for (let attr of attrs) {
 				if (attr.value.trim()) {
 					this.attributes.push({
 						name: attr.name,
@@ -275,29 +263,29 @@ export class NodeTrack {
 	}
 
 	private _createDefaultAnchor() {
-		return document.createComment( ` ${this.node.nodeValue ?? (this.node as HTMLElement).outerHTML} `)
+		return document.createComment(` ${this.node.nodeValue ?? (this.node as HTMLElement).outerHTML} `)
 	}
 
 	private _switchNodeAndAnchor(directiveNode: HTMLElement | Node | Comment | Array<Element>) {
 		if (directiveNode === this.anchor) {
-		    return directiveNode;
+			return directiveNode;
 		}
 
 		if (!Array.isArray(directiveNode) && !(/[831]/.test(`${(directiveNode as Node).nodeType}`))) {
 			directiveNode = this._createDefaultAnchor();
 		}
-		
+
 		const anchorIsArray = Array.isArray(this.anchor);
 		const dirIsArray = Array.isArray(directiveNode);
 		const anchorEl = document.createComment('')
 		let nextEl: Element | Comment | Text = anchorEl;
-		
+
 		if (anchorIsArray) {
 			(this.anchor as Array<Element>)[0].parentNode?.insertBefore(nextEl, (this.anchor as Array<Element>)[0]);
 		} else {
 			(this.anchor as HTMLElement).before(nextEl);
 		}
-		
+
 		if (dirIsArray) {
 			for (let el of (directiveNode as Array<Element>)) {
 				if (!el.isConnected) {
@@ -307,13 +295,13 @@ export class NodeTrack {
 						customSlotChildNodes: Array.from(this.component.childNodes)
 					});
 				}
-				
+
 				nextEl = el;
 			}
 		} else {
 			nextEl.after(directiveNode as Node);
 		}
-		
+
 		anchorEl.parentNode?.removeChild(anchorEl);
 
 		if (anchorIsArray) {
@@ -321,12 +309,12 @@ export class NodeTrack {
 				if (!dirIsArray) {
 					el.parentNode?.removeChild(el);
 					this._unTrackNode(el);
-				} else if(!(directiveNode as Array<Element>).includes(el)) {
+				} else if (!(directiveNode as Array<Element>).includes(el)) {
 					el.parentNode?.removeChild(el);
 					this._unTrackNode(el);
 				}
 			}
-		} else if(this.anchor !== directiveNode) {
+		} else if (this.anchor !== directiveNode) {
 			(this.anchor as Node).parentNode?.removeChild(this.anchor as Node);
 		}
 
