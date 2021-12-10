@@ -1,7 +1,23 @@
 import {Directive} from "../directive";
 
 export class Repeat extends Directive {
-	render(repeatData: any, {element, rawElementOuterHTML, anchorNode}: directiveRenderOptions) {
+	parseValue(value: string): string {
+		const idx = value.lastIndexOf(';');
+		let iPart = value;
+		let kPart = '';
+		
+		if (idx > 0) {
+			iPart = value.slice(0, idx);
+			kPart = value.slice(idx + 1);
+		}
+		
+		const [v, vAs = "$item"] = `${iPart} `.split(/\s+as\s+/g).map(s => s.trim());
+		const [k, kAs = "$key"] = `${kPart} `.split(/\s+as\s+/g).map(s => s.trim());
+		
+		return `[${v}, "${vAs}", "${k === '$key' ? kAs : ''}"]`;
+	}
+	
+	render([repeatData, vAs, kAs]: any, {element, rawElementOuterHTML, anchorNode}: directiveRenderOptions) {
 		anchorNode = (anchorNode ?? []) as Array<HTMLElement>;
 		const list: Array<HTMLElement> = [];
 
@@ -20,13 +36,13 @@ export class Repeat extends Directive {
 
 			for (let index = 0; index < times; index++) {
 				if (anchorNode[index]) {
-					this.updateNodeContext(anchorNode[index], index, repeatData);
+					this.updateNodeContext(anchorNode[index], index, vAs, kAs, repeatData);
 					list.push(anchorNode[index]);
 					continue
 				}
 
 				const el = this.cloneRepeatedNode(rawElementOuterHTML);
-				this.updateNodeContext(el, index, repeatData)
+				this.updateNodeContext(el, index, vAs, kAs, repeatData)
 				list.push(el);
 			}
 		}
@@ -34,11 +50,11 @@ export class Repeat extends Directive {
 		return list;
 	}
 	
-	updateNodeContext(el: Node, index: number, list: Array<any> = []) {
+	updateNodeContext(el: Node, index: number, vAs: string, kAs: string, list: Array<any> = []) {
 		const [key, value] = list[index] ?? [index, index + 1];
 		// set context so this and inner nodes can catch these values
-		this.setContext(el, '$key', key);
-		this.setContext(el, '$item', value);
+		this.setContext(el, kAs || '$key', key);
+		this.setContext(el, vAs || '$item', value);
 	}
 
 	cloneRepeatedNode(rawElementOuterHTML: string): HTMLElement {

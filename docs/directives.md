@@ -169,6 +169,35 @@ class FlatList extends WebComponent {
 }
 ```
 
+#### Repeat As
+You don't have to stick to `$item` and `$key`. You may also specify how you want to reference the items and keys of
+your list which can be convenient when you have nested repeats.
+
+```js
+class ContextMenu extends WebComponent {
+  static observedAttributes = ['items'];
+  
+  get template() {
+    return `
+      <ul repeat="items as $menuItem">
+        <li>
+          <span>{$menuItem.label}</span>
+          <ul repeat="$menuItem.items as $subMenuItem; $key as $id">
+            <li>
+              <span><b>{$id}</b> {$subMenuItem.label}</span>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    `
+  }
+}
+```
+
+You don't have to specify a name starting with dollar sign ,but it is conventional to do so in order to distinguish
+data created in the template vs from the class or context.
+
+
 ### ref
 The `ref` directive allows you to grab a reference to a DOM element. Its value must be the name of the property you want
 to assign the reference to.
