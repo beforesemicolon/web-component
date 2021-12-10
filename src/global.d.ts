@@ -4,8 +4,9 @@ import {directiveRegistry} from "./directives/registry";
 export declare global {
 	export type onUpdateCallback = (property: string, oldValue: unknown, newValue: unknown) => void;
 	
-	export interface renderOptions {
+	export interface trackerOptions {
 		customSlot?: boolean;
+		trackOnly?: boolean;
 		customSlotChildNodes?: Array<Node>;
 	}
 
@@ -47,7 +48,7 @@ export declare global {
 	export interface directiveRenderOptions {
 		element: HTMLElement,
 		rawElementOuterHTML: string,
-		anchorNode: Text | Comment | HTMLElement | Array<HTMLElement> | null
+		anchorNode: Text | Comment | Element | Array<Element> | null
 	}
 
 	export interface DirectiveValue {
@@ -101,6 +102,7 @@ export declare global {
 		static isRegistered: boolean;
 		static initialContext: ObjectLiteral;
 		static registerAll: (components: Array<WebComponentConstructor>) => void;
+		static parseHTML: (markup: string) => DocumentFragment;
 
 		readonly root: HTMLElement | ShadowRoot | null;
 		readonly mounted: boolean;

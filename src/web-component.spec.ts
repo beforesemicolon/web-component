@@ -1,6 +1,5 @@
 import {WebComponent} from './web-component';
 import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
-import {JSDOM} from "jsdom";
 
 describe('WebComponent', () => {
 
@@ -281,11 +280,11 @@ describe('WebComponent', () => {
 		});
 
 		it('should trigger onAdoption when move to a different document', () => {
-			const dom = new JSDOM();
-			const doc2 = dom.window.document;
-
-			document.body.appendChild(k);
-			doc2.body.appendChild(k);
+			const iframe = document.createElement('iframe');
+			
+			document.body.appendChild(iframe)
+			
+			iframe.contentDocument?.body.appendChild(k);
 
 			expect(adoptionFn).toHaveBeenCalledTimes(1);
 		});

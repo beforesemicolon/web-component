@@ -1,3 +1,8 @@
+// simply importing directive here will automatically register them and make them available for
+// anything later on
+import './directives';
+import booleanAttr from './utils/boolean-attributes.json';
+import metadata from "./metadata";
 import {parse} from './utils/parse';
 import {setComponentPropertiesFromObservedAttributes} from './utils/set-component-properties-from-observed-attributes';
 import {setupComponentPropertiesForAutoUpdate} from './utils/setup-component-properties-for-auto-update';
@@ -6,12 +11,7 @@ import {turnKebabToCamelCasing} from './utils/turn-kebab-to-camel-casing';
 import {getStyleString} from './utils/get-style-string';
 import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
 import {NodeTrack} from './node-track';
-import booleanAttr from './utils/boolean-attributes.json';
-import metadata from "./metadata";
-// simply importing directive here will automatically register them and make them available for
-// anything later on
-import './directives';
-import {renderNode} from "./utils/render-node";
+import {trackNode} from "./utils/track-node";
 import {jsonParse} from "./utils/json-parse";
 
 /**
@@ -92,6 +92,14 @@ export class WebComponent extends HTMLElement {
 	 * the initial context data for the component
 	 */
 	static initialContext = {};
+	
+	/**
+	 * parses special template HTML string taking in consideration
+	 * all the additional syntax specific to this framework
+	 */
+	static parseHTML(markup: string): DocumentFragment {
+		return parse(markup)
+	}
 
 	/**
 	 * registers the component with the CustomElementRegistry taking an optional tag name if not
@@ -249,7 +257,7 @@ export class WebComponent extends HTMLElement {
 					this.innerHTML = '';
 				}
 
-				renderNode(contentNode, this, {
+				trackNode(contentNode, this, {
 					customSlot: this.customSlot,
 					customSlotChildNodes: this.customSlot ? childNodes : []
 				});

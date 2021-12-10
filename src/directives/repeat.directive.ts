@@ -1,4 +1,5 @@
 import {Directive} from "../directive";
+import {parse} from "../utils/parse";
 
 export class Repeat extends Directive {
 	parseValue(value: string): string {
@@ -18,8 +19,8 @@ export class Repeat extends Directive {
 	}
 	
 	render([repeatData, vAs, kAs]: any, {element, rawElementOuterHTML, anchorNode}: directiveRenderOptions) {
-		anchorNode = (anchorNode ?? []) as Array<HTMLElement>;
-		const list: Array<HTMLElement> = [];
+		anchorNode = (anchorNode ?? []) as Array<Element>;
+		const list: Array<Element> = [];
 
 		if (element.nodeType === 1) {
 			let times: number;
@@ -57,10 +58,8 @@ export class Repeat extends Directive {
 		this.setContext(el, vAs || '$item', value);
 	}
 
-	cloneRepeatedNode(rawElementOuterHTML: string): HTMLElement {
-		const n = document.createElement('div');
-		n.innerHTML = rawElementOuterHTML;
-		const clone = n.children[0] as HTMLElement;
+	cloneRepeatedNode(rawElementOuterHTML: string): Element {
+		const clone = parse(rawElementOuterHTML).children[0];
 		// remove the repeat node to avoid infinite loop where the clone node also repeat
 		clone.removeAttribute('repeat');
 		// remove the if because the if directive is execute before any directive

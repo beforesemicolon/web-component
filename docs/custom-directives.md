@@ -129,7 +129,7 @@ The `render` method gets called with 2 arguments:
 - **value** (result of parsing the string returned by `parseValue`);
 - options containing the 
   - the **element** the element that the directive is attached to;
-  - the **rawElementOuterHTML** the element's outerHTML as it was defined in the template;
+  - the **rawElementOuterHTML** the element's outerHTML as it was defined in the template. Use `WebComponent.parseHTML` to turn into an Element;
   - the **anchorNode** the last node or array of node the directive returned;
 
 Continuing with our `wrapper` example, the `render` method should be expecting an array containing the value and the prop

@@ -19,14 +19,9 @@ export function defineNodeContextMetadata(node: Node, component: WebComponent) {
 		}
 	})
 
-	let timer: NodeJS.Timer;
 	metadata.get(node).updateContext = (key: string, val: any) => {
 		ctx[key] = val;
-		clearTimeout(timer);
-		timer = setTimeout(() => {
-			metadata.get(component).trackers.get(node)?.updateNode();
-			node.childNodes.forEach(child => metadata.get(child)?.updateContext());
-		}, 0)
-
+		metadata.get(component).trackers.get(node)?.updateNode();
+		node.childNodes.forEach(child => metadata.get(child)?.updateContext());
 	}
 }

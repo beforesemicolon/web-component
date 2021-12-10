@@ -7,7 +7,7 @@ import {directiveRegistry} from './directives/registry';
 import {evaluateStringInComponentContext} from "./utils/evaluate-string-in-component-context";
 import metadata from "./metadata";
 import {defineNodeContextMetadata} from "./utils/define-node-context-metadata";
-import {renderNode} from "./utils/render-node";
+import {trackNode} from "./utils/track-node";
 import {jsonParse} from "./utils/json-parse";
 
 /**
@@ -60,7 +60,7 @@ export class NodeTrack {
 		// and no longer has a parent(removed from the DOM)
 		// and it is is not being shadowed(temporarily removed from the DOM by a directive)
 		// the node no longer needs to be tracked so it can be discarded
-		if (metadata.get(this.node).__rendered && !this.node.parentNode && !metadata.get(this.node).shadowed) {
+		if (metadata.get(this.node).__tracked && !this.node.parentNode && !metadata.get(this.node).shadowed) {
 			return this._unTrackNode(this.node);
 		}
 
@@ -75,7 +75,7 @@ export class NodeTrack {
 					extractExecutableSnippetFromString(val).forEach((exc) => {
 						val = resolveExecutable(this.component, metadata.get(this.node).$context ?? {}, exc, val);
 					});
-
+					
 					const value = evaluateStringInComponentContext(val, this.component, this.$context);
 					directiveNode = handler.render(value, {
 						element: this.node,
@@ -89,7 +89,7 @@ export class NodeTrack {
 					}
 
 				} catch (e: any) {
-					this.component.onError(new Error(`"${directive.name}" on ${(this.node as HTMLElement).outerHTML}: ${e.message}`));
+					this.component.onError(new Error(`"${directive.name}" on ${metadata.get(this.node).rawNodeString}: ${e.message}`));
 				}
 
 				this.dirAnchors.set(directive, null)
@@ -132,12 +132,14 @@ export class NodeTrack {
 				}
 			}
 
-			return;
+			return this.node;
 		}
 
 		metadata.get(this.node).shadowed = true;
 
 		this.anchor = this._switchNodeAndAnchor(directiveNode);
+		
+		return directiveNode;
 	}
 
 	private _unTrackNode(node: Node) {
@@ -288,7 +290,7 @@ export class NodeTrack {
 			for (let el of (directiveNode as Array<Element>)) {
 				if (!el.isConnected) {
 					nextEl.after(el);
-					renderNode(el, this.component, {
+					trackNode(el, this.component, {
 						customSlot: this.component.customSlot,
 						customSlotChildNodes: Array.from(this.component.childNodes)
 					});
