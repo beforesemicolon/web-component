@@ -15,15 +15,10 @@ export function evaluateStringInComponentContext(
 			...component.$properties
 		]));
 
-		const values = keys.map((key: string) => {
-			// @ts-ignore
-			return nodeData[key] ?? component[key] ?? ctx[key] ?? null;
-		});
-
-		const fn = new Function(...keys, `"use strict";\n return ${executable};`);
-
-		return fn.apply(component, values) ?? '';
-	} catch(e) {
+		return (
+			new Function(...keys, `"use strict";\n return ${executable};`)
+		).apply(component, keys.map((key: string) => nodeData[key] ?? component[key] ?? ctx[key] ?? null)) ?? '';
+	} catch (e) {
 		component.onError(e as Error);
 	}
 }

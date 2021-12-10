@@ -12,6 +12,7 @@ import metadata from "./metadata";
 // anything later on
 import './directives';
 import {renderNode} from "./utils/render-node";
+import {jsonParse} from "./utils/json-parse";
 
 /**
  * a extension on the native web component API to simplify and automate most of the pain points
@@ -32,7 +33,8 @@ export class WebComponent extends HTMLElement {
 			context: {},
 			contextSource: null,
 			contextSubscribers: [],
-			unsubscribeCtx: () => {},
+			unsubscribeCtx: () => {
+			},
 		} as WebComponentMetadata);
 
 		// @ts-ignore
@@ -123,7 +125,7 @@ export class WebComponent extends HTMLElement {
 	static get isRegistered() {
 		return customElements.get(this.tagName) !== undefined;
 	}
-	
+
 	/**
 	 * whether or not the component should use the real slot element or mimic its behavior
 	 * when rendering template
@@ -200,7 +202,7 @@ export class WebComponent extends HTMLElement {
 					if (this.mounted) {
 						this.onUpdate('$context', metadata.get(this).context, newContext)
 					}
-					
+
 					metadata.get(this).contextSubscribers.forEach((cb: (ctx: {}) => void) => cb(newContext));
 				})
 			}
@@ -231,14 +233,14 @@ export class WebComponent extends HTMLElement {
 				const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
 
 				contentNode = parse(style + this.template);
-				
+
 				let childNodes: Array<Node> = [];
-				
+
 				if (this.customSlot) {
 					childNodes = Array.from(this.childNodes);
 					this.innerHTML = '';
 				}
-				
+
 				renderNode(contentNode, this, {
 					customSlot: this.customSlot,
 					customSlotChildNodes: this.customSlot ? childNodes : []
@@ -259,11 +261,11 @@ export class WebComponent extends HTMLElement {
 						}
 					})
 				}
-				
+
 				metadata.get(this).parsed = true;
 				metadata.get(this).root.appendChild(contentNode);
 			}
-			
+
 			metadata.get(this).mounted = true;
 			this.onMount();
 		} catch (e) {
@@ -299,17 +301,10 @@ export class WebComponent extends HTMLElement {
 			if (!(name.startsWith('data-') || name === 'class' || name === 'style')) {
 				const prop: any = turnKebabToCamelCasing(name);
 
-				if (booleanAttr.hasOwnProperty(prop)) {
-					newValue = this.hasAttribute(name);
-				} else if (typeof newValue === 'string') {
-					try {
-						newValue = JSON.parse(newValue.replace(/['`]/g, '"'));
-					} catch (e) {
-					}
-				}
-
 				// @ts-ignore
-				this[prop] = newValue;
+				this[prop] = booleanAttr.hasOwnProperty(prop)
+					? this.hasAttribute(name)
+					: jsonParse(newValue);
 			} else {
 				this.forceUpdate();
 
@@ -335,7 +330,7 @@ export class WebComponent extends HTMLElement {
 		metadata.get(this).trackers.forEach((track: NodeTrack) => {
 			track.updateNode()
 		});
-		
+
 		return true;
 	}
 

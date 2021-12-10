@@ -8,6 +8,7 @@ import {evaluateStringInComponentContext} from "./utils/evaluate-string-in-compo
 import metadata from "./metadata";
 import {defineNodeContextMetadata} from "./utils/define-node-context-metadata";
 import {renderNode} from "./utils/render-node";
+import {jsonParse} from "./utils/json-parse";
 
 /**
  * handles all logic related to tracking and updating a tracked node.
@@ -120,10 +121,7 @@ export class NodeTrack {
 					const camelName = turnKebabToCamelCasing(name);
 
 					if ((this.node as ObjectLiteral)[camelName] !== undefined) {
-						try {
-							newValue = JSON.parse(newValue.replace(/['`]/g, '"'));
-						} catch (e) {
-						}
+						newValue = jsonParse(newValue);
 
 						if (newValue !== (this.node as ObjectLiteral)[camelName]) {
 							(this.node as ObjectLiteral)[camelName] = newValue;
