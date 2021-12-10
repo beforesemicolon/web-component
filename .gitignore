@@ -1,5 +1,7 @@
 .idea
-dist
+dist/*
+!dist/web-component.min.js
+!dist/web-component.min.js.map
 node_modules
 **.tgz
 coverage
