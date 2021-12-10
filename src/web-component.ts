@@ -21,6 +21,7 @@ import {jsonParse} from "./utils/json-parse";
 export class WebComponent extends HTMLElement {
 	readonly $refs: Refs = Object.create(null);
 	$properties: Array<string> = ['$context', '$refs'];
+	templateId = '';
 
 	constructor() {
 		super();
@@ -231,8 +232,11 @@ export class WebComponent extends HTMLElement {
 				let contentNode;
 				const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
 				const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
+				const temp = this.templateId
+					? (document.getElementById(this.templateId)?.innerHTML)
+					: null;
 
-				contentNode = parse(style + this.template);
+				contentNode = parse(style + temp ?? this.template);
 
 				let childNodes: Array<Node> = [];
 
