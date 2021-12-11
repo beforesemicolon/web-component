@@ -2,7 +2,6 @@ import metadata from "../metadata";
 import {NodeTrack} from "../node-track";
 
 export function trackNode(node: Node | HTMLElement | DocumentFragment, component: WebComponent, opt: trackerOptions = {}) {
-	const {customSlot = false, customSlotChildNodes = [], trackOnly = false} = opt
 	// it is possible that the node is already rendered by the parent component
 	// and then picked up by the child component via slot
 	// in that case we do not need to render it again since it will already be
@@ -12,6 +11,8 @@ export function trackNode(node: Node | HTMLElement | DocumentFragment, component
 	if (metadata.get(node)?.__tracked || node.nodeName === '#comment' || node.nodeName === 'SCRIPT') {
 		return;
 	}
+
+	let {customSlot = false, customSlotChildNodes = [], trackOnly = false} = opt
 	
 	if (node.nodeName === 'SLOT') {
 		if (customSlot) {
@@ -32,11 +33,8 @@ export function trackNode(node: Node | HTMLElement | DocumentFragment, component
 		// avoid fragments
 		if (node.nodeType !== 11) {
 			if (!metadata.has(node)) {
-				metadata.set(node, Object.create(null));
+				metadata.set(node, {__tracked: true});
 			}
-			
-			// mark the node as tracked so it gets skipped if picked via slot
-			metadata.get(node).__tracked = true;
 			
 			const isElement = node.nodeType === 1;
 			const isTextNode = !isElement && node.nodeName === '#text';
@@ -46,7 +44,7 @@ export function trackNode(node: Node | HTMLElement | DocumentFragment, component
 				const track = new NodeTrack(node, component as WebComponent);
 				if (!track.empty) {
 					metadata.get(component).trackers.set(node, track);
-					opt.trackOnly = !trackOnly && track.updateNode() !== node;
+					trackOnly = !trackOnly && track.updateNode() !== node;
 				}
 			}
 			
@@ -59,7 +57,7 @@ export function trackNode(node: Node | HTMLElement | DocumentFragment, component
 			}
 		}
 		
-		node.childNodes.forEach(child => trackNode(child, component, opt));
+		node.childNodes.forEach(child => trackNode(child, component, {...opt, trackOnly}));
 	}
 }
 

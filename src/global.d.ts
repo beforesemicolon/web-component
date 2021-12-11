@@ -62,12 +62,18 @@ export declare global {
 		static register: () => void;
 
 		parseValue: (value: string, prop: string | null) => string;
-		render: (val: any, options: directiveRenderOptions) => Pick<directiveRenderOptions, 'anchorNode'>;
+		render: (val: any, options: directiveRenderOptions) => directiveRenderOptions['anchorNode'];
 		setContext: (node: Node, key: string, value: any) => void;
 		getContext(node: Node) {}
 
-		[key: string | Directive]: any;
+		[key: string]: any;
 	}
+
+	export interface DirectiveConstructor {
+        new (component: WebComponent): Directive;
+
+		register: (name?: string) =>  void;
+    }
 
 	export type ObjectLiteral = {[key: string]: any};
 

@@ -1,1 +1,1 @@
-export const directiveRegistry = Object.create(null);
+export const directiveRegistry: {[key: string]: DirectiveConstructor} = {};

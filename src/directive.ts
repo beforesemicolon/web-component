@@ -20,7 +20,7 @@ export class Directive {
 		return value;
 	}
 
-	render(val: unknown, {element}: directiveRenderOptions): directiveRenderOptions['anchorNode'] | null {
+	render(val: unknown, {element}: directiveRenderOptions): directiveRenderOptions['anchorNode'] {
 		return element;
 	}
 
