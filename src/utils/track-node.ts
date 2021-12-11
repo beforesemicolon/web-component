@@ -1,19 +1,21 @@
-import metadata from "../metadata";
+import {metadata} from "../metadata";
 import {NodeTrack} from "../node-track";
 
 export function trackNode(node: Node | HTMLElement | DocumentFragment, component: WebComponent, opt: trackerOptions = {}) {
-	const {customSlot = false, customSlotChildNodes = [], trackOnly = false} = opt
 	// it is possible that the node is already rendered by the parent component
 	// and then picked up by the child component via slot
 	// in that case we do not need to render it again since it will already be
 	// ready to do anything it needs and also prevent it from being tracked again.
 	// Also, scripts and comments are ignored since comments is never seen and script tags
 	// contain logic inside that does not need any tracking because it may cause issues
-	if (metadata.get(node)?.__tracked || node.nodeName === '#comment' || node.nodeName === 'SCRIPT') {
+	if (metadata.get(node)?.tracked || /#comment|SCRIPT/.test(node.nodeName)) {
 		return;
 	}
+
+	const {nodeName, nodeValue, childNodes, nodeType} = node;
+	let {customSlot = false, customSlotChildNodes = [], trackOnly = false} = opt
 	
-	if (node.nodeName === 'SLOT') {
+	if (nodeName === 'SLOT') {
 		if (customSlot) {
 			return renderCustomSlot(node as HTMLSlotElement, customSlotChildNodes)
 				.forEach((child: Node) => trackNode(child, component, opt));
@@ -25,41 +27,33 @@ export function trackNode(node: Node | HTMLElement | DocumentFragment, component
 			});
 		});
 		
-		node.childNodes.forEach((n: HTMLElement | Node) => {
+		childNodes.forEach((n: HTMLElement | Node) => {
 			trackNode(n, component, opt);
 		});
 	} else {
 		// avoid fragments
-		if (node.nodeType !== 11) {
-			if (!metadata.has(node)) {
-				metadata.set(node, Object.create(null));
-			}
-			
-			// mark the node as tracked so it gets skipped if picked via slot
-			metadata.get(node).__tracked = true;
-			
-			const isElement = node.nodeType === 1;
-			const isTextNode = !isElement && node.nodeName === '#text';
+		if (nodeType !== 11) {
+			const isElement = nodeType === 1;
+			const isTextNode = !isElement && nodeName === '#text';
 			const isRepeatedNode = isElement && (node as HTMLElement).hasAttribute('repeat');
 			
-			if (isElement || (isTextNode && node.nodeValue?.trim())) {
+			if (isElement || (isTextNode && nodeValue?.trim())) {
 				const track = new NodeTrack(node, component as WebComponent);
 				if (!track.empty) {
 					metadata.get(component).trackers.set(node, track);
-					opt.trackOnly = !trackOnly && track.updateNode() !== node;
+					trackOnly = !trackOnly && track.updateNode() !== node;
 				}
 			}
 			
 			if (
 				isRepeatedNode ||
-				node.nodeName === 'TEXTAREA' ||
-				node.nodeName === 'STYLE'
+				/#text|TEXTAREA|STYLE/.test(nodeName)
 			) {
 				return;
 			}
 		}
 		
-		node.childNodes.forEach(child => trackNode(child, component, opt));
+		Array.from(childNodes).forEach(child => trackNode(child, component, {...opt, trackOnly}));
 	}
 }
 

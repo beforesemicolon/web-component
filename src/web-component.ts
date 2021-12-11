@@ -2,7 +2,7 @@
 // anything later on
 import './directives';
 import booleanAttr from './utils/boolean-attributes.json';
-import metadata from "./metadata";
+import {metadata} from "./metadata";
 import {parse} from './utils/parse';
 import {setComponentPropertiesFromObservedAttributes} from './utils/set-component-properties-from-observed-attributes';
 import {setupComponentPropertiesForAutoUpdate} from './utils/setup-component-properties-for-auto-update';
@@ -19,7 +19,7 @@ import {jsonParse} from "./utils/json-parse";
  * when it comes to creating and working with web components on the browser
  */
 export class WebComponent extends HTMLElement {
-	readonly $refs: Refs = Object.create(null);
+	readonly $refs: Refs = {};
 	$properties: Array<string> = ['$context', '$refs'];
 	templateId = '';
 

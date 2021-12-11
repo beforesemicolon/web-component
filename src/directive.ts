@@ -1,5 +1,5 @@
 import {directiveRegistry} from "./directives/registry";
-import metadata from "./metadata";
+import {metadata} from "./metadata";
 import {defineNodeContextMetadata} from "./utils/define-node-context-metadata";
 
 export class Directive {
@@ -20,7 +20,7 @@ export class Directive {
 		return value;
 	}
 
-	render(val: unknown, {element}: directiveRenderOptions): directiveRenderOptions['anchorNode'] | null {
+	render(val: unknown, {element}: directiveRenderOptions): directiveRenderOptions['anchorNode'] {
 		return element;
 	}
 

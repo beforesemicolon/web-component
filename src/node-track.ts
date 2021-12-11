@@ -5,7 +5,7 @@ import {resolveExecutable} from "./utils/resolve-executable";
 import {getEventHandlerFunction} from "./utils/get-event-handler-function";
 import {directiveRegistry} from './directives/registry';
 import {evaluateStringInComponentContext} from "./utils/evaluate-string-in-component-context";
-import metadata from "./metadata";
+import {metadata} from "./metadata";
 import {defineNodeContextMetadata} from "./utils/define-node-context-metadata";
 import {trackNode} from "./utils/track-node";
 import {jsonParse} from "./utils/json-parse";
@@ -23,8 +23,7 @@ export class NodeTrack {
 		executables: Array<Executable>;
 	}> = []
 	directives: Array<DirectiveValue> = [];
-	eventHandlers: Array<EventHandlerTrack> = [];
-	property: null | {
+	property: {
 		name: string;
 		value: string;
 		executables: Array<Executable>;
@@ -43,9 +42,13 @@ export class NodeTrack {
 		this.anchor = node;
 		this.component = component;
 
+		if (!metadata.has(node)) {
+			metadata.set(node, {tracked: true});
+		}
+
 		// whether or not the node was replaced by another on render
 		metadata.get(this.node).shadowed = false;
-		metadata.get(this.node).rawNodeString = (this.node as HTMLElement).outerHTML ?? (this.node as Text).nodeValue;
+		metadata.get(this.node).rawNodeString = (node as HTMLElement).outerHTML ?? (node as Text).nodeValue;
 		defineNodeContextMetadata(node, component);
 
 		this._setTracks();
@@ -60,7 +63,7 @@ export class NodeTrack {
 		// and no longer has a parent(removed from the DOM)
 		// and it is is not being shadowed(temporarily removed from the DOM by a directive)
 		// the node no longer needs to be tracked so it can be discarded
-		if (metadata.get(this.node).__tracked && !this.node.parentNode && !metadata.get(this.node).shadowed) {
+		if (metadata.get(this.node).tracked && !this.node.parentNode && !metadata.get(this.node).shadowed) {
 			return this._unTrackNode(this.node);
 		}
 
@@ -150,6 +153,7 @@ export class NodeTrack {
 
 	private _setTracks() {
 		const {nodeName, nodeValue, textContent, attributes} =  this.node as HTMLElement;
+		const eventHandlers: Array<EventHandlerTrack> = [];
 
 		if (nodeName === '#text') {
 			this.property = {
@@ -220,7 +224,7 @@ export class NodeTrack {
 
 					(this.node as Element).removeAttribute(attribute.name);
 				} else if (attribute.name.startsWith('on')) {
-					this.eventHandlers.push({
+					eventHandlers.push({
 						eventName: attribute.name.slice(2).toLowerCase(),
 						attribute
 					});
@@ -229,7 +233,7 @@ export class NodeTrack {
 				}
 			}
 
-			this.eventHandlers.forEach(({eventName, fn, attribute}) => {
+			eventHandlers.forEach(({eventName, fn, attribute}) => {
 				(this.node as HTMLElement).removeAttribute(attribute.name);
 
 				if (!fn && !isRepeatedNode) {
@@ -257,9 +261,8 @@ export class NodeTrack {
 		}
 
 		this.empty = !this.directives.length &&
-			!this.eventHandlers.length &&
-			!this.attributes.length &&
-			!this.property?.executables.length;
+			!this.attributes.some(attr => attr.executables.length) &&
+			!this.property.executables.length;
 	}
 
 	private _createDefaultAnchor() {

@@ -1,5 +1,5 @@
 import {defineNodeContextMetadata} from "./define-node-context-metadata";
-import metadata from "../metadata";
+import {metadata} from "../metadata";
 import {WebComponent} from "../web-component";
 
 describe('defineNodeContextMetadata', () => {

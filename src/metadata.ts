@@ -6,4 +6,4 @@
  * it weak nature also means that when no node reference exist, these data will simply be
  * garbage collected
  */
-export default new WeakMap() as any;
+export const metadata: WeakMap<any, any> = new WeakMap();
