@@ -4,7 +4,8 @@ import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
 describe('WebComponent', () => {
 
 	describe('constructor and configuration', () => {
-		class AComp extends WebComponent {}
+		class AComp extends WebComponent {
+		}
 
 		AComp.register();
 
@@ -47,7 +48,8 @@ describe('WebComponent', () => {
 
 	describe('registration', () => {
 		it('should register with new tag name', () => {
-			class BComp extends WebComponent {}
+			class BComp extends WebComponent {
+			}
 
 			expect(BComp.isRegistered).toBeFalsy();
 
@@ -58,8 +60,11 @@ describe('WebComponent', () => {
 		});
 
 		it('should register all given components', () => {
-			class CComp extends WebComponent {}
-			class DComp extends WebComponent {}
+			class CComp extends WebComponent {
+			}
+
+			class DComp extends WebComponent {
+			}
 
 			expect(CComp.isRegistered).toBeFalsy();
 			expect(DComp.isRegistered).toBeFalsy();
@@ -72,7 +77,8 @@ describe('WebComponent', () => {
 		});
 
 		it('should throw error if tag name is invalid', () => {
-			class EComp extends WebComponent {}
+			class EComp extends WebComponent {
+			}
 
 			EComp.tagName = 'e';
 
@@ -83,7 +89,8 @@ describe('WebComponent', () => {
 
 	describe('stylesheet', () => {
 		it('should be empty if not set', () => {
-			class ZComp extends WebComponent {}
+			class ZComp extends WebComponent {
+			}
 
 			ZComp.register();
 
@@ -164,7 +171,8 @@ describe('WebComponent', () => {
 
 	describe('template', () => {
 		it('should not set content with empty template', () => {
-			class JComp extends WebComponent {}
+			class JComp extends WebComponent {
+			}
 
 			JComp.register();
 
@@ -208,22 +216,22 @@ describe('WebComponent', () => {
 
 			expect(l.innerHTML).toBe('<div>test</div>')
 		});
-		
+
 		it('should use template id', () => {
 			class OComp extends WebComponent {
 				templateId = "sample";
 			}
-			
+
 			OComp.register();
-			
+
 			document.body.innerHTML = `
 				<template id="sample"><div>test</div></template>
 			`;
-			
+
 			const l = new OComp();
-			
+
 			document.body.appendChild(l);
-			
+
 			expect(l.root?.innerHTML).toBe('<div>test</div>')
 		});
 	});
@@ -281,9 +289,9 @@ describe('WebComponent', () => {
 
 		it('should trigger onAdoption when move to a different document', () => {
 			const iframe = document.createElement('iframe');
-			
+
 			document.body.appendChild(iframe)
-			
+
 			iframe.contentDocument?.body.appendChild(k);
 
 			expect(adoptionFn).toHaveBeenCalledTimes(1);
@@ -746,20 +754,20 @@ describe('WebComponent', () => {
 	describe('directives', () => {
 		describe('ref', () => {
 			it('should set ref attribute', () => {
-                class RefA extends WebComponent {
-                    get template() {
-                        return '<div ref="myRef"></div>'
-                    }
-                }
+				class RefA extends WebComponent {
+					get template() {
+						return '<div ref="myRef"></div>'
+					}
+				}
 
-                RefA.register();
-                const s = new RefA();
+				RefA.register();
+				const s = new RefA();
 
-                document.body.appendChild(s);
+				document.body.appendChild(s);
 
-                expect(s.root?.innerHTML).toBe('<div></div>')
-                expect(s.$refs.myRef).toBeDefined()
-            });
+				expect(s.root?.innerHTML).toBe('<div></div>')
+				expect(s.$refs.myRef).toBeDefined()
+			});
 
 			it('should allow to be used in template', () => {
 				class RefB extends WebComponent {
@@ -958,7 +966,7 @@ describe('WebComponent', () => {
 				expect(s.root?.innerHTML).toBe('<button>click me</button>');
 			});
 
-			it('should handle nested if', () => {
+			it('should handle nested ifs', () => {
 				class IfB extends WebComponent {
 					check = true;
 					icon = '';
@@ -978,6 +986,27 @@ describe('WebComponent', () => {
 				s.icon = 'star';
 
 				expect(s.root?.innerHTML).toBe('<button>click me <span>star</span></button>');
+			});
+
+			it('should handle sequential ifs', () => {
+				class IfC extends WebComponent {
+					check = true;
+
+					get template() {
+						return '<p if="check">lorem</p><p if="!check">lorem</p><p if="check">lorem</p>'
+					}
+				}
+
+				IfC.register();
+				const s = new IfC();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<p>lorem</p><!-- if: false --><p>lorem</p>');
+
+				s.check = false;
+
+				expect(s.root?.innerHTML).toBe('<!-- if: false --><p>lorem</p><!-- if: false -->');
 			});
 		});
 
@@ -1002,13 +1031,13 @@ describe('WebComponent', () => {
 
 				expect(s.root?.innerHTML).toBe('<li class="item-0">item 1</li>');
 
-				s.count = Array.from({length: 3}, (_, i) => i+1);
+				s.count = Array.from({length: 3}, (_, i) => i + 1);
 
 				s.count = 1;
 
 				expect(s.root?.innerHTML).toBe('<li class="item-0">item 1</li>');
 
-				s.count = Array.from({length: 3}, (_, i) => i+1);
+				s.count = Array.from({length: 3}, (_, i) => i + 1);
 
 				expect(s.root?.innerHTML).toBe('<li class="item-0">item 1</li><li class="item-1">item 2</li><li class="item-2">item 3</li>');
 
@@ -1029,7 +1058,7 @@ describe('WebComponent', () => {
 				expect(s.root?.innerHTML).toBe('<li class="item-0">item t</li><li class="item-1">item w</li><li class="item-2">item o</li>');
 
 				s.count = {
-					*[Symbol.iterator]() {
+					* [Symbol.iterator]() {
 						yield 500;
 						yield 250;
 						yield 50;
@@ -1098,23 +1127,23 @@ describe('WebComponent', () => {
 				expect(cb).toHaveBeenCalledWith(new MouseEvent('click'), 2, 1)
 
 			});
-			
+
 			it('should render list and update items on click', () => {
 				class NumberList extends WebComponent {
 					list = [1];
-					
+
 					get template() {
 						return '<ul>\n' +
 							'<li repeat="list">item-{$item}</li>\n' +
 							'</ul>\n' +
 							'<button type="button" onclick="addItem()">add to list</button>'
 					}
-					
+
 					addItem() {
 						this.list.push(this.list.length + 1)
 					}
 				}
-				
+
 				NumberList.register();
 
 				const btn = new NumberList();
@@ -1135,6 +1164,82 @@ describe('WebComponent', () => {
 					'<li>item-1</li><li>item-2</li>\n' +
 					'</ul>\n' +
 					'<button type="button">add to list</button>');
+			});
+
+			it('should repeat with custom names', () => {
+				class RepeatD extends WebComponent {
+					items = [
+						{"label": "Home", "items": []},
+						{
+							"label": "Projects", "items": [
+								{"label": "Calculator App", "items": []},
+								{"label": "Todo App", "items": []}
+							]
+						}
+					];
+
+					get template() {
+						return '' +
+						'<ul>\n' +
+								'<li\n' +
+									'repeat="items as $page"\n' +
+									'class="page"\n' +
+								'>\n' +
+									'<span>{$page.label}</span>\n' +
+									'<ul if="$page.items.length">\n' +
+										'<li\n' +
+											'repeat="$page.items"\n' +
+											'class="sub-page"\n' +
+										'>\n' +
+											'<span>{$item.label}</span>\n' +
+										'</li>\n' +
+									'</ul>\n' +
+								'</li>\n' +
+						'</ul>';
+					}
+				}
+
+				RepeatD.register();
+				const s = new RepeatD();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toEqual(
+					'<ul>\n' +
+						'<li class="page">\n' +
+							'<span>Home</span>\n' +
+							'<!-- if: 0 -->\n' +
+						'</li>' +
+						'<li class="page">\n' +
+							'<span>Projects</span>\n' +
+							'<ul>\n' +
+								'<li class="sub-page">\n' +
+									'<span>Calculator App</span>\n' +
+								'</li>' +
+								'<li class="sub-page">\n' +
+									'<span>Todo App</span>\n' +
+								'</li>\n' +
+							'</ul>\n' +
+						'</li>\n' +
+					'</ul>')
+			});
+
+			it('should allow for sequential repeats', () => {
+				class RepeatE extends WebComponent {
+					items = [2, 4, 6];
+
+					get template() {
+						return '<p repeat="items">{$item}</p>' +
+							'<p repeat="items">{$item}</p>';
+					}
+				}
+
+				RepeatE.register();
+				const s = new RepeatE();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<p>2</p><p>4</p><p>6</p><p>2</p><p>4</p><p>6</p>')
 			});
 		});
 

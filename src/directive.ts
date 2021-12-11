@@ -1,5 +1,5 @@
 import {directiveRegistry} from "./directives/registry";
-import metadata from "./metadata";
+import {metadata} from "./metadata";
 import {defineNodeContextMetadata} from "./utils/define-node-context-metadata";
 
 export class Directive {

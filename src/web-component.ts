@@ -2,7 +2,7 @@
 // anything later on
 import './directives';
 import booleanAttr from './utils/boolean-attributes.json';
-import metadata from "./metadata";
+import {metadata} from "./metadata";
 import {parse} from './utils/parse';
 import {setComponentPropertiesFromObservedAttributes} from './utils/set-component-properties-from-observed-attributes';
 import {setupComponentPropertiesForAutoUpdate} from './utils/setup-component-properties-for-auto-update';
