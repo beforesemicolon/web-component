@@ -13,12 +13,8 @@ export function evaluateStringInComponentContext(
 		...Object.getOwnPropertyNames(ctx),
 		...component.$properties
 	]));
-	
-	try {
-		return (
-			new Function(...keys, `"use strict";\n return ${executable};`)
-		).apply(component, keys.map((key: string) => nodeData[key] ?? component[key] ?? ctx[key] ?? null)) ?? '';
-	} catch(e) {
-		component.onError(e as Error);
-	}
+
+	return (
+		new Function(...keys, `"use strict";\n return ${executable};`)
+	).apply(component, keys.map((key: string) => nodeData[key] ?? component[key] ?? ctx[key] ?? null)) ?? '';
 }

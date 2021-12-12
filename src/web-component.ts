@@ -13,6 +13,7 @@ import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
 import {NodeTrack} from './node-track';
 import {trackNode} from "./utils/track-node";
 import {jsonParse} from "./utils/json-parse";
+import {defineNodeContextMetadata} from "./utils/define-node-context-metadata";
 
 /**
  * a extension on the native web component API to simplify and automate most of the pain points
@@ -259,7 +260,8 @@ export class WebComponent extends HTMLElement {
 
 				trackNode(contentNode, this, {
 					customSlot: this.customSlot,
-					customSlotChildNodes: this.customSlot ? childNodes : []
+					customSlotChildNodes: this.customSlot ? childNodes : [],
+					trackers: metadata.get(this).trackers,
 				});
 
 				const {tagName, mode} = (this.constructor as WebComponentConstructor);

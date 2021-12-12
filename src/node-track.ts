@@ -35,6 +35,7 @@ export class NodeTrack {
 	readonly component: WebComponent;
 	anchor: HTMLElement | Node | Comment | Array<Element>;
 	empty = false;
+	trackers = new Map();
 	readonly dirAnchors = new WeakMap();
 
 	constructor(node: HTMLElement | Node, component: WebComponent) {
@@ -42,13 +43,10 @@ export class NodeTrack {
 		this.anchor = node;
 		this.component = component;
 
-		if (!metadata.has(node)) {
-			metadata.set(node, {tracked: true});
-		}
-
 		// whether or not the node was replaced by another on render
 		metadata.get(this.node).shadowed = false;
 		metadata.get(this.node).rawNodeString = (node as HTMLElement).outerHTML ?? (node as Text).nodeValue;
+
 		defineNodeContextMetadata(node, component);
 
 		this._setTracks();
@@ -76,7 +74,7 @@ export class NodeTrack {
 
 					let val = handler.parseValue(directive.value, directive.prop);
 					extractExecutableSnippetFromString(val).forEach((exc) => {
-						val = resolveExecutable(this.component, metadata.get(this.node).$context ?? {}, exc, val);
+						val = resolveExecutable(this.component, this.$context, exc, val);
 					});
 					
 					const value = evaluateStringInComponentContext(val, this.component, this.$context);
@@ -106,7 +104,7 @@ export class NodeTrack {
 
 			if (this.property?.executables.length) {
 				const newValue = this.property.executables.reduce((val, exc) => {
-					return resolveExecutable(this.component, metadata.get(this.node).$context ?? {}, exc, val);
+					return resolveExecutable(this.component, this.$context, exc, val);
 				}, this.property.value)
 
 
@@ -118,7 +116,7 @@ export class NodeTrack {
 			for (let {name, value, executables} of this.attributes) {
 				if (executables.length) {
 					let newValue = executables.reduce((val, exc) => {
-						return resolveExecutable(this.component, metadata.get(this.node).$context ?? {}, exc, val);
+						return resolveExecutable(this.component, this.$context, exc, val);
 					}, value)
 
 					const camelName = turnKebabToCamelCasing(name);
@@ -146,7 +144,7 @@ export class NodeTrack {
 	}
 
 	private _unTrackNode(node: Node) {
-		metadata.get(this.component).trackers.delete(node);
+		this.trackers.delete(node);
 		metadata.delete(node);
 		node.childNodes.forEach(n => this._unTrackNode(n))
 	}
@@ -274,45 +272,29 @@ export class NodeTrack {
 			return directiveNode;
 		}
 
-		if (!Array.isArray(directiveNode) && !(/[831]/.test(`${(directiveNode as Node).nodeType}`))) {
+		let dirIsArray = Array.isArray(directiveNode);
+
+		if (
+			(dirIsArray && !(directiveNode as Array<Element>).length) ||
+			(!dirIsArray && !(/[831]/.test(`${(directiveNode as Node).nodeType}`)))
+		) {
 			directiveNode = this._createDefaultAnchor();
+			dirIsArray = false;
 		}
 
 		const anchorIsArray = Array.isArray(this.anchor);
-		const dirIsArray = Array.isArray(directiveNode);
-		const anchorEl = document.createComment('')
+		const anchorEl = document.createComment('bfs')
 		let nextEl: Element | Comment | Text = anchorEl;
 
 		if (anchorIsArray) {
-			(this.anchor as Array<Element>)[0].parentNode?.insertBefore(nextEl, (this.anchor as Array<Element>)[0]);
+			(this.anchor as Array<Element>)[0]?.parentNode?.insertBefore(nextEl, (this.anchor as Array<Element>)[0]);
 		} else {
 			(this.anchor as HTMLElement).before(nextEl);
 		}
 
-		if (dirIsArray) {
-			for (let el of (directiveNode as Array<Element>)) {
-				if (!el.isConnected) {
-					nextEl.after(el);
-					trackNode(el, this.component, {
-						customSlot: this.component.customSlot,
-						customSlotChildNodes: Array.from(this.component.childNodes)
-					});
-				}
-
-				nextEl = el;
-			}
-		} else {
-			nextEl.after(directiveNode as Node);
-		}
-
-		anchorEl.parentNode?.removeChild(anchorEl);
-
 		if (anchorIsArray) {
 			for (let el of (this.anchor as Array<Element>)) {
-				if (!dirIsArray) {
-					el.parentNode?.removeChild(el);
-					this._unTrackNode(el);
-				} else if (!(directiveNode as Array<Element>).includes(el)) {
+				if (!dirIsArray || !(directiveNode as Array<Element>).includes(el)) {
 					el.parentNode?.removeChild(el);
 					this._unTrackNode(el);
 				}
@@ -320,6 +302,28 @@ export class NodeTrack {
 		} else if (this.anchor !== directiveNode) {
 			(this.anchor as Node).parentNode?.removeChild(this.anchor as Node);
 		}
+
+		if (dirIsArray) {
+			for (let el of (directiveNode as Array<Element>)) {
+				nextEl.after(el);
+				trackNode(el, this.component, {
+					customSlot: this.component.customSlot,
+					customSlotChildNodes: Array.from(this.component.childNodes),
+					trackers: this.trackers,
+				});
+
+				nextEl = el;
+			}
+		} else {
+			nextEl.after(directiveNode as Node);
+			trackNode(directiveNode as Node, this.component, {
+				customSlot: this.component.customSlot,
+				customSlotChildNodes: Array.from(this.component.childNodes),
+				trackers: this.trackers,
+			});
+		}
+
+		anchorEl.parentNode?.removeChild(anchorEl);
 
 		this.anchor = directiveNode;
 
