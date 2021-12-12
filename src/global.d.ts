@@ -8,6 +8,7 @@ export declare global {
 		customSlot?: boolean;
 		trackOnly?: boolean;
 		customSlotChildNodes?: Array<Node>;
+		trackers?: Map<Node, NodeTrack>;
 	}
 
 	export interface booleanAttributes {
@@ -63,7 +64,7 @@ export declare global {
 
 		parseValue: (value: string, prop: string | null) => string;
 		render: (val: any, options: directiveRenderOptions) => directiveRenderOptions['anchorNode'];
-		setContext: (node: Node, key: string, value: any) => void;
+		updateContext: (node: Node, ctx: ObjectLiteral) => void;
 		getContext(node: Node) {}
 
 		[key: string]: any;

@@ -19,9 +19,9 @@ export function defineNodeContextMetadata(node: Node, component: WebComponent) {
 		}
 	})
 
-	metadata.get(node).updateContext = (key: string, val: any) => {
-		ctx[key] = val;
-		metadata.get(component).trackers.get(node)?.updateNode();
-		node.childNodes.forEach(child => metadata.get(child)?.updateContext());
+	metadata.get(node).updateContext = (newCtx: ObjectLiteral) => {
+		if (typeof newCtx === 'object') {
+			ctx = {...ctx, ...newCtx};
+		}
 	}
 }

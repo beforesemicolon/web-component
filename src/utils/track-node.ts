@@ -8,7 +8,7 @@ export function trackNode(node: Node | HTMLElement | DocumentFragment, component
 	// ready to do anything it needs and also prevent it from being tracked again.
 	// Also, scripts and comments are ignored since comments is never seen and script tags
 	// contain logic inside that does not need any tracking because it may cause issues
-	if (metadata.get(node)?.tracked || /#comment|SCRIPT/.test(node.nodeName)) {
+	if (metadata.get(node)?.tracked || /#comment|SCRIPT/.test(node.nodeName) || (node.nodeName === '#text' && !node.nodeValue?.trim())) {
 		return;
 	}
 
@@ -36,11 +36,16 @@ export function trackNode(node: Node | HTMLElement | DocumentFragment, component
 			const isElement = nodeType === 1;
 			const isTextNode = !isElement && nodeName === '#text';
 			const isRepeatedNode = isElement && (node as HTMLElement).hasAttribute('repeat');
-			
+
+			if (!metadata.has(node)) {
+				metadata.set(node, {tracked: true});
+			}
+
 			if (isElement || (isTextNode && nodeValue?.trim())) {
-				const track = new NodeTrack(node, component as WebComponent);
+				const track: NodeTrack = new NodeTrack(node, component as WebComponent);
 				if (!track.empty) {
-					metadata.get(component).trackers.set(node, track);
+					// @ts-ignore
+					opt.trackers?.set(node, track);
 					trackOnly = !trackOnly && track.updateNode() !== node;
 				}
 			}
