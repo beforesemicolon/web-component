@@ -1,18 +1,18 @@
 import {metadata} from "../metadata";
 import {NodeTrack} from "../node-track";
+import {defineNodeContextMetadata} from "./define-node-context-metadata";
 
-export function trackNode(node: Node | HTMLElement | DocumentFragment, component: WebComponent, opt: trackerOptions = {}) {
-	// it is possible that the node is already rendered by the parent component
-	// and then picked up by the child component via slot
-	// in that case we do not need to render it again since it will already be
-	// ready to do anything it needs and also prevent it from being tracked again.
-	// Also, scripts and comments are ignored since comments is never seen and script tags
-	// contain logic inside that does not need any tracking because it may cause issues
-	if (metadata.get(node)?.tracked || /#comment|SCRIPT/.test(node.nodeName) || (node.nodeName === '#text' && !node.nodeValue?.trim())) {
+export function trackNode(node: Node | HTMLElement | DocumentFragment, component: WebComponent, opt: trackerOptions) {
+	const {nodeName, nodeValue, childNodes, nodeType} = node;
+
+	if (!metadata.has(node)) {
+		metadata.set(node, {});
+	}
+
+	if (/#comment|SCRIPT/.test(nodeName) || (nodeName === '#text' && !nodeValue?.trim())) {
 		return;
 	}
 
-	const {nodeName, nodeValue, childNodes, nodeType} = node;
 	let {customSlot = false, customSlotChildNodes = [], trackOnly = false} = opt
 	
 	if (nodeName === 'SLOT') {
@@ -37,28 +37,28 @@ export function trackNode(node: Node | HTMLElement | DocumentFragment, component
 			const isTextNode = !isElement && nodeName === '#text';
 			const isRepeatedNode = isElement && (node as HTMLElement).hasAttribute('repeat');
 
-			if (!metadata.has(node)) {
-				metadata.set(node, {tracked: true});
-			}
+			defineNodeContextMetadata(node);
 
 			if (isElement || (isTextNode && nodeValue?.trim())) {
-				const track: NodeTrack = new NodeTrack(node, component as WebComponent);
+				const track: NodeTrack = new NodeTrack(node, component);
 				if (!track.empty) {
-					// @ts-ignore
-					opt.trackers?.set(node, track);
-					trackOnly = !trackOnly && track.updateNode() !== node;
+					metadata.get(node).track = track;
+
+					if (!trackOnly && track.updateNode(trackOnly) !== node) {
+						return;
+					}
 				}
 			}
 			
 			if (
 				isRepeatedNode ||
-				/#text|TEXTAREA|STYLE/.test(nodeName)
+				/#text|TEXTAREA|STYLE/.test(node.nodeName)
 			) {
 				return;
 			}
 		}
 		
-		Array.from(childNodes).forEach(child => trackNode(child, component, {...opt, trackOnly}));
+		Array.from(node.childNodes).forEach(child => trackNode(child, component, opt));
 	}
 }
 

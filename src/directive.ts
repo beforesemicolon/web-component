@@ -32,7 +32,7 @@ export class Directive {
 	}
 
 	updateContext(node: Node, newCtx: ObjectLiteral) {
-		defineNodeContextMetadata(node, metadata.get(this).component);
+		defineNodeContextMetadata(node);
 		metadata.get(node)?.updateContext(newCtx);
 	}
 }

@@ -10,10 +10,8 @@ import {turnCamelToKebabCasing} from './utils/turn-camel-to-kebab-casing';
 import {turnKebabToCamelCasing} from './utils/turn-kebab-to-camel-casing';
 import {getStyleString} from './utils/get-style-string';
 import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
-import {NodeTrack} from './node-track';
 import {trackNode} from "./utils/track-node";
 import {jsonParse} from "./utils/json-parse";
-import {defineNodeContextMetadata} from "./utils/define-node-context-metadata";
 
 /**
  * a extension on the native web component API to simplify and automate most of the pain points
@@ -29,7 +27,6 @@ export class WebComponent extends HTMLElement {
 
 		metadata.set(this, {
 			root: this,
-			trackers: new Map(),
 			mounted: false,
 			parsed: false,
 			context: {},
@@ -260,8 +257,7 @@ export class WebComponent extends HTMLElement {
 
 				trackNode(contentNode, this, {
 					customSlot: this.customSlot,
-					customSlotChildNodes: this.customSlot ? childNodes : [],
-					trackers: metadata.get(this).trackers,
+					customSlotChildNodes: this.customSlot ? childNodes : []
 				});
 
 				const {tagName, mode} = (this.constructor as WebComponentConstructor);
@@ -345,9 +341,21 @@ export class WebComponent extends HTMLElement {
 	 * updates any already tracked node with current component data including context and node level data.
 	 */
 	forceUpdate() {
-		metadata.get(this).trackers.forEach((track: NodeTrack) => {
-			track.updateNode()
-		});
+		(function update(nodes: NodeListOf<ChildNode> | Array<ChildNode>) {
+			Array.from(nodes).forEach(c => {
+				const res = (metadata.get(metadata.get(c).shadowNode || c)).track?.updateNode();
+
+				if (res) {
+					if (Array.isArray(res)) {
+						res.forEach(r => update(r.childNodes));
+					} else {
+						update(res.childNodes);
+					}
+				} else {
+					update(c.childNodes);
+				}
+			})
+		})(((this.root || this).childNodes));
 
 		return true;
 	}

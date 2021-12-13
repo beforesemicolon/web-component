@@ -6,7 +6,6 @@ import {getEventHandlerFunction} from "./utils/get-event-handler-function";
 import {directiveRegistry} from './directives/registry';
 import {evaluateStringInComponentContext} from "./utils/evaluate-string-in-component-context";
 import {metadata} from "./metadata";
-import {defineNodeContextMetadata} from "./utils/define-node-context-metadata";
 import {trackNode} from "./utils/track-node";
 import {jsonParse} from "./utils/json-parse";
 
@@ -35,7 +34,6 @@ export class NodeTrack {
 	readonly component: WebComponent;
 	anchor: HTMLElement | Node | Comment | Array<Element>;
 	empty = false;
-	trackers = new Map();
 	readonly dirAnchors = new WeakMap();
 
 	constructor(node: HTMLElement | Node, component: WebComponent) {
@@ -43,28 +41,18 @@ export class NodeTrack {
 		this.anchor = node;
 		this.component = component;
 
-		// whether or not the node was replaced by another on render
-		metadata.get(this.node).shadowed = false;
 		metadata.get(this.node).rawNodeString = (node as HTMLElement).outerHTML ?? (node as Text).nodeValue;
-
-		defineNodeContextMetadata(node, component);
 
 		this._setTracks();
 	}
 
 	get $context() {
-		return metadata.get(this.node).$context;
+		return (this.anchor === this.node
+			? metadata.get(this.node).$context
+			: metadata.get(Array.isArray(this.anchor) ? this.anchor[0] : this.anchor)?.$context) || {};
 	}
 
-	updateNode() {
-		// if a node was rendered before(handled by the render function)
-		// and no longer has a parent(removed from the DOM)
-		// and it is is not being shadowed(temporarily removed from the DOM by a directive)
-		// the node no longer needs to be tracked so it can be discarded
-		if (metadata.get(this.node).tracked && !this.node.parentNode && !metadata.get(this.node).shadowed) {
-			return this._unTrackNode(this.node);
-		}
-
+	updateNode(trackOnly = true) {
 		let directiveNode: any = this.node;
 
 		for (let directive of this.directives) {
@@ -76,7 +64,7 @@ export class NodeTrack {
 					extractExecutableSnippetFromString(val).forEach((exc) => {
 						val = resolveExecutable(this.component, this.$context, exc, val);
 					});
-					
+
 					const value = evaluateStringInComponentContext(val, this.component, this.$context);
 					directiveNode = handler.render(value, {
 						element: this.node,
@@ -98,15 +86,12 @@ export class NodeTrack {
 		}
 
 		if (directiveNode === this.node) {
-			metadata.get(this.node).shadowed = false;
-
-			this.anchor = this._switchNodeAndAnchor(directiveNode);
+			this.anchor = this._switchNodeAndAnchor(directiveNode, trackOnly);
 
 			if (this.property?.executables.length) {
 				const newValue = this.property.executables.reduce((val, exc) => {
 					return resolveExecutable(this.component, this.$context, exc, val);
 				}, this.property.value)
-
 
 				if (newValue !== (this.node as ObjectLiteral)[this.property.name]) {
 					(this.node as ObjectLiteral)[this.property.name] = newValue;
@@ -133,24 +118,15 @@ export class NodeTrack {
 				}
 			}
 
-			return this.node;
+		} else {
+			this.anchor = this._switchNodeAndAnchor(directiveNode, trackOnly);
 		}
 
-		metadata.get(this.node).shadowed = true;
-
-		this.anchor = this._switchNodeAndAnchor(directiveNode);
-		
 		return directiveNode;
 	}
 
-	private _unTrackNode(node: Node) {
-		this.trackers.delete(node);
-		metadata.delete(node);
-		node.childNodes.forEach(n => this._unTrackNode(n))
-	}
-
 	private _setTracks() {
-		const {nodeName, nodeValue, textContent, attributes} =  this.node as HTMLElement;
+		const {nodeName, nodeValue, textContent, attributes} = this.node as HTMLElement;
 		const eventHandlers: Array<EventHandlerTrack> = [];
 
 		if (nodeName === '#text') {
@@ -267,18 +243,18 @@ export class NodeTrack {
 		return document.createComment(` ${this.node.nodeValue ?? (this.node as HTMLElement).outerHTML} `)
 	}
 
-	private _switchNodeAndAnchor(directiveNode: HTMLElement | Node | Comment | Array<Element>) {
-		if (directiveNode === this.anchor) {
-			return directiveNode;
+	private _switchNodeAndAnchor(dirNode: HTMLElement | Node | Comment | Array<Element>, trackOnly = true) {
+		if (dirNode === this.anchor) {
+			return dirNode;
 		}
 
-		let dirIsArray = Array.isArray(directiveNode);
+		let dirIsArray = Array.isArray(dirNode);
 
 		if (
-			(dirIsArray && !(directiveNode as Array<Element>).length) ||
-			(!dirIsArray && !(/[831]/.test(`${(directiveNode as Node).nodeType}`)))
+			(dirIsArray && !(dirNode as Array<Element>).length) ||
+			(!dirIsArray && !(/[831]/.test(`${(dirNode as Node).nodeType}`)))
 		) {
-			directiveNode = this._createDefaultAnchor();
+			dirNode = this._createDefaultAnchor();
 			dirIsArray = false;
 		}
 
@@ -292,41 +268,45 @@ export class NodeTrack {
 			(this.anchor as HTMLElement).before(nextEl);
 		}
 
-		if (anchorIsArray) {
-			for (let el of (this.anchor as Array<Element>)) {
-				if (!dirIsArray || !(directiveNode as Array<Element>).includes(el)) {
-					el.parentNode?.removeChild(el);
-					this._unTrackNode(el);
-				}
-			}
-		} else if (this.anchor !== directiveNode) {
-			(this.anchor as Node).parentNode?.removeChild(this.anchor as Node);
-		}
-
 		if (dirIsArray) {
-			for (let el of (directiveNode as Array<Element>)) {
-				nextEl.after(el);
-				trackNode(el, this.component, {
-					customSlot: this.component.customSlot,
-					customSlotChildNodes: Array.from(this.component.childNodes),
-					trackers: this.trackers,
-				});
+			for (let el of (dirNode as Array<Element>)) {
+				if (!el.isConnected) {
+					nextEl.after(el);
+					trackNode(el, this.component, {
+						customSlot: this.component.customSlot,
+						customSlotChildNodes: Array.from(this.component.childNodes),
+						trackOnly
+					});
+					metadata.get(el).shadowNode = this.node;
+				}
 
 				nextEl = el;
 			}
 		} else {
-			nextEl.after(directiveNode as Node);
-			trackNode(directiveNode as Node, this.component, {
+			nextEl.after(dirNode as Node);
+			trackNode(dirNode as Node, this.component, {
 				customSlot: this.component.customSlot,
 				customSlotChildNodes: Array.from(this.component.childNodes),
-				trackers: this.trackers,
+				trackOnly
 			});
+			metadata.get(dirNode).shadowNode = this.node;
 		}
+
+		if (anchorIsArray) {
+			for (let el of (this.anchor as Array<Element>)) {
+				if (!dirIsArray || !(dirNode as Array<Element>).includes(el)) {
+					el.parentNode?.removeChild(el);
+				}
+			}
+		} else if (this.anchor !== dirNode) {
+			(this.anchor as Node).parentNode?.removeChild(this.anchor as Node);
+		}
+
 
 		anchorEl.parentNode?.removeChild(anchorEl);
 
-		this.anchor = directiveNode;
+		this.anchor = dirNode;
 
-		return directiveNode;
+		return dirNode;
 	}
 }
