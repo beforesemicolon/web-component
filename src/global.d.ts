@@ -1,5 +1,4 @@
 import {ShadowRootModeExtended} from './enums/ShadowRootModeExtended.enum';
-import {directiveRegistry} from "./directives/registry";
 
 export declare global {
 	export type onUpdateCallback = (property: string, oldValue: unknown, newValue: unknown) => void;
@@ -8,7 +7,6 @@ export declare global {
 		customSlot?: boolean;
 		trackOnly?: boolean;
 		customSlotChildNodes?: Array<Node>;
-		trackers?: Map<Node, NodeTrack>;
 	}
 
 	export interface booleanAttributes {
@@ -34,7 +32,6 @@ export declare global {
 			executables: Array<Executable>;
 		}>;
 		directives: Array<DirectiveValue>;
-		eventHandlers: Array<EventHandlerTrack>;
 		property: null | {
 			name: string;
 			value: string;
@@ -91,7 +88,6 @@ export declare global {
 	
 	export interface WebComponentMetadata {
 		root: WebComponent | ShadowRoot;
-		trackers: Map;
 		mounted: boolean;
 		parsed: boolean;
 		context: object;

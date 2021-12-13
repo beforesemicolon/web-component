@@ -1,6 +1,6 @@
 import {metadata} from "../metadata";
 
-export function defineNodeContextMetadata(node: Node, component: WebComponent) {
+export function defineNodeContextMetadata(node: Node) {
 	if (metadata.get(node)?.$context) {
 		return;
 	}
