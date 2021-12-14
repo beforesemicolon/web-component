@@ -89,7 +89,6 @@ export declare global {
 		root: WebComponent | ShadowRoot;
 		mounted: boolean;
 		parsed: boolean;
-		context: object;
 		contextSource: WebComponent | null;
 		contextSubscribers: Array<(ctx: object) => void>;
 		unsubscribeCtx: (ctx: object) => void;

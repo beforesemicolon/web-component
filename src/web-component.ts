@@ -13,6 +13,7 @@ import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
 import {trackNode} from "./utils/track-node";
 import {jsonParse} from "./utils/json-parse";
 import {deepUpdateNode} from "./utils/deep-update-node";
+import {defineNodeContextMetadata} from "./utils/define-node-context-metadata";
 
 /**
  * a extension on the native web component API to simplify and automate most of the pain points
@@ -27,16 +28,18 @@ export class WebComponent extends HTMLElement {
 	constructor() {
 		super();
 
-		$.set(this, {
-			root: this,
-			mounted: false,
-			parsed: false,
-			context: {},
-			contextSource: null,
-			contextSubscribers: [],
-			unsubscribeCtx: () => {
-			},
-		} as WebComponentMetadata);
+		if (!$.has(this)) {
+		   defineNodeContextMetadata(this)
+		}
+
+		const meta = $.get(this);
+
+		meta.root = this;
+		meta.mounted = false;
+		meta.parsed = false;
+		meta.contextSource = null;
+		meta.contextSubscribers = [];
+		meta.unsubscribeCtx = () => {};
 
 		// @ts-ignore
 		let {mode, observedAttributes, delegatesFocus, initialContext} = this.constructor;
@@ -45,7 +48,7 @@ export class WebComponent extends HTMLElement {
 			$.get(this).root = this.attachShadow({mode, delegatesFocus});
 		}
 
-		$.get(this).context = initialContext;
+		$.get(this).updateContext(initialContext);
 
 		this.$properties.push(
 			...setComponentPropertiesFromObservedAttributes(this, observedAttributes,
@@ -179,7 +182,10 @@ export class WebComponent extends HTMLElement {
 	get $context(): ObjectLiteral {
 		// make sure the subscribe method is part of the prototype
 		// so it is hidden unless the prototype is checked
-		return Object.setPrototypeOf({...$.get(this).contextSource?.$context, ...$.get(this).context}, {
+		return Object.setPrototypeOf({
+			...$.get(this).contextSource?.$context, // context from the nearest ancestor component
+			...$.get(this).$context, // context from the component node itself
+		}, {
 			subscribe: ctxSubscriberHandler($.get(this).contextSubscribers),
 		});
 	}
@@ -189,11 +195,11 @@ export class WebComponent extends HTMLElement {
 	}
 
 	updateContext(ctx: ObjectLiteral) {
-		$.get(this).context = {...$.get(this).context, ...ctx};
+		$.get(this).updateContext(ctx);
 
 		if (this.mounted) {
 			this.forceUpdate();
-			$.get(this).contextSubscribers.forEach((cb: (ctx: {}) => void) => cb($.get(this).context));
+			$.get(this).contextSubscribers.forEach((cb: (ctx: {}) => void) => cb($.get(this).$context));
 		}
 	}
 
@@ -209,7 +215,7 @@ export class WebComponent extends HTMLElement {
 					this.forceUpdate();
 
 					if (this.mounted) {
-						this.onUpdate('$context', $.get(this).context, newContext)
+						this.onUpdate('$context', $.get(this).$context, newContext)
 					}
 
 					$.get(this).contextSubscribers.forEach((cb: (ctx: {}) => void) => cb(newContext));
