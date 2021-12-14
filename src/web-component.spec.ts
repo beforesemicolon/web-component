@@ -1012,6 +1012,8 @@ describe('WebComponent', () => {
 
 				expect(s.root?.innerHTML).toBe('<!-- if: false --><p>lorem</p><!-- if: false -->');
 			});
+
+			it.todo('should handle nested component ifs')
 		});
 
 		describe('should handle repeat', () => {
@@ -1270,6 +1272,8 @@ describe('WebComponent', () => {
 
 				expect(s.root?.innerHTML).toBe('<p>2</p><p>4</p><p>6</p><p>2</p><p>4</p><p>6</p>')
 			});
+
+			it.todo('should handle nested component repeats')
 		});
 
 		describe('should allow mix of hashed attributes', () => {
