@@ -2,7 +2,7 @@
 // anything later on
 import './directives';
 import booleanAttr from './utils/boolean-attributes.json';
-import {metadata} from "./metadata";
+import {$} from "./metadata";
 import {parse} from './utils/parse';
 import {setComponentPropertiesFromObservedAttributes} from './utils/set-component-properties-from-observed-attributes';
 import {setupComponentPropertiesForAutoUpdate} from './utils/setup-component-properties-for-auto-update';
@@ -27,7 +27,7 @@ export class WebComponent extends HTMLElement {
 	constructor() {
 		super();
 
-		metadata.set(this, {
+		$.set(this, {
 			root: this,
 			mounted: false,
 			parsed: false,
@@ -42,10 +42,10 @@ export class WebComponent extends HTMLElement {
 		let {mode, observedAttributes, delegatesFocus, initialContext} = this.constructor;
 
 		if (mode !== 'none') {
-			metadata.get(this).root = this.attachShadow({mode, delegatesFocus});
+			$.get(this).root = this.attachShadow({mode, delegatesFocus});
 		}
 
-		metadata.get(this).context = initialContext;
+		$.get(this).context = initialContext;
 
 		this.$properties.push(
 			...setComponentPropertiesFromObservedAttributes(this, observedAttributes,
@@ -149,7 +149,7 @@ export class WebComponent extends HTMLElement {
 	 * @returns {*}
 	 */
 	get root(): HTMLElement | ShadowRoot | null {
-		return (this.constructor as WebComponentConstructor).mode === 'closed' ? null : metadata.get(this).root;
+		return (this.constructor as WebComponentConstructor).mode === 'closed' ? null : $.get(this).root;
 	}
 
 	/**
@@ -157,7 +157,7 @@ export class WebComponent extends HTMLElement {
 	 * @returns {boolean}
 	 */
 	get mounted() {
-		return metadata.get(this).mounted;
+		return $.get(this).mounted;
 	}
 
 	/**
@@ -179,40 +179,40 @@ export class WebComponent extends HTMLElement {
 	get $context(): ObjectLiteral {
 		// make sure the subscribe method is part of the prototype
 		// so it is hidden unless the prototype is checked
-		return Object.setPrototypeOf({...metadata.get(this).contextSource?.$context, ...metadata.get(this).context}, {
-			subscribe: ctxSubscriberHandler(metadata.get(this).contextSubscribers),
+		return Object.setPrototypeOf({...$.get(this).contextSource?.$context, ...$.get(this).context}, {
+			subscribe: ctxSubscriberHandler($.get(this).contextSubscribers),
 		});
 	}
 
 	get parsed() {
-		return metadata.get(this).parsed;
+		return $.get(this).parsed;
 	}
 
 	updateContext(ctx: ObjectLiteral) {
-		metadata.get(this).context = {...metadata.get(this).context, ...ctx};
+		$.get(this).context = {...$.get(this).context, ...ctx};
 
 		if (this.mounted) {
 			this.forceUpdate();
-			metadata.get(this).contextSubscribers.forEach((cb: (ctx: {}) => void) => cb(metadata.get(this).context));
+			$.get(this).contextSubscribers.forEach((cb: (ctx: {}) => void) => cb($.get(this).context));
 		}
 	}
 
 	connectedCallback() {
-		const {parsed} = metadata.get(this);
+		const {parsed} = $.get(this);
 		try {
 			// @ts-ignore
-			metadata.get(this).contextSource = getClosestWebComponentAncestor(this);
+			$.get(this).contextSource = getClosestWebComponentAncestor(this);
 
-			if (metadata.get(this).contextSource) {
+			if ($.get(this).contextSource) {
 				// force update the component if the ancestor context gets updated as well
-				metadata.get(this).unsubscribeCtx = metadata.get(this).contextSource.$context.subscribe((newContext: ObjectLiteral) => {
+				$.get(this).unsubscribeCtx = $.get(this).contextSource.$context.subscribe((newContext: ObjectLiteral) => {
 					this.forceUpdate();
 
 					if (this.mounted) {
-						this.onUpdate('$context', metadata.get(this).context, newContext)
+						this.onUpdate('$context', $.get(this).context, newContext)
 					}
 
-					metadata.get(this).contextSubscribers.forEach((cb: (ctx: {}) => void) => cb(newContext));
+					$.get(this).contextSubscribers.forEach((cb: (ctx: {}) => void) => cb(newContext));
 				})
 			}
 
@@ -277,11 +277,11 @@ export class WebComponent extends HTMLElement {
 					})
 				}
 
-				metadata.get(this).parsed = true;
-				metadata.get(this).root.appendChild(contentNode);
+				$.get(this).parsed = true;
+				$.get(this).root.appendChild(contentNode);
 			}
 
-			metadata.get(this).mounted = true;
+			$.get(this).mounted = true;
 			this.onMount();
 		} catch (e) {
 			this.onError(e as ErrorEvent);
@@ -296,9 +296,9 @@ export class WebComponent extends HTMLElement {
 
 	disconnectedCallback() {
 		try {
-			metadata.get(this).contextSource = null;
-			metadata.get(this).mounted = false;
-			metadata.get(this).unsubscribeCtx();
+			$.get(this).contextSource = null;
+			$.get(this).mounted = false;
+			$.get(this).unsubscribeCtx();
 			this.onDestroy();
 		} catch (e) {
 			this.onError(e as Error)

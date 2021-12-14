@@ -1,4 +1,4 @@
-import {metadata} from "../metadata";
+import {$} from "../metadata";
 import {NodeTrack} from "../node-track";
 import {defineNodeContextMetadata} from "./define-node-context-metadata";
 
@@ -8,7 +8,7 @@ export function trackNode(node: Node | HTMLElement | DocumentFragment, component
 
 	defineNodeContextMetadata(node);
 
-	if (metadata.get(node).shadowNode || /#comment|SCRIPT/.test(nodeName) || (nodeName === '#text' && !nodeValue?.trim())) {
+	if (/#comment|SCRIPT/.test(nodeName) || (nodeName === '#text' && !nodeValue?.trim())) {
 		return;
 	}
 
@@ -32,14 +32,10 @@ export function trackNode(node: Node | HTMLElement | DocumentFragment, component
 	} else {
 		// avoid fragments
 		if (nodeType !== 11) {
-			const isElement = nodeType === 1;
-			const isTextNode = !isElement && nodeName === '#text';
-			const isRepeatedNode = isElement && (node as HTMLElement).hasAttribute('repeat');
-
-			if (isElement || (isTextNode && nodeValue?.trim())) {
+			if (nodeType === 1 || nodeName === '#text') {
 				const track: NodeTrack = new NodeTrack(node, component);
 				if (!track.empty) {
-					metadata.get(node).track = track;
+					$.get(node).track = track;
 
 					if (track.updateNode() !== node) {
 						return;
@@ -47,15 +43,12 @@ export function trackNode(node: Node | HTMLElement | DocumentFragment, component
 				}
 			}
 			
-			if (
-				isRepeatedNode ||
-				/#text|TEXTAREA|STYLE/.test(node.nodeName)
-			) {
+			if (/#text|TEXTAREA|STYLE/.test(nodeName)) {
 				return;
 			}
 		}
 		
-		Array.from(node.childNodes).forEach(child => trackNode(child, component, opt));
+		Array.from(childNodes).forEach(c => trackNode(c, component, opt));
 	}
 }
 
