@@ -8,6 +8,7 @@ import {evaluateStringInComponentContext} from "./utils/evaluate-string-in-compo
 import {metadata} from "./metadata";
 import {trackNode} from "./utils/track-node";
 import {jsonParse} from "./utils/json-parse";
+import {deepUpdateNode} from "./utils/deep-update-node";
 
 /**
  * handles all logic related to tracking and updating a tracked node.
@@ -49,10 +50,10 @@ export class NodeTrack {
 	get $context() {
 		return (this.anchor === this.node
 			? metadata.get(this.node).$context
-			: metadata.get(Array.isArray(this.anchor) ? this.anchor[0] : this.anchor)?.$context) || {};
+			: metadata.get((this.anchor as Array<Element>)[0] ?? this.anchor)?.$context) || {};
 	}
 
-	updateNode(trackOnly = true) {
+	updateNode() {
 		let directiveNode: any = this.node;
 
 		for (let directive of this.directives) {
@@ -86,7 +87,7 @@ export class NodeTrack {
 		}
 
 		if (directiveNode === this.node) {
-			this.anchor = this._switchNodeAndAnchor(directiveNode, trackOnly);
+			this.anchor = this._switchNodeAndAnchor(directiveNode);
 
 			if (this.property?.executables.length) {
 				const newValue = this.property.executables.reduce((val, exc) => {
@@ -119,7 +120,7 @@ export class NodeTrack {
 			}
 
 		} else {
-			this.anchor = this._switchNodeAndAnchor(directiveNode, trackOnly);
+			this.anchor = this._switchNodeAndAnchor(directiveNode);
 		}
 
 		return directiveNode;
@@ -243,7 +244,7 @@ export class NodeTrack {
 		return document.createComment(` ${this.node.nodeValue ?? (this.node as HTMLElement).outerHTML} `)
 	}
 
-	private _switchNodeAndAnchor(dirNode: HTMLElement | Node | Comment | Array<Element>, trackOnly = true) {
+	private _switchNodeAndAnchor(dirNode: HTMLElement | Node | Comment | Array<Element>) {
 		if (dirNode === this.anchor) {
 			return dirNode;
 		}
@@ -270,12 +271,14 @@ export class NodeTrack {
 
 		if (dirIsArray) {
 			for (let el of (dirNode as Array<Element>)) {
-				if (!el.isConnected) {
+				if (el.isConnected) {
+					metadata.get(el).track?.updateNode();
+					el.childNodes.forEach(c => deepUpdateNode(c, this.component))
+				} else {
 					nextEl.after(el);
 					trackNode(el, this.component, {
 						customSlot: this.component.customSlot,
-						customSlotChildNodes: Array.from(this.component.childNodes),
-						trackOnly
+						customSlotChildNodes: this.component.customSlot ? this.component._childNodes : []
 					});
 					metadata.get(el).shadowNode = this.node;
 				}
@@ -284,12 +287,22 @@ export class NodeTrack {
 			}
 		} else {
 			nextEl.after(dirNode as Node);
-			trackNode(dirNode as Node, this.component, {
-				customSlot: this.component.customSlot,
-				customSlotChildNodes: Array.from(this.component.childNodes),
-				trackOnly
-			});
-			metadata.get(dirNode).shadowNode = this.node;
+
+			if (metadata.has(dirNode)) {
+				const {track, shadowNode} = metadata.get(dirNode);
+
+				if (dirNode !== this.node && !shadowNode) {
+					track?.updateNode();
+				}
+
+				(dirNode as Node).childNodes.forEach(c => deepUpdateNode(c, this.component))
+			} else {
+				trackNode(dirNode as Node, this.component, {
+					customSlot: this.component.customSlot,
+					customSlotChildNodes: this.component.customSlot ? this.component._childNodes : []
+				});
+				metadata.get(dirNode).shadowNode = this.node;
+			}
 		}
 
 		if (anchorIsArray) {
@@ -301,7 +314,6 @@ export class NodeTrack {
 		} else if (this.anchor !== dirNode) {
 			(this.anchor as Node).parentNode?.removeChild(this.anchor as Node);
 		}
-
 
 		anchorEl.parentNode?.removeChild(anchorEl);
 

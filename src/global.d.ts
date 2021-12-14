@@ -5,7 +5,6 @@ export declare global {
 	
 	export interface trackerOptions {
 		customSlot?: boolean;
-		trackOnly?: boolean;
 		customSlotChildNodes?: Array<Node>;
 	}
 
@@ -117,6 +116,7 @@ export declare global {
 		readonly $context: ObjectLiteral;
 		readonly $refs: Refs;
 		readonly $properties: Array<string>;
+		readonly _childNodes: Array<Node>;
 
 		updateContext: (ctx: ObjectLiteral) => void;
 

@@ -3,17 +3,16 @@ import {NodeTrack} from "../node-track";
 import {defineNodeContextMetadata} from "./define-node-context-metadata";
 
 export function trackNode(node: Node | HTMLElement | DocumentFragment, component: WebComponent, opt: trackerOptions) {
+
 	const {nodeName, nodeValue, childNodes, nodeType} = node;
 
-	if (!metadata.has(node)) {
-		metadata.set(node, {});
-	}
+	defineNodeContextMetadata(node);
 
-	if (/#comment|SCRIPT/.test(nodeName) || (nodeName === '#text' && !nodeValue?.trim())) {
+	if (metadata.get(node).shadowNode || /#comment|SCRIPT/.test(nodeName) || (nodeName === '#text' && !nodeValue?.trim())) {
 		return;
 	}
 
-	let {customSlot = false, customSlotChildNodes = [], trackOnly = false} = opt
+	let {customSlot = false, customSlotChildNodes = []} = opt
 	
 	if (nodeName === 'SLOT') {
 		if (customSlot) {
@@ -37,14 +36,12 @@ export function trackNode(node: Node | HTMLElement | DocumentFragment, component
 			const isTextNode = !isElement && nodeName === '#text';
 			const isRepeatedNode = isElement && (node as HTMLElement).hasAttribute('repeat');
 
-			defineNodeContextMetadata(node);
-
 			if (isElement || (isTextNode && nodeValue?.trim())) {
 				const track: NodeTrack = new NodeTrack(node, component);
 				if (!track.empty) {
 					metadata.get(node).track = track;
 
-					if (!trackOnly && track.updateNode(trackOnly) !== node) {
+					if (track.updateNode() !== node) {
 						return;
 					}
 				}

@@ -12,6 +12,7 @@ import {getStyleString} from './utils/get-style-string';
 import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
 import {trackNode} from "./utils/track-node";
 import {jsonParse} from "./utils/json-parse";
+import {deepUpdateNode} from "./utils/deep-update-node";
 
 /**
  * a extension on the native web component API to simplify and automate most of the pain points
@@ -21,6 +22,7 @@ export class WebComponent extends HTMLElement {
 	readonly $refs: Refs = {};
 	$properties: Array<string> = ['$context', '$refs'];
 	templateId = '';
+	_childNodes: Array<Node> = [];
 
 	constructor() {
 		super();
@@ -90,7 +92,7 @@ export class WebComponent extends HTMLElement {
 	 * the initial context data for the component
 	 */
 	static initialContext = {};
-	
+
 	/**
 	 * parses special template HTML string taking in consideration
 	 * all the additional syntax specific to this framework
@@ -239,25 +241,24 @@ export class WebComponent extends HTMLElement {
 				const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
 				const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
 				let temp: string = this.template;
-				
+
 				if (!temp && this.templateId) {
 					const t = document.getElementById(this.templateId);
-					
+
 					temp = t?.nodeName === 'TEMPLATE' ? t.innerHTML : temp;
 				}
 
 				contentNode = parse(style + temp);
 
-				let childNodes: Array<Node> = [];
+				this._childNodes = Array.from(this.childNodes);
 
 				if (this.customSlot) {
-					childNodes = Array.from(this.childNodes);
 					this.innerHTML = '';
 				}
 
 				trackNode(contentNode, this, {
 					customSlot: this.customSlot,
-					customSlotChildNodes: this.customSlot ? childNodes : []
+					customSlotChildNodes: this.customSlot ? this._childNodes : []
 				});
 
 				const {tagName, mode} = (this.constructor as WebComponentConstructor);
@@ -341,22 +342,7 @@ export class WebComponent extends HTMLElement {
 	 * updates any already tracked node with current component data including context and node level data.
 	 */
 	forceUpdate() {
-		(function update(nodes: NodeListOf<ChildNode> | Array<ChildNode>) {
-			Array.from(nodes).forEach(c => {
-				const res = (metadata.get(metadata.get(c).shadowNode || c)).track?.updateNode();
-
-				if (res) {
-					if (Array.isArray(res)) {
-						res.forEach(r => update(r.childNodes));
-					} else {
-						update(res.childNodes);
-					}
-				} else {
-					update(c.childNodes);
-				}
-			})
-		})(((this.root || this).childNodes));
-
+		(this.root || this).childNodes.forEach(n => deepUpdateNode(n, this))
 		return true;
 	}
 
