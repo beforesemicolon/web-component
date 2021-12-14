@@ -5,7 +5,7 @@ import {resolveExecutable} from "./utils/resolve-executable";
 import {getEventHandlerFunction} from "./utils/get-event-handler-function";
 import {directiveRegistry} from './directives/registry';
 import {evaluateStringInComponentContext} from "./utils/evaluate-string-in-component-context";
-import {metadata} from "./metadata";
+import {$} from "./metadata";
 import {trackNode} from "./utils/track-node";
 import {jsonParse} from "./utils/json-parse";
 import {deepUpdateNode} from "./utils/deep-update-node";
@@ -42,15 +42,15 @@ export class NodeTrack {
 		this.anchor = node;
 		this.component = component;
 
-		metadata.get(this.node).rawNodeString = (node as HTMLElement).outerHTML ?? (node as Text).nodeValue;
+		$.get(this.node).rawNodeString = (node as HTMLElement).outerHTML ?? (node as Text).nodeValue;
 
 		this._setTracks();
 	}
 
 	get $context() {
 		return (this.anchor === this.node
-			? metadata.get(this.node).$context
-			: metadata.get((this.anchor as Array<Element>)[0] ?? this.anchor)?.$context) || {};
+			? $.get(this.node).$context
+			: $.get((this.anchor as Array<Element>)[0] ?? this.anchor)?.$context) || {};
 	}
 
 	updateNode() {
@@ -70,7 +70,7 @@ export class NodeTrack {
 					directiveNode = handler.render(value, {
 						element: this.node,
 						anchorNode: this.dirAnchors.get(directive) ?? null,
-						rawElementOuterHTML: metadata.get(this.node).rawNodeString
+						rawElementOuterHTML: $.get(this.node).rawNodeString
 					} as directiveRenderOptions);
 
 					if (directiveNode !== this.node) {
@@ -79,7 +79,7 @@ export class NodeTrack {
 					}
 
 				} catch (e: any) {
-					this.component.onError(new Error(`"${directive.name}" on ${metadata.get(this.node).rawNodeString}: ${e.message}`));
+					this.component.onError(new Error(`"${directive.name}" on ${$.get(this.node).rawNodeString}: ${e.message}`));
 				}
 
 				this.dirAnchors.set(directive, null)
@@ -272,7 +272,7 @@ export class NodeTrack {
 		if (dirIsArray) {
 			for (let el of (dirNode as Array<Element>)) {
 				if (el.isConnected) {
-					metadata.get(el).track?.updateNode();
+					$.get(el).track?.updateNode();
 					el.childNodes.forEach(c => deepUpdateNode(c, this.component))
 				} else {
 					nextEl.after(el);
@@ -280,7 +280,7 @@ export class NodeTrack {
 						customSlot: this.component.customSlot,
 						customSlotChildNodes: this.component.customSlot ? this.component._childNodes : []
 					});
-					metadata.get(el).shadowNode = this.node;
+					$.get(el).shadowNode = this.node;
 				}
 
 				nextEl = el;
@@ -288,8 +288,8 @@ export class NodeTrack {
 		} else {
 			nextEl.after(dirNode as Node);
 
-			if (metadata.has(dirNode)) {
-				const {track, shadowNode} = metadata.get(dirNode);
+			if ($.has(dirNode)) {
+				const {track, shadowNode} = $.get(dirNode);
 
 				if (dirNode !== this.node && !shadowNode) {
 					track?.updateNode();
@@ -301,7 +301,7 @@ export class NodeTrack {
 					customSlot: this.component.customSlot,
 					customSlotChildNodes: this.component.customSlot ? this.component._childNodes : []
 				});
-				metadata.get(dirNode).shadowNode = this.node;
+				$.get(dirNode).shadowNode = this.node;
 			}
 		}
 

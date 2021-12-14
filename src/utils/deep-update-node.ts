@@ -1,37 +1,37 @@
-import {metadata} from "../metadata";
+import {$} from "../metadata";
 import {trackNode} from "./track-node";
 
 export function deepUpdateNode(n: Node, comp: WebComponent) {
-	if (!metadata.has(n)) {
+	if (!$.has(n)) {
 		return trackNode(n, comp, {
 			customSlot: comp.customSlot,
 			customSlotChildNodes: comp.customSlot ? comp._childNodes : []
 		});
 	}
 
-	const {shadowNode, track} = metadata.get(n) || {};
+	const {shadowNode, track} = $.get(n) || {};
 
 	if (shadowNode) {
-		metadata.get(shadowNode).track.updateNode();
-	} else {
-		if (track) {
-			if (track.component === comp) {
-				const res = track.updateNode();
+		return $.get(shadowNode).track.updateNode();
+	}
 
-				if (res !== n) {
-					return;
-				}
-			} else {
-				metadata.set(n, {});
-				return trackNode(n, comp, {
-					customSlot: comp.customSlot,
-					customSlotChildNodes: comp.customSlot ? comp._childNodes : []
-				});
+	if (track) {
+		if (track.component === comp) {
+			const res = track.updateNode();
+
+			if (res !== n) {
+				return;
 			}
+		} else {
+			$.set(n, {});
+			return trackNode(n, comp, {
+				customSlot: comp.customSlot,
+				customSlotChildNodes: comp.customSlot ? comp._childNodes : []
+			});
 		}
+	}
 
-		if (!/#text|TEXTAREA|STYLE|#comment|SCRIPT/.test(n.nodeName)) {
-			n.childNodes.forEach((c: Node) => deepUpdateNode(c, comp))
-		}
+	if (!/#text|TEXTAREA|STYLE|#comment|SCRIPT/.test(n.nodeName)) {
+		n.childNodes.forEach((c: Node) => deepUpdateNode(c, comp))
 	}
 }
