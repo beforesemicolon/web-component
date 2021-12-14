@@ -3,6 +3,10 @@ import {trackNode} from "./track-node";
 
 export function deepUpdateNode(n: Node, comp: WebComponent) {
 	if (!$.has(n)) {
+		if (n.nodeName === '#text' && !n.nodeValue?.trim()) {
+			return;
+		}
+
 		return trackNode(n, comp, {
 			customSlot: comp.customSlot,
 			customSlotChildNodes: comp.customSlot ? comp._childNodes : []

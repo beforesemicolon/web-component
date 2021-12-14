@@ -3,12 +3,17 @@ import {NodeTrack} from "../node-track";
 import {defineNodeContextMetadata} from "./define-node-context-metadata";
 
 export function trackNode(node: Node | HTMLElement | DocumentFragment, component: WebComponent, opt: trackerOptions) {
-
 	const {nodeName, nodeValue, childNodes, nodeType} = node;
 
-	defineNodeContextMetadata(node);
+	if ((nodeName === '#text' && !nodeValue?.trim())) {
+		return;
+	}
 
-	if (/#comment|SCRIPT/.test(nodeName) || (nodeName === '#text' && !nodeValue?.trim())) {
+	if (nodeType !== 11 && nodeName !== 'SLOT') {
+		defineNodeContextMetadata(node);
+	}
+
+	if (/#comment|SCRIPT/.test(nodeName)) {
 		return;
 	}
 

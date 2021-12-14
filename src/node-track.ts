@@ -42,7 +42,9 @@ export class NodeTrack {
 		this.anchor = node;
 		this.component = component;
 
-		$.get(this.node).rawNodeString = (node as HTMLElement).outerHTML ?? (node as Text).nodeValue;
+		$.get(this.node).rawNodeString = /#text|#comment/.test(node.nodeName)
+			? node.nodeValue
+			: (node as HTMLElement).outerHTML;
 
 		this._setTracks();
 	}
