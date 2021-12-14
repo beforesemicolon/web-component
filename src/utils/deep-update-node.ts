@@ -30,6 +30,8 @@ export function deepUpdateNode(n: Node, comp: WebComponent) {
 			}
 		}
 
-		n.childNodes.forEach((c: Node) => deepUpdateNode(c, comp))
+		if (!/#text|TEXTAREA|STYLE|#comment|SCRIPT/.test(n.nodeName)) {
+			n.childNodes.forEach((c: Node) => deepUpdateNode(c, comp))
+		}
 	}
 }
