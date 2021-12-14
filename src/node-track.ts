@@ -5,10 +5,10 @@ import {resolveExecutable} from "./utils/resolve-executable";
 import {getEventHandlerFunction} from "./utils/get-event-handler-function";
 import {directiveRegistry} from './directives/registry';
 import {evaluateStringInComponentContext} from "./utils/evaluate-string-in-component-context";
-import {metadata} from "./metadata";
-import {defineNodeContextMetadata} from "./utils/define-node-context-metadata";
+import {$} from "./metadata";
 import {trackNode} from "./utils/track-node";
 import {jsonParse} from "./utils/json-parse";
+import {deepUpdateNode} from "./utils/deep-update-node";
 
 /**
  * handles all logic related to tracking and updating a tracked node.
@@ -42,31 +42,20 @@ export class NodeTrack {
 		this.anchor = node;
 		this.component = component;
 
-		if (!metadata.has(node)) {
-			metadata.set(node, {tracked: true});
-		}
-
-		// whether or not the node was replaced by another on render
-		metadata.get(this.node).shadowed = false;
-		metadata.get(this.node).rawNodeString = (node as HTMLElement).outerHTML ?? (node as Text).nodeValue;
-		defineNodeContextMetadata(node, component);
+		$.get(this.node).rawNodeString = /#text|#comment/.test(node.nodeName)
+			? node.nodeValue
+			: (node as HTMLElement).outerHTML;
 
 		this._setTracks();
 	}
 
 	get $context() {
-		return metadata.get(this.node).$context;
+		return (this.anchor === this.node
+			? $.get(this.node).$context
+			: $.get((this.anchor as Array<Element>)[0] ?? this.anchor)?.$context) || {};
 	}
 
 	updateNode() {
-		// if a node was rendered before(handled by the render function)
-		// and no longer has a parent(removed from the DOM)
-		// and it is is not being shadowed(temporarily removed from the DOM by a directive)
-		// the node no longer needs to be tracked so it can be discarded
-		if (metadata.get(this.node).tracked && !this.node.parentNode && !metadata.get(this.node).shadowed) {
-			return this._unTrackNode(this.node);
-		}
-
 		let directiveNode: any = this.node;
 
 		for (let directive of this.directives) {
@@ -76,14 +65,14 @@ export class NodeTrack {
 
 					let val = handler.parseValue(directive.value, directive.prop);
 					extractExecutableSnippetFromString(val).forEach((exc) => {
-						val = resolveExecutable(this.component, metadata.get(this.node).$context ?? {}, exc, val);
+						val = resolveExecutable(this.component, this.$context, exc, val);
 					});
-					
+
 					const value = evaluateStringInComponentContext(val, this.component, this.$context);
 					directiveNode = handler.render(value, {
 						element: this.node,
 						anchorNode: this.dirAnchors.get(directive) ?? null,
-						rawElementOuterHTML: metadata.get(this.node).rawNodeString
+						rawElementOuterHTML: $.get(this.node).rawNodeString
 					} as directiveRenderOptions);
 
 					if (directiveNode !== this.node) {
@@ -92,7 +81,7 @@ export class NodeTrack {
 					}
 
 				} catch (e: any) {
-					this.component.onError(new Error(`"${directive.name}" on ${metadata.get(this.node).rawNodeString}: ${e.message}`));
+					this.component.onError(new Error(`"${directive.name}" on ${$.get(this.node).rawNodeString}: ${e.message}`));
 				}
 
 				this.dirAnchors.set(directive, null)
@@ -100,15 +89,12 @@ export class NodeTrack {
 		}
 
 		if (directiveNode === this.node) {
-			metadata.get(this.node).shadowed = false;
-
 			this.anchor = this._switchNodeAndAnchor(directiveNode);
 
 			if (this.property?.executables.length) {
 				const newValue = this.property.executables.reduce((val, exc) => {
-					return resolveExecutable(this.component, metadata.get(this.node).$context ?? {}, exc, val);
+					return resolveExecutable(this.component, this.$context, exc, val);
 				}, this.property.value)
-
 
 				if (newValue !== (this.node as ObjectLiteral)[this.property.name]) {
 					(this.node as ObjectLiteral)[this.property.name] = newValue;
@@ -118,7 +104,7 @@ export class NodeTrack {
 			for (let {name, value, executables} of this.attributes) {
 				if (executables.length) {
 					let newValue = executables.reduce((val, exc) => {
-						return resolveExecutable(this.component, metadata.get(this.node).$context ?? {}, exc, val);
+						return resolveExecutable(this.component, this.$context, exc, val);
 					}, value)
 
 					const camelName = turnKebabToCamelCasing(name);
@@ -135,24 +121,15 @@ export class NodeTrack {
 				}
 			}
 
-			return this.node;
+		} else {
+			this.anchor = this._switchNodeAndAnchor(directiveNode);
 		}
 
-		metadata.get(this.node).shadowed = true;
-
-		this.anchor = this._switchNodeAndAnchor(directiveNode);
-		
 		return directiveNode;
 	}
 
-	private _unTrackNode(node: Node) {
-		metadata.get(this.component).trackers.delete(node);
-		metadata.delete(node);
-		node.childNodes.forEach(n => this._unTrackNode(n))
-	}
-
 	private _setTracks() {
-		const {nodeName, nodeValue, textContent, attributes} =  this.node as HTMLElement;
+		const {nodeName, nodeValue, textContent, attributes} = this.node as HTMLElement;
 		const eventHandlers: Array<EventHandlerTrack> = [];
 
 		if (nodeName === '#text') {
@@ -269,60 +246,81 @@ export class NodeTrack {
 		return document.createComment(` ${this.node.nodeValue ?? (this.node as HTMLElement).outerHTML} `)
 	}
 
-	private _switchNodeAndAnchor(directiveNode: HTMLElement | Node | Comment | Array<Element>) {
-		if (directiveNode === this.anchor) {
-			return directiveNode;
+	private _switchNodeAndAnchor(dirNode: HTMLElement | Node | Comment | Array<Element>) {
+		if (dirNode === this.anchor) {
+			return dirNode;
 		}
 
-		if (!Array.isArray(directiveNode) && !(/[831]/.test(`${(directiveNode as Node).nodeType}`))) {
-			directiveNode = this._createDefaultAnchor();
+		let dirIsArray = Array.isArray(dirNode);
+
+		if (
+			(dirIsArray && !(dirNode as Array<Element>).length) ||
+			(!dirIsArray && !(/[831]/.test(`${(dirNode as Node).nodeType}`)))
+		) {
+			dirNode = this._createDefaultAnchor();
+			dirIsArray = false;
 		}
 
 		const anchorIsArray = Array.isArray(this.anchor);
-		const dirIsArray = Array.isArray(directiveNode);
-		const anchorEl = document.createComment('')
+		const anchorEl = document.createComment('bfs')
 		let nextEl: Element | Comment | Text = anchorEl;
 
 		if (anchorIsArray) {
-			(this.anchor as Array<Element>)[0].parentNode?.insertBefore(nextEl, (this.anchor as Array<Element>)[0]);
+			(this.anchor as Array<Element>)[0]?.parentNode?.insertBefore(nextEl, (this.anchor as Array<Element>)[0]);
 		} else {
 			(this.anchor as HTMLElement).before(nextEl);
 		}
 
 		if (dirIsArray) {
-			for (let el of (directiveNode as Array<Element>)) {
-				if (!el.isConnected) {
+			for (let el of (dirNode as Array<Element>)) {
+				if (el.isConnected) {
+					$.get(el).track?.updateNode();
+					el.childNodes.forEach(c => deepUpdateNode(c, this.component))
+				} else {
 					nextEl.after(el);
 					trackNode(el, this.component, {
 						customSlot: this.component.customSlot,
-						customSlotChildNodes: Array.from(this.component.childNodes)
+						customSlotChildNodes: this.component.customSlot ? this.component._childNodes : []
 					});
+					$.get(el).shadowNode = this.node;
 				}
 
 				nextEl = el;
 			}
 		} else {
-			nextEl.after(directiveNode as Node);
+			nextEl.after(dirNode as Node);
+
+			if ($.has(dirNode)) {
+				const {track, shadowNode} = $.get(dirNode);
+
+				if (dirNode !== this.node && !shadowNode) {
+					track?.updateNode();
+				}
+
+				(dirNode as Node).childNodes.forEach(c => deepUpdateNode(c, this.component))
+			} else {
+				trackNode(dirNode as Node, this.component, {
+					customSlot: this.component.customSlot,
+					customSlotChildNodes: this.component.customSlot ? this.component._childNodes : []
+				});
+				$.get(dirNode).shadowNode = this.node;
+			}
+		}
+
+		if (anchorIsArray) {
+			for (let el of (this.anchor as Array<Element>)) {
+				if (!dirIsArray || !(dirNode as Array<Element>).includes(el)) {
+					el.parentNode?.removeChild(el);
+				}
+			}
+		} else if (this.anchor !== dirNode) {
+			(this.anchor as Node).parentNode?.removeChild(this.anchor as Node);
 		}
 
 		anchorEl.parentNode?.removeChild(anchorEl);
 
-		if (anchorIsArray) {
-			for (let el of (this.anchor as Array<Element>)) {
-				if (!dirIsArray) {
-					el.parentNode?.removeChild(el);
-					this._unTrackNode(el);
-				} else if (!(directiveNode as Array<Element>).includes(el)) {
-					el.parentNode?.removeChild(el);
-					this._unTrackNode(el);
-				}
-			}
-		} else if (this.anchor !== directiveNode) {
-			(this.anchor as Node).parentNode?.removeChild(this.anchor as Node);
-		}
+		this.anchor = dirNode;
 
-		this.anchor = directiveNode;
-
-		return directiveNode;
+		return dirNode;
 	}
 }

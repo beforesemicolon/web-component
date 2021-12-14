@@ -1,11 +1,10 @@
 import {directiveRegistry} from "./directives/registry";
-import {metadata} from "./metadata";
+import {$} from "./metadata";
 import {defineNodeContextMetadata} from "./utils/define-node-context-metadata";
 
 export class Directive {
-
 	constructor(component: WebComponent) {
-		metadata.set(this, {component})
+		$.set(this, {component})
 	}
 
 	static register(name: string = '') {
@@ -25,15 +24,15 @@ export class Directive {
 	}
 
 	setRef(name: string, node: Node) {
-		metadata.get(this).component.$refs[name] = node;
+		$.get(this).component.$refs[name] = node;
 	}
 
 	getContext(node: Node) {
-		return metadata.get(node).$context ?? null;
+		return $.get(node).$context ?? null;
 	}
 
-	setContext(node: Node, key: string, value: any) {
-		defineNodeContextMetadata(node, metadata.get(this).component);
-		metadata.get(node)?.updateContext(key, value);
+	updateContext(node: Node, newCtx: ObjectLiteral) {
+		defineNodeContextMetadata(node);
+		$.get(node)?.updateContext(newCtx);
 	}
 }

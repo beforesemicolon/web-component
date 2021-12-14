@@ -986,6 +986,10 @@ describe('WebComponent', () => {
 				s.icon = 'star';
 
 				expect(s.root?.innerHTML).toBe('<button>click me <span>star</span></button>');
+
+				s.icon = '';
+
+				expect(s.root?.innerHTML).toBe('<button>click me <!-- if:  --></button>');
 			});
 
 			it('should handle sequential ifs', () => {
@@ -1008,6 +1012,8 @@ describe('WebComponent', () => {
 
 				expect(s.root?.innerHTML).toBe('<!-- if: false --><p>lorem</p><!-- if: false -->');
 			});
+
+			it.todo('should handle nested component ifs')
 		});
 
 		describe('should handle repeat', () => {
@@ -1204,7 +1210,7 @@ describe('WebComponent', () => {
 
 				document.body.appendChild(s);
 
-				expect(s.root?.innerHTML).toEqual(
+				expect(s.root?.innerHTML).toBe(
 					'<ul>\n' +
 						'<li class="page">\n' +
 							'<span>Home</span>\n' +
@@ -1221,7 +1227,32 @@ describe('WebComponent', () => {
 								'</li>\n' +
 							'</ul>\n' +
 						'</li>\n' +
-					'</ul>')
+					'</ul>');
+
+				s.items.push({label: "Contact", items: []});
+
+				expect(s.root?.innerHTML).toBe(
+					'<ul>\n' +
+						'<li class="page">\n' +
+							'<span>Home</span>\n' +
+							'<!-- if: 0 -->\n' +
+						'</li>' +
+						'<li class="page">\n' +
+							'<span>Projects</span>\n' +
+							'<ul>\n' +
+								'<li class="sub-page">\n' +
+									'<span>Calculator App</span>\n' +
+								'</li>' +
+								'<li class="sub-page">\n' +
+									'<span>Todo App</span>\n' +
+								'</li>\n' +
+							'</ul>\n' +
+						'</li>' +
+						'<li class="page">\n' +
+							'<span>Contact</span>\n' +
+							'<!-- if: 0 -->\n' +
+						'</li>\n' +
+					'</ul>');
 			});
 
 			it('should allow for sequential repeats', () => {
@@ -1241,6 +1272,8 @@ describe('WebComponent', () => {
 
 				expect(s.root?.innerHTML).toBe('<p>2</p><p>4</p><p>6</p><p>2</p><p>4</p><p>6</p>')
 			});
+
+			it.todo('should handle nested component repeats')
 		});
 
 		describe('should allow mix of hashed attributes', () => {

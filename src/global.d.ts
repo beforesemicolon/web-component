@@ -1,12 +1,10 @@
 import {ShadowRootModeExtended} from './enums/ShadowRootModeExtended.enum';
-import {directiveRegistry} from "./directives/registry";
 
 export declare global {
 	export type onUpdateCallback = (property: string, oldValue: unknown, newValue: unknown) => void;
 	
 	export interface trackerOptions {
 		customSlot?: boolean;
-		trackOnly?: boolean;
 		customSlotChildNodes?: Array<Node>;
 	}
 
@@ -33,7 +31,6 @@ export declare global {
 			executables: Array<Executable>;
 		}>;
 		directives: Array<DirectiveValue>;
-		eventHandlers: Array<EventHandlerTrack>;
 		property: null | {
 			name: string;
 			value: string;
@@ -63,7 +60,7 @@ export declare global {
 
 		parseValue: (value: string, prop: string | null) => string;
 		render: (val: any, options: directiveRenderOptions) => directiveRenderOptions['anchorNode'];
-		setContext: (node: Node, key: string, value: any) => void;
+		updateContext: (node: Node, ctx: ObjectLiteral) => void;
 		getContext(node: Node) {}
 
 		[key: string]: any;
@@ -90,10 +87,8 @@ export declare global {
 	
 	export interface WebComponentMetadata {
 		root: WebComponent | ShadowRoot;
-		trackers: Map;
 		mounted: boolean;
 		parsed: boolean;
-		context: object;
 		contextSource: WebComponent | null;
 		contextSubscribers: Array<(ctx: object) => void>;
 		unsubscribeCtx: (ctx: object) => void;
@@ -120,6 +115,7 @@ export declare global {
 		readonly $context: ObjectLiteral;
 		readonly $refs: Refs;
 		readonly $properties: Array<string>;
+		readonly _childNodes: Array<Node>;
 
 		updateContext: (ctx: ObjectLiteral) => void;
 

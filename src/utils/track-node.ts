@@ -1,19 +1,23 @@
-import {metadata} from "../metadata";
+import {$} from "../metadata";
 import {NodeTrack} from "../node-track";
+import {defineNodeContextMetadata} from "./define-node-context-metadata";
 
-export function trackNode(node: Node | HTMLElement | DocumentFragment, component: WebComponent, opt: trackerOptions = {}) {
-	// it is possible that the node is already rendered by the parent component
-	// and then picked up by the child component via slot
-	// in that case we do not need to render it again since it will already be
-	// ready to do anything it needs and also prevent it from being tracked again.
-	// Also, scripts and comments are ignored since comments is never seen and script tags
-	// contain logic inside that does not need any tracking because it may cause issues
-	if (metadata.get(node)?.tracked || /#comment|SCRIPT/.test(node.nodeName)) {
+export function trackNode(node: Node | HTMLElement | DocumentFragment, component: WebComponent, opt: trackerOptions) {
+	const {nodeName, nodeValue, childNodes, nodeType} = node;
+
+	if ((nodeName === '#text' && !nodeValue?.trim())) {
 		return;
 	}
 
-	const {nodeName, nodeValue, childNodes, nodeType} = node;
-	let {customSlot = false, customSlotChildNodes = [], trackOnly = false} = opt
+	if (nodeType !== 11 && nodeName !== 'SLOT') {
+		defineNodeContextMetadata(node);
+	}
+
+	if (/#comment|SCRIPT/.test(nodeName)) {
+		return;
+	}
+
+	let {customSlot = false, customSlotChildNodes = []} = opt
 	
 	if (nodeName === 'SLOT') {
 		if (customSlot) {
@@ -33,27 +37,23 @@ export function trackNode(node: Node | HTMLElement | DocumentFragment, component
 	} else {
 		// avoid fragments
 		if (nodeType !== 11) {
-			const isElement = nodeType === 1;
-			const isTextNode = !isElement && nodeName === '#text';
-			const isRepeatedNode = isElement && (node as HTMLElement).hasAttribute('repeat');
-			
-			if (isElement || (isTextNode && nodeValue?.trim())) {
-				const track = new NodeTrack(node, component as WebComponent);
+			if (nodeType === 1 || nodeName === '#text') {
+				const track: NodeTrack = new NodeTrack(node, component);
 				if (!track.empty) {
-					metadata.get(component).trackers.set(node, track);
-					trackOnly = !trackOnly && track.updateNode() !== node;
+					$.get(node).track = track;
+
+					if (track.updateNode() !== node) {
+						return;
+					}
 				}
 			}
 			
-			if (
-				isRepeatedNode ||
-				/#text|TEXTAREA|STYLE/.test(nodeName)
-			) {
+			if (/#text|TEXTAREA|STYLE/.test(nodeName)) {
 				return;
 			}
 		}
 		
-		Array.from(childNodes).forEach(child => trackNode(child, component, {...opt, trackOnly}));
+		Array.from(childNodes).forEach(c => trackNode(c, component, opt));
 	}
 }
 

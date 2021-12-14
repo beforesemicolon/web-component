@@ -2,7 +2,7 @@
 // anything later on
 import './directives';
 import booleanAttr from './utils/boolean-attributes.json';
-import {metadata} from "./metadata";
+import {$} from "./metadata";
 import {parse} from './utils/parse';
 import {setComponentPropertiesFromObservedAttributes} from './utils/set-component-properties-from-observed-attributes';
 import {setupComponentPropertiesForAutoUpdate} from './utils/setup-component-properties-for-auto-update';
@@ -10,9 +10,10 @@ import {turnCamelToKebabCasing} from './utils/turn-camel-to-kebab-casing';
 import {turnKebabToCamelCasing} from './utils/turn-kebab-to-camel-casing';
 import {getStyleString} from './utils/get-style-string';
 import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
-import {NodeTrack} from './node-track';
 import {trackNode} from "./utils/track-node";
 import {jsonParse} from "./utils/json-parse";
+import {deepUpdateNode} from "./utils/deep-update-node";
+import {defineNodeContextMetadata} from "./utils/define-node-context-metadata";
 
 /**
  * a extension on the native web component API to simplify and automate most of the pain points
@@ -22,30 +23,32 @@ export class WebComponent extends HTMLElement {
 	readonly $refs: Refs = {};
 	$properties: Array<string> = ['$context', '$refs'];
 	templateId = '';
+	_childNodes: Array<Node> = [];
 
 	constructor() {
 		super();
 
-		metadata.set(this, {
-			root: this,
-			trackers: new Map(),
-			mounted: false,
-			parsed: false,
-			context: {},
-			contextSource: null,
-			contextSubscribers: [],
-			unsubscribeCtx: () => {
-			},
-		} as WebComponentMetadata);
+		if (!$.has(this)) {
+		   defineNodeContextMetadata(this)
+		}
+
+		const meta = $.get(this);
+
+		meta.root = this;
+		meta.mounted = false;
+		meta.parsed = false;
+		meta.contextSource = null;
+		meta.contextSubscribers = [];
+		meta.unsubscribeCtx = () => {};
 
 		// @ts-ignore
 		let {mode, observedAttributes, delegatesFocus, initialContext} = this.constructor;
 
 		if (mode !== 'none') {
-			metadata.get(this).root = this.attachShadow({mode, delegatesFocus});
+			$.get(this).root = this.attachShadow({mode, delegatesFocus});
 		}
 
-		metadata.get(this).context = initialContext;
+		$.get(this).updateContext(initialContext);
 
 		this.$properties.push(
 			...setComponentPropertiesFromObservedAttributes(this, observedAttributes,
@@ -92,7 +95,7 @@ export class WebComponent extends HTMLElement {
 	 * the initial context data for the component
 	 */
 	static initialContext = {};
-	
+
 	/**
 	 * parses special template HTML string taking in consideration
 	 * all the additional syntax specific to this framework
@@ -149,7 +152,7 @@ export class WebComponent extends HTMLElement {
 	 * @returns {*}
 	 */
 	get root(): HTMLElement | ShadowRoot | null {
-		return (this.constructor as WebComponentConstructor).mode === 'closed' ? null : metadata.get(this).root;
+		return (this.constructor as WebComponentConstructor).mode === 'closed' ? null : $.get(this).root;
 	}
 
 	/**
@@ -157,7 +160,7 @@ export class WebComponent extends HTMLElement {
 	 * @returns {boolean}
 	 */
 	get mounted() {
-		return metadata.get(this).mounted;
+		return $.get(this).mounted;
 	}
 
 	/**
@@ -179,40 +182,43 @@ export class WebComponent extends HTMLElement {
 	get $context(): ObjectLiteral {
 		// make sure the subscribe method is part of the prototype
 		// so it is hidden unless the prototype is checked
-		return Object.setPrototypeOf({...metadata.get(this).contextSource?.$context, ...metadata.get(this).context}, {
-			subscribe: ctxSubscriberHandler(metadata.get(this).contextSubscribers),
+		return Object.setPrototypeOf({
+			...$.get(this).contextSource?.$context, // context from the nearest ancestor component
+			...$.get(this).$context, // context from the component node itself
+		}, {
+			subscribe: ctxSubscriberHandler($.get(this).contextSubscribers),
 		});
 	}
 
 	get parsed() {
-		return metadata.get(this).parsed;
+		return $.get(this).parsed;
 	}
 
 	updateContext(ctx: ObjectLiteral) {
-		metadata.get(this).context = {...metadata.get(this).context, ...ctx};
+		$.get(this).updateContext(ctx);
 
 		if (this.mounted) {
 			this.forceUpdate();
-			metadata.get(this).contextSubscribers.forEach((cb: (ctx: {}) => void) => cb(metadata.get(this).context));
+			$.get(this).contextSubscribers.forEach((cb: (ctx: {}) => void) => cb($.get(this).$context));
 		}
 	}
 
 	connectedCallback() {
-		const {parsed} = metadata.get(this);
+		const {parsed} = $.get(this);
 		try {
 			// @ts-ignore
-			metadata.get(this).contextSource = getClosestWebComponentAncestor(this);
+			$.get(this).contextSource = getClosestWebComponentAncestor(this);
 
-			if (metadata.get(this).contextSource) {
+			if ($.get(this).contextSource) {
 				// force update the component if the ancestor context gets updated as well
-				metadata.get(this).unsubscribeCtx = metadata.get(this).contextSource.$context.subscribe((newContext: ObjectLiteral) => {
+				$.get(this).unsubscribeCtx = $.get(this).contextSource.$context.subscribe((newContext: ObjectLiteral) => {
 					this.forceUpdate();
 
 					if (this.mounted) {
-						this.onUpdate('$context', metadata.get(this).context, newContext)
+						this.onUpdate('$context', $.get(this).$context, newContext)
 					}
 
-					metadata.get(this).contextSubscribers.forEach((cb: (ctx: {}) => void) => cb(newContext));
+					$.get(this).contextSubscribers.forEach((cb: (ctx: {}) => void) => cb(newContext));
 				})
 			}
 
@@ -241,25 +247,24 @@ export class WebComponent extends HTMLElement {
 				const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
 				const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
 				let temp: string = this.template;
-				
+
 				if (!temp && this.templateId) {
 					const t = document.getElementById(this.templateId);
-					
+
 					temp = t?.nodeName === 'TEMPLATE' ? t.innerHTML : temp;
 				}
 
 				contentNode = parse(style + temp);
 
-				let childNodes: Array<Node> = [];
+				this._childNodes = Array.from(this.childNodes);
 
 				if (this.customSlot) {
-					childNodes = Array.from(this.childNodes);
 					this.innerHTML = '';
 				}
 
 				trackNode(contentNode, this, {
 					customSlot: this.customSlot,
-					customSlotChildNodes: this.customSlot ? childNodes : []
+					customSlotChildNodes: this.customSlot ? this._childNodes : []
 				});
 
 				const {tagName, mode} = (this.constructor as WebComponentConstructor);
@@ -278,11 +283,11 @@ export class WebComponent extends HTMLElement {
 					})
 				}
 
-				metadata.get(this).parsed = true;
-				metadata.get(this).root.appendChild(contentNode);
+				$.get(this).parsed = true;
+				$.get(this).root.appendChild(contentNode);
 			}
 
-			metadata.get(this).mounted = true;
+			$.get(this).mounted = true;
 			this.onMount();
 		} catch (e) {
 			this.onError(e as ErrorEvent);
@@ -297,9 +302,9 @@ export class WebComponent extends HTMLElement {
 
 	disconnectedCallback() {
 		try {
-			metadata.get(this).contextSource = null;
-			metadata.get(this).mounted = false;
-			metadata.get(this).unsubscribeCtx();
+			$.get(this).contextSource = null;
+			$.get(this).mounted = false;
+			$.get(this).unsubscribeCtx();
 			this.onDestroy();
 		} catch (e) {
 			this.onError(e as Error)
@@ -343,10 +348,7 @@ export class WebComponent extends HTMLElement {
 	 * updates any already tracked node with current component data including context and node level data.
 	 */
 	forceUpdate() {
-		metadata.get(this).trackers.forEach((track: NodeTrack) => {
-			track.updateNode()
-		});
-
+		(this.root || this).childNodes.forEach(n => deepUpdateNode(n, this))
 		return true;
 	}
 

@@ -54,8 +54,10 @@ export class Repeat extends Directive {
 	updateNodeContext(el: Node, index: number, vAs: string, kAs: string, list: Array<any> = []) {
 		const [key, value] = list[index] ?? [index, index + 1];
 		// set context so this and inner nodes can catch these values
-		this.setContext(el, kAs || '$key', key);
-		this.setContext(el, vAs || '$item', value);
+		this.updateContext(el, {
+			[vAs || '$item']: value,
+            [kAs || '$key']: key
+		});
 	}
 
 	cloneRepeatedNode(rawElementOuterHTML: string): Element {
