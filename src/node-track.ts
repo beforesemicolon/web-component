@@ -8,7 +8,6 @@ import {evaluateStringInComponentContext} from "./utils/evaluate-string-in-compo
 import {$} from "./metadata";
 import {trackNode} from "./utils/track-node";
 import {jsonParse} from "./utils/json-parse";
-import {deepUpdateNode} from "./utils/deep-update-node";
 
 /**
  * handles all logic related to tracking and updating a tracked node.
@@ -35,6 +34,7 @@ export class NodeTrack {
 	readonly component: WebComponent;
 	anchor: HTMLElement | Node | Comment | Array<Element>;
 	empty = false;
+	tracks = new Map();
 	readonly dirAnchors = new WeakMap();
 
 	constructor(node: HTMLElement | Node, component: WebComponent) {
@@ -47,6 +47,7 @@ export class NodeTrack {
 			: (node as HTMLElement).outerHTML;
 
 		this._setTracks();
+
 	}
 
 	get $context() {
@@ -120,6 +121,10 @@ export class NodeTrack {
 					}
 				}
 			}
+
+			this.tracks.forEach((track) => {
+				track.updateNode();
+			});
 
 		} else {
 			this.anchor = this._switchNodeAndAnchor(directiveNode);
@@ -274,14 +279,10 @@ export class NodeTrack {
 		if (dirIsArray) {
 			for (let el of (dirNode as Array<Element>)) {
 				if (el.isConnected) {
-					$.get(el).track?.updateNode();
-					el.childNodes.forEach(c => deepUpdateNode(c, this.component))
+					this._deepUpdateNode(el);
 				} else {
 					nextEl.after(el);
-					trackNode(el, this.component, {
-						customSlot: this.component.customSlot,
-						customSlotChildNodes: this.component.customSlot ? this.component._childNodes : []
-					});
+					this._trackNode(el);
 					$.get(el).shadowNode = this.node;
 				}
 
@@ -291,19 +292,11 @@ export class NodeTrack {
 			nextEl.after(dirNode as Node);
 
 			if ($.has(dirNode)) {
-				const {track, shadowNode} = $.get(dirNode);
-
-				if (dirNode !== this.node && !shadowNode) {
-					track?.updateNode();
+				if (dirNode !== this.node) {
+					this._deepUpdateNode(dirNode as Node);
 				}
-
-				(dirNode as Node).childNodes.forEach(c => deepUpdateNode(c, this.component))
 			} else {
-				trackNode(dirNode as Node, this.component, {
-					customSlot: this.component.customSlot,
-					customSlotChildNodes: this.component.customSlot ? this.component._childNodes : []
-				});
-				$.get(dirNode).shadowNode = this.node;
+				this._trackNode(dirNode as Node);
 			}
 		}
 
@@ -311,10 +304,12 @@ export class NodeTrack {
 			for (let el of (this.anchor as Array<Element>)) {
 				if (!dirIsArray || !(dirNode as Array<Element>).includes(el)) {
 					el.parentNode?.removeChild(el);
+					this._unTrackNode(el);
 				}
 			}
 		} else if (this.anchor !== dirNode) {
 			(this.anchor as Node).parentNode?.removeChild(this.anchor as Node);
+			this._unTrackNode(this.anchor as Node);
 		}
 
 		anchorEl.parentNode?.removeChild(anchorEl);
@@ -323,4 +318,25 @@ export class NodeTrack {
 
 		return dirNode;
 	}
+
+	private _trackNode(n: Node) {
+		trackNode(n, this.component, {
+			customSlot: this.component.customSlot,
+			customSlotChildNodes: this.component.customSlot ? this.component._childNodes : [],
+			tracks: this.tracks
+		})
+	}
+
+	private _unTrackNode(n: Node) {
+		if (n !== this.node) {
+			this.tracks.delete(n);
+			n.childNodes.forEach(c => this._unTrackNode(c));
+		}
+	}
+
+	private _deepUpdateNode(n: Node) {
+		$.get(n)?.track?.updateNode();
+		n.childNodes.forEach(c => this._deepUpdateNode(c));
+	}
+
 }

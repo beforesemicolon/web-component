@@ -5,7 +5,7 @@ import {defineNodeContextMetadata} from "./define-node-context-metadata";
 export function trackNode(node: Node | HTMLElement | DocumentFragment, component: WebComponent, opt: trackerOptions) {
 	const {nodeName, nodeValue, childNodes, nodeType} = node;
 
-	if ((nodeName === '#text' && !nodeValue?.trim())) {
+	if ($.get(node)?.tracked || (nodeName === '#text' && !nodeValue?.trim())) {
 		return;
 	}
 
@@ -17,7 +17,7 @@ export function trackNode(node: Node | HTMLElement | DocumentFragment, component
 		return;
 	}
 
-	let {customSlot = false, customSlotChildNodes = []} = opt
+	let {customSlot = false, customSlotChildNodes = [], trackOnly = false, tracks} = opt
 	
 	if (nodeName === 'SLOT') {
 		if (customSlot) {
@@ -41,19 +41,31 @@ export function trackNode(node: Node | HTMLElement | DocumentFragment, component
 				const track: NodeTrack = new NodeTrack(node, component);
 				if (!track.empty) {
 					$.get(node).track = track;
+					tracks.set(node, track);
 
-					if (track.updateNode() !== node) {
-						return;
+					if (!trackOnly) {
+						const res = track.updateNode();
+						if (res !== node) {
+							trackOnly = true;
+
+							if (Array.isArray(res)) {
+							   return;
+							}
+						}
 					}
+
+					tracks = track.tracks;
 				}
 			}
+
+			$.get(node).tracked = true;
 			
 			if (/#text|TEXTAREA|STYLE/.test(nodeName)) {
 				return;
 			}
 		}
 		
-		Array.from(childNodes).forEach(c => trackNode(c, component, opt));
+		Array.from(childNodes).forEach(c => trackNode(c, component, {...opt, trackOnly, tracks}));
 	}
 }
 

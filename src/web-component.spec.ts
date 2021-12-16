@@ -941,7 +941,7 @@ describe('WebComponent', () => {
 		});
 
 		describe('should handle if', () => {
-			it('should render element if truthy', () => {
+			it('should render element and react to changes after', () => {
 				class IfA extends WebComponent {
 					check = true;
 
@@ -964,6 +964,31 @@ describe('WebComponent', () => {
 				s.check = true;
 
 				expect(s.root?.innerHTML).toBe('<button>click me</button>');
+			});
+
+			it('should NOT render element and react to changes after', () => {
+				class IfD extends WebComponent {
+					check = false;
+
+					get template() {
+						return '<button if="check">click me</button>'
+					}
+				}
+
+				IfD.register();
+				const s = new IfD();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<!-- if: false -->');
+
+				s.check = true;
+
+				expect(s.root?.innerHTML).toBe('<button>click me</button>');
+
+				s.check = false;
+
+				expect(s.root?.innerHTML).toBe('<!-- if: false -->');
 			});
 
 			it('should handle nested ifs', () => {
@@ -992,6 +1017,36 @@ describe('WebComponent', () => {
 				expect(s.root?.innerHTML).toBe('<button>click me <!-- if:  --></button>');
 			});
 
+			it('should handle nested ifs reversed', () => {
+				class IfB extends WebComponent {
+					check = false;
+					icon = 'star';
+
+					get template() {
+						return '<button if="check">click me <span if="icon">{icon}</span></button>'
+					}
+				}
+
+				IfB.register();
+				const s = new IfB();
+
+				document.body.appendChild(s);
+
+				expect(s.root?.innerHTML).toBe('<!-- if: false -->');
+
+				s.check = true;
+
+				expect(s.root?.innerHTML).toBe('<button>click me <span>star</span></button>');
+
+				s.icon = '';
+
+				expect(s.root?.innerHTML).toBe('<button>click me <!-- if:  --></button>');
+
+				s.icon = 'star';
+
+				expect(s.root?.innerHTML).toBe('<button>click me <span>star</span></button>');
+			});
+
 			it('should handle sequential ifs', () => {
 				class IfC extends WebComponent {
 					check = true;
@@ -1013,7 +1068,7 @@ describe('WebComponent', () => {
 				expect(s.root?.innerHTML).toBe('<!-- if: false --><p>lorem</p><!-- if: false -->');
 			});
 
-			it.todo('should handle nested component ifs')
+			it.todo('should handle nested component ifs');
 		});
 
 		describe('should handle repeat', () => {
@@ -1186,22 +1241,22 @@ describe('WebComponent', () => {
 
 					get template() {
 						return '' +
-						'<ul>\n' +
-								'<li\n' +
-									'repeat="items as $page"\n' +
-									'class="page"\n' +
-								'>\n' +
-									'<span>{$page.label}</span>\n' +
-									'<ul if="$page.items.length">\n' +
-										'<li\n' +
-											'repeat="$page.items"\n' +
-											'class="sub-page"\n' +
-										'>\n' +
-											'<span>{$item.label}</span>\n' +
-										'</li>\n' +
-									'</ul>\n' +
-								'</li>\n' +
-						'</ul>';
+							'<ul>\n' +
+							'<li\n' +
+							'repeat="items as $page"\n' +
+							'class="page"\n' +
+							'>\n' +
+							'<span>{$page.label}</span>\n' +
+							'<ul if="$page.items.length">\n' +
+							'<li\n' +
+							'repeat="$page.items"\n' +
+							'class="sub-page"\n' +
+							'>\n' +
+							'<span>{$item.label}</span>\n' +
+							'</li>\n' +
+							'</ul>\n' +
+							'</li>\n' +
+							'</ul>';
 					}
 				}
 
@@ -1212,46 +1267,46 @@ describe('WebComponent', () => {
 
 				expect(s.root?.innerHTML).toBe(
 					'<ul>\n' +
-						'<li class="page">\n' +
-							'<span>Home</span>\n' +
-							'<!-- if: 0 -->\n' +
-						'</li>' +
-						'<li class="page">\n' +
-							'<span>Projects</span>\n' +
-							'<ul>\n' +
-								'<li class="sub-page">\n' +
-									'<span>Calculator App</span>\n' +
-								'</li>' +
-								'<li class="sub-page">\n' +
-									'<span>Todo App</span>\n' +
-								'</li>\n' +
-							'</ul>\n' +
-						'</li>\n' +
+					'<li class="page">\n' +
+					'<span>Home</span>\n' +
+					'<!-- if: 0 -->\n' +
+					'</li>' +
+					'<li class="page">\n' +
+					'<span>Projects</span>\n' +
+					'<ul>\n' +
+					'<li class="sub-page">\n' +
+					'<span>Calculator App</span>\n' +
+					'</li>' +
+					'<li class="sub-page">\n' +
+					'<span>Todo App</span>\n' +
+					'</li>\n' +
+					'</ul>\n' +
+					'</li>\n' +
 					'</ul>');
 
 				s.items.push({label: "Contact", items: []});
 
 				expect(s.root?.innerHTML).toBe(
 					'<ul>\n' +
-						'<li class="page">\n' +
-							'<span>Home</span>\n' +
-							'<!-- if: 0 -->\n' +
-						'</li>' +
-						'<li class="page">\n' +
-							'<span>Projects</span>\n' +
-							'<ul>\n' +
-								'<li class="sub-page">\n' +
-									'<span>Calculator App</span>\n' +
-								'</li>' +
-								'<li class="sub-page">\n' +
-									'<span>Todo App</span>\n' +
-								'</li>\n' +
-							'</ul>\n' +
-						'</li>' +
-						'<li class="page">\n' +
-							'<span>Contact</span>\n' +
-							'<!-- if: 0 -->\n' +
-						'</li>\n' +
+					'<li class="page">\n' +
+					'<span>Home</span>\n' +
+					'<!-- if: 0 -->\n' +
+					'</li>' +
+					'<li class="page">\n' +
+					'<span>Projects</span>\n' +
+					'<ul>\n' +
+					'<li class="sub-page">\n' +
+					'<span>Calculator App</span>\n' +
+					'</li>' +
+					'<li class="sub-page">\n' +
+					'<span>Todo App</span>\n' +
+					'</li>\n' +
+					'</ul>\n' +
+					'</li>' +
+					'<li class="page">\n' +
+					'<span>Contact</span>\n' +
+					'<!-- if: 0 -->\n' +
+					'</li>\n' +
 					'</ul>');
 			});
 

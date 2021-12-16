@@ -12,7 +12,6 @@ import {getStyleString} from './utils/get-style-string';
 import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
 import {trackNode} from "./utils/track-node";
 import {jsonParse} from "./utils/json-parse";
-import {deepUpdateNode} from "./utils/deep-update-node";
 import {defineNodeContextMetadata} from "./utils/define-node-context-metadata";
 
 /**
@@ -38,6 +37,7 @@ export class WebComponent extends HTMLElement {
 		meta.mounted = false;
 		meta.parsed = false;
 		meta.contextSource = null;
+		meta.tracks = new Map();
 		meta.contextSubscribers = [];
 		meta.unsubscribeCtx = () => {};
 
@@ -264,7 +264,8 @@ export class WebComponent extends HTMLElement {
 
 				trackNode(contentNode, this, {
 					customSlot: this.customSlot,
-					customSlotChildNodes: this.customSlot ? this._childNodes : []
+					customSlotChildNodes: this.customSlot ? this._childNodes : [],
+					tracks: $.get(this).tracks,
 				});
 
 				const {tagName, mode} = (this.constructor as WebComponentConstructor);
@@ -348,7 +349,9 @@ export class WebComponent extends HTMLElement {
 	 * updates any already tracked node with current component data including context and node level data.
 	 */
 	forceUpdate() {
-		(this.root || this).childNodes.forEach(n => deepUpdateNode(n, this))
+		$.get(this).tracks.forEach((t: NodeTrack) => {
+			t.updateNode();
+		});
 		return true;
 	}
 

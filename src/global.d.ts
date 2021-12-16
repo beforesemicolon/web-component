@@ -6,6 +6,8 @@ export declare global {
 	export interface trackerOptions {
 		customSlot?: boolean;
 		customSlotChildNodes?: Array<Node>;
+		trackOnly?: boolean;
+		tracks: Map<Node, NodeTrack>;
 	}
 
 	export interface booleanAttributes {
@@ -25,11 +27,14 @@ export declare global {
 
 	export class NodeTrack {
 		node: HTMLElement | Node | WebComponent;
+		anchor: HTMLElement | Node | Comment | Array<Element>;
+		tracks: Map<Node, NodeTrack>;
 		attributes: Array<{
 			name: string;
 			value: string;
 			executables: Array<Executable>;
 		}>;
+		empty: boolean;
 		directives: Array<DirectiveValue>;
 		property: null | {
 			name: string;
@@ -37,8 +42,7 @@ export declare global {
 			executables: Array<Executable>;
 		};
 
-		update: () => void;
-		empty: boolean;
+		updateNode: () => void;
 		$context: ObjectLiteral;
 	}
 	
