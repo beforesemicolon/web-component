@@ -7,7 +7,7 @@ describe('Repeat Directive', () => {
 
 	const dir = new Repeat(new TestComp());
 	// @ts-ignore
-	const setContextSpy = jest.spyOn(dir, 'setContext');
+	const setContextSpy = jest.spyOn(dir, 'updateContext');
 	let element: HTMLElement;
 
 	beforeEach(() => {
@@ -36,7 +36,7 @@ describe('Repeat Directive', () => {
 		expect(res[0].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
 		expect(res[1].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
 		expect(res[2].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
-		expect(setContextSpy).toHaveBeenCalledTimes(6)
+		expect(setContextSpy).toHaveBeenCalledTimes(3)
 		expect(dir.getContext(res[0])).toEqual({$item: 1, $key: 0})
 		expect(dir.getContext(res[1])).toEqual({$item: 2, $key: 1})
 		expect(dir.getContext(res[2])).toEqual({$item: 3, $key: 2})
@@ -52,7 +52,7 @@ describe('Repeat Directive', () => {
 		expect(res[0].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
 		expect(res[1].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
 		expect(res[2].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
-		expect(setContextSpy).toHaveBeenCalledTimes(6)
+		expect(setContextSpy).toHaveBeenCalledTimes(3)
 		expect(dir.getContext(res[0])).toEqual({$item: 2, $key: "0"})
 		expect(dir.getContext(res[1])).toEqual({$item: 4, $key: "1"})
 		expect(dir.getContext(res[2])).toEqual({$item: 6, $key: "2"})
@@ -68,7 +68,7 @@ describe('Repeat Directive', () => {
 		expect(res[0].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
 		expect(res[1].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
 		expect(res[2].outerHTML).toBe('<div class="item-{$key}">item {$item}</div>')
-		expect(setContextSpy).toHaveBeenCalledTimes(6)
+		expect(setContextSpy).toHaveBeenCalledTimes(3)
 		// @ts-ignore
 		expect(dir.getContext(res[0])).toEqual({$item: 100, $key: "a"})
 		// @ts-ignore
@@ -103,7 +103,7 @@ describe('Repeat Directive', () => {
 		expect(res.length).toBe(3)
 		expect(dir.parseValue(value)).toBe('[menu, "pg", "index"]')
 		expect(element.outerHTML).toBe('<div class="item-{index}" repeat="menu as pg; $key as index">item {pg}</div>');
-		expect(setContextSpy).toHaveBeenCalledTimes(6)
+		expect(setContextSpy).toHaveBeenCalledTimes(3)
 		expect(dir.getContext(res[0])).toEqual({pg: 'pg1', index: "0"})
 		expect(dir.getContext(res[1])).toEqual({pg: 'pg2', index: "1"})
 		expect(dir.getContext(res[2])).toEqual({pg: 'pg3', index: "2"})

@@ -1,5 +1,5 @@
 import {defineNodeContextMetadata} from "./define-node-context-metadata";
-import {metadata} from "../metadata";
+import {$} from "../metadata";
 import {WebComponent} from "../web-component";
 
 describe('defineNodeContextMetadata', () => {
@@ -9,42 +9,44 @@ describe('defineNodeContextMetadata', () => {
 	const node = document.createElement('div');
 
 	beforeEach(() => {
-		metadata.delete(node);
+		$.delete(node);
 	})
 
 	it('should set node $context', () => {
-		expect(metadata.has(node)).toBeFalsy();
+		expect($.has(node)).toBeFalsy();
 
-		defineNodeContextMetadata(node, new TestComp());
+		defineNodeContextMetadata(node);
 
-		expect(metadata.has(node)).toBeTruthy();
-		expect(metadata.get(node).$context).toEqual({})
-		expect(typeof metadata.get(node).updateContext).toBe('function')
+		expect($.has(node)).toBeTruthy();
+		expect($.get(node).$context).toEqual({})
+		expect(typeof $.get(node).updateContext).toBe('function')
 	});
 
 	it('should return if already exists', () => {
-		defineNodeContextMetadata(node, new TestComp());
+		defineNodeContextMetadata(node);
 
-		expect(metadata.has(node)).toBeTruthy();
+		expect($.has(node)).toBeTruthy();
 
-		metadata.get(node).test = true;
+		$.get(node).test = true;
 
-		expect(metadata.get(node).test).toBe(true);
+		expect($.get(node).test).toBe(true);
 
-		defineNodeContextMetadata(node, new TestComp());
+		defineNodeContextMetadata(node);
 
-		expect(metadata.get(node).test).toBe(true);
+		expect($.get(node).test).toBe(true);
 	});
 
 	it('should inherit context from parent node', () => {
 		const parent = document.createElement('div');
 		parent.appendChild(node);
 
-		defineNodeContextMetadata(parent, new TestComp());
-		defineNodeContextMetadata(node, new TestComp());
+		defineNodeContextMetadata(parent);
+		defineNodeContextMetadata(node);
 
-		metadata.get(parent).updateContext('parent', 'content');
+		$.get(parent).updateContext({
+			parent: 'content'
+		});
 
-		expect(metadata.get(node).$context).toEqual({parent: "content"});
+		expect($.get(node).$context).toEqual({parent: "content"});
 	});
 });

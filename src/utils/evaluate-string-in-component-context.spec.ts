@@ -2,8 +2,6 @@ import {evaluateStringInComponentContext} from './evaluate-string-in-component-c
 import {WebComponent} from "../web-component";
 
 describe('evaluateStringInComponentContext', () => {
-	const errorSpy = jest.fn();
-
 	class EvalApp extends WebComponent {
 		str = 'simple';
 		numb = 23;
@@ -11,10 +9,6 @@ describe('evaluateStringInComponentContext', () => {
 		arr = [2, 4, 6];
 		obj = {x: 100};
 		set = new Set([2, 6]);
-
-		onError(e: Error) {
-			errorSpy(e)
-		}
 	}
 
 	EvalApp.register()
@@ -27,9 +21,8 @@ describe('evaluateStringInComponentContext', () => {
 		expect(evaluateStringInComponentContext('', app)).toEqual('')
 	});
 
-	it('should return undefined if there is any error', () => {
-		expect(evaluateStringInComponentContext('none', app)).toBeUndefined();
-		expect(errorSpy).toHaveBeenCalledWith(new ReferenceError("none is not defined"));
+	it('should throw error if there is any error', () => {
+		expect(() => evaluateStringInComponentContext('none', app)).toThrowError('none is not defined');
 	});
 
 	it('should eval string based on component data', () => {
