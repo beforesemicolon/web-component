@@ -3,6 +3,18 @@ import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
 
 describe('WebComponent', () => {
 
+	beforeEach(() => {
+		jest.spyOn(window, 'requestAnimationFrame').mockImplementation(cb => {
+			cb(0)
+			return 0;
+		});
+	});
+
+	afterEach(() => {
+		// @ts-ignore
+		window.requestAnimationFrame.mockRestore();
+	});
+
 	describe('constructor and configuration', () => {
 		class AComp extends WebComponent {
 		}
@@ -1018,7 +1030,7 @@ describe('WebComponent', () => {
 			});
 
 			it('should handle nested ifs reversed', () => {
-				class IfB extends WebComponent {
+				class IfE extends WebComponent {
 					check = false;
 					icon = 'star';
 
@@ -1027,8 +1039,8 @@ describe('WebComponent', () => {
 					}
 				}
 
-				IfB.register();
-				const s = new IfB();
+				IfE.register();
+				const s = new IfE();
 
 				document.body.appendChild(s);
 

@@ -39,6 +39,7 @@ export class WebComponent extends HTMLElement {
 		meta.contextSource = null;
 		meta.tracks = new Map();
 		meta.contextSubscribers = [];
+		meta.updateFrame = 0;
 		meta.unsubscribeCtx = () => {};
 
 		// @ts-ignore
@@ -349,9 +350,13 @@ export class WebComponent extends HTMLElement {
 	 * updates any already tracked node with current component data including context and node level data.
 	 */
 	forceUpdate() {
-		$.get(this).tracks.forEach((t: NodeTrack) => {
-			t.updateNode();
+		cancelAnimationFrame($.get(this).updateFrame);
+		$.get(this).updateFrame = requestAnimationFrame(() => {
+			$.get(this).tracks.forEach((t: NodeTrack) => {
+				t.updateNode();
+			});
 		});
+
 		return true;
 	}
 
