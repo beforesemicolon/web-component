@@ -3,6 +3,18 @@ import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
 
 describe('WebComponent', () => {
 
+	beforeEach(() => {
+		jest.spyOn(window, 'requestAnimationFrame').mockImplementation(cb => {
+			cb(0)
+			return 0;
+		});
+	});
+
+	afterEach(() => {
+		// @ts-ignore
+		window.requestAnimationFrame.mockRestore();
+	});
+
 	describe('constructor and configuration', () => {
 		class AComp extends WebComponent {
 		}
