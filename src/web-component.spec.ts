@@ -629,28 +629,25 @@ describe('WebComponent', () => {
 	});
 
 	describe('context', () => {
-		class TargetComp extends WebComponent {
-			get template() {
-				return '{$context.title}'
-			}
-		}
-
-		class AppComp extends WebComponent {
-			get template() {
-				return '<div><target-comp></target-comp></div>'
-			}
-		}
-
-		WebComponent.registerAll([TargetComp, AppComp]);
-
-		const app = new AppComp();
-
-		beforeEach(() => {
-			app?.remove();
-			document.body.appendChild(app);
-		})
 
 		it('should update app context and be inherited', () => {
+			class TargetComp extends WebComponent {
+				get template() {
+					return '{$context.title}'
+				}
+			}
+			
+			class AppComp extends WebComponent {
+				get template() {
+					return '<div><target-comp></target-comp></div>'
+				}
+			}
+			
+			WebComponent.registerAll([TargetComp, AppComp]);
+			const app = new AppComp();
+			
+			document.body.appendChild(app);
+			
 			const forceUpdateSpy = jest.spyOn(app, 'forceUpdate');
 
 			expect(app.root?.innerHTML).toBe('<div><target-comp></target-comp></div>')
@@ -688,6 +685,31 @@ describe('WebComponent', () => {
 			app.root?.appendChild(target);
 
 			expect(target?.root?.innerHTML).toBe('Updated Text App');
+		});
+		
+		it('should inherit context from parent node', () => {
+			class CtxComp extends WebComponent {
+				get template() {
+					return '{$item}'
+				}
+			}
+			
+			class CtxApp extends WebComponent {
+				get template() {
+					return '<p repeat="1"><ctx-comp></ctx-comp></p>'
+				}
+			}
+			
+			CtxApp.register();
+			CtxComp.register();
+			
+			const app = new CtxApp();
+			
+			document.body.appendChild(app);
+			
+			const comp = app.root?.querySelector('ctx-comp') as Element;
+
+			expect(comp.shadowRoot?.innerHTML).toBe('1')
 		});
 	});
 
