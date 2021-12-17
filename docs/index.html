@@ -5,17 +5,20 @@
 	<title>Code Editor</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<!-- codemirror -->
 	<script src="./examples/editor/codemirror.js"></script>
-	<script src="./examples/editor/modes/javascript.js"></script>
-	<script src="./examples/editor/modes/xml.js"></script>
-	<script src="./examples/editor/modes/htmlmixed.js"></script>
-	<script src="./examples/editor/modes/css.js"></script>
 	<link rel="stylesheet" href="./examples/editor/codemirror.css">
+	<!-- theme -->
 	<link rel="stylesheet" href="./examples/editor/themes/dracula.css">
 	<link rel="stylesheet" href="./examples/editor/themes/shadowfox.css">
 	<link rel="stylesheet" href="./examples/editor/themes/base16-light.css">
 	<link rel="stylesheet" href="./examples/editor/themes/neo.css">
-
+	<!-- modes -->
+	<script src="./examples/editor/modes/javascript.js"></script>
+	<script src="./examples/editor/modes/xml.js"></script>
+	<script src="./examples/editor/modes/htmlmixed.js"></script>
+	<script src="./examples/editor/modes/css.js"></script>
+	<!-- addons -->
 	<style>
 		body {
 			background: #eee;
@@ -365,7 +368,14 @@
         const commonOptions = {
           theme: 'neo',
           lineNumbers: true,
-	        tabSize: 2,
+	      tabSize: 2,
+          autoCloseBrackets: true,
+          smartIndent: true,
+          indentWithTabs: true,
+          electricChars: true,
+          lineWrapping: true,
+          autofocus: true,
+          spellcheck: true,
         };
 
         const jsEditor = CodeMirror.fromTextArea(document.getElementById('js-editor'), {
