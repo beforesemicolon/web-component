@@ -14,4 +14,8 @@ export class ContextProviderComponent extends WebComponent {
 	get template() {
 		return '<slot></slot>';
 	}
+
+	get stylesheet() {
+		return ':host { display: block; }';
+	}
 }
