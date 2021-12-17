@@ -2,7 +2,12 @@ export function proxify(name: string, object: any, notify: (name: string, o: any
 }, self = null): any {
 	self = self ?? object;
 
-	if (!object || object.__proxy__ || typeof object === 'number' || typeof object === 'string' || typeof object === 'boolean' || typeof object === 'function') {
+	if (
+		!object ||
+		object.__proxy__ ||
+		/number|function|string|bigint|boolean/.test(typeof object) ||
+		[String, Number, Boolean, BigInt].some(o => object instanceof o)
+	) {
 		return object;
 	}
 

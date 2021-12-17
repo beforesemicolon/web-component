@@ -1,13 +1,13 @@
 {
   "name": "@beforesemicolon/web-component",
-  "version": "0.16.3",
+  "version": "0.16.4",
   "description": "Web Component Client Framework",
   "main": "dist/index.js",
   "scripts": {
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "build:browser": "esbuild src/client.ts --bundle --minify --keep-names --sourcemap --target=chrome58 --outfile=dist/web-component.min.js",
-    "build:browser-local": "esbuild src/client.ts --bundle --target=chrome58 --outfile=dist/web-component.min.js",
+    "build:browser": "esbuild src/client.ts --bundle --minify --keep-names --sourcemap --target=es2020 --outfile=dist/web-component.min.js",
+    "build:browser-local": "esbuild src/client.ts --bundle --target=es2020 --outfile=dist/web-component.min.js",
     "build": "tsc --noEmit && rm -rf dist && npm run build:browser && tsc",
     "build:local": "tsc --noEmit && rm -rf dist && npm run build:browser-local && tsc",
     "local": "nodemon --watch src -e ts --exec npm run build:local"

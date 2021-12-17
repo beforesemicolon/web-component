@@ -18,15 +18,23 @@ describe('proxify', () => {
 
     it('number', () => {
       expect(proxify('sample', 12)).toEqual(12);
+      expect(proxify('sample', new Number('21'))).toEqual(new Number('21'));
     });
 
     it('string', () => {
       expect(proxify('sample', 'str')).toEqual('str');
+      expect(proxify('sample', new String('str'))).toEqual(new String('str'));
     });
 
     it('boolean', () => {
       expect(proxify('sample', true)).toEqual(true);
       expect(proxify('sample', false)).toEqual(false);
+      expect(proxify('sample', new Boolean('true'))).toEqual(new Boolean('true'));
+    });
+
+    it('bigint', () => {
+      expect(proxify('sample', 1n)).toEqual(1n);
+      expect(proxify('sample', BigInt('12'))).toEqual(12n);
     });
   });
 
@@ -43,15 +51,15 @@ describe('proxify', () => {
 
     describe('should proxy Array and call change callback', () => {
       it('when changed index', () => {
-        prx[0] = 10;
+        prx[0] = [10];
 
-        expect(cb).toHaveBeenCalledWith("sample", [10]);
+        expect(cb).toHaveBeenCalledWith("sample", [[10]]);
 
         cb.mockClear();
 
-        prx[0] = 20;
+        prx[0][0] = 20;
 
-        expect(cb).toHaveBeenCalledWith("sample", [20]);
+        expect(cb).toHaveBeenCalledWith("sample", [[20]]);
       });
 
       it('when using push and pop', () => {
