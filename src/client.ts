@@ -1,3 +1,6 @@
+// @beforesemicolon/web-component, copyright (c) by Elson Correia
+// Distributed under an MIT license: https://github.com/beforesemicolon/web-component/blob/master/LICENSE
+
 import {WebComponent} from './web-component';
 import {Directive} from './directive';
 import {ContextProviderComponent} from './context-provider-component';
