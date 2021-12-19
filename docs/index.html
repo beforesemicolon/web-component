@@ -46,12 +46,6 @@
 			<h1>BFS Web Components</h1>
 			<div class="controls">
 				<list-selector
-					id="examples-selector"
-					groups="{examples}"
-					value="{currentExample.value}"
-					label="Examples:"
-					onchange="onExampleSelection($event)"></list-selector>
-				<list-selector
 					id="theme-selector"
 					items="{themes}"
 					value="{currentTheme.value}"
@@ -59,39 +53,45 @@
 					onchange="onThemeChange($event)"></list-selector>
 			</div>
 		</header>
-		<div class="wrapper">
+		<main>
 			<code-examples-menu
-				collapsed
+				id="examples-menu"
 				list="{examples}"
 				active-item="{currentExample}"
-				onselection="onExampleSelection($event)">
+				onselection="onExampleSelection($event)"
+				oncollapse="onPreviewCollapse($event)">
 				>
 			</code-examples-menu>
-			<tabs-container ontabchange="onEditorChange($event)">
-				<tab-head
-					slot="head"
-					repeat="editors as $editor"
-					id="{$editor.type}-tab"
-					content-id="{$editor.type}-content"
-					active="{currentEditor.type === $editor.type}">
-					{$editor.value}
-				</tab-head>
-				<tab-content
-					slot="content"
-					repeat="editors as $editor"
-					id="{$editor.type}-content"
-					tab-id="{$editor.type}-tab">
-					<code-editor
-						example-path="./examples/{currentExample.value}"
-						type="{$editor.type}"
-						content-id="{$editor.contentId}"
-						active="{currentEditor.type === $editor.type}"
-						theme="{currentTheme.value}"
-						onloading="onEditorLoading($event)">
-					</code-editor>
-				</tab-content>
-			</tabs-container>
-		</div>
+			<div class="wrapper">
+				<tabs-container id="code-view" ontabchange="onEditorChange($event)">
+					<tab-head
+						slot="head"
+						repeat="editors as $editor"
+						id="{$editor.type}-tab"
+						content-id="{$editor.type}-content"
+						active="{currentEditor.type === $editor.type}">
+						{$editor.value}
+					</tab-head>
+					<tab-content
+						slot="content"
+						repeat="editors as $editor"
+						id="{$editor.type}-content"
+						tab-id="{$editor.type}-tab">
+						<code-editor
+							example-path="./examples/{currentExample.value}"
+							type="{$editor.type}"
+							content-id="{$editor.contentId}"
+							active="{currentEditor.type === $editor.type}"
+							theme="{currentTheme.value}"
+							onloading="onEditorLoading($event)"
+							oncontent="onCodeLoaded($event)">
+						</code-editor>
+					</tab-content>
+				</tabs-container>
+				<flex-resizer direction="horizontal" reset="{previewCollapsed || menuCollapsed}"></flex-resizer>
+				<code-preview id="code-preview" code="{currentCode}" oncollapse="onPreviewCollapse($event)"></code-preview>
+			</div>
+		</main>
 		<footer>
 			<p><small>Copyright &copy; Before Semicolon Web Components 2021. All rights reserved</small></p>
 			<div class="social-media-links">
@@ -428,11 +428,129 @@
           }
         }
       }
+
+      class FlexResizer extends WebComponent {
+        static observedAttributes = ['direction', 'reset'];
+        resizing = false;
+        #prevPos = 0;
+        #prevBox;
+        #nextBox;
+        #prop;
+
+        get template() {
+          this.#prop = !this.direction || this.direction === 'horizontal' ? 'width' : 'height';
+
+          return `<button type="button" class="resize-button"
+			onmousedown="onResizeStart($event)"
+			onmouseup="onResizeEnd()"
+			>||</button>`
+        }
+
+        get stylesheet() {
+          return `
+            <style>
+                :host {
+                    display: block;
+					width: 10px;
+					min-width: 10px;
+					max-width: 10px;
+					height: 100%;
+					position: relative;
+					background: #f2f2f2;
+					box-sizing: border-box;
+					z-index: 1000;
+                }
+
+                :host * {
+                    box-sizing: border-box;
+                }
+
+                .resize-button {
+					border-radius: 3px;
+					-webkit-appearance: none;
+					-moz-appearance: none;
+					appearance: none;
+					background: #ddd;
+					border: none;
+					cursor: pointer;
+					position: absolute;
+					left: 0;
+					top: 50%;
+					padding: 1px;
+					transform: translate(0, -50%);
+					width: 10px;
+					height: 100px;
+				}
+
+				.resize-button::after {
+					content: '';
+					display: [resizing ? 'block' : 'none'];
+					position: absolute;
+					left: 50%;
+					top: 50%;
+					transform: translate(-50%, -50%);
+					width: 500px;
+					height: 100%;
+				}
+
+			</style>
+		 `;
+        }
+
+        onMount() {
+          requestAnimationFrame(() => {
+            this.#prevBox = this.previousElementSibling;
+            this.#prevBox.style.flex = `${this.#prevBox.offsetWidth}px 0 0`;
+            this.#nextBox = this.nextElementSibling;
+            this.#nextBox.style.flex = `${this.#nextBox.offsetWidth}px 0 0`;
+
+            window.addEventListener("mousemove", this.onResize.bind(this), false);
+            window.addEventListener("resize", this.onResize.bind(this), true);
+          })
+        }
+
+        onUpdate(name, oldValue, newValue) {
+          if (name === 'direction') {
+            this.#prop = !this.direction || this.direction === 'horizontal' ? 'width' : 'height';
+          } else if(name === 'reset' && newValue) {
+            this.#prevBox.style.flex = `1 0 0`;
+            this.#nextBox.style.flex = `1 0 0`;
+          }
+        }
+
+        onResize(event) {
+          if (this.resizing) {
+            const diff = this.#prevPos - event.x;
+            this.#prevPos = event.x;
+
+            if (diff) {
+              this.#prevBox.style.flex = `${Math.max(0, (parseInt(getComputedStyle(this.#prevBox).getPropertyValue(this.#prop)) - diff))}px 0 0`;
+              this.#nextBox.style.flex = `${Math.max(0, (parseInt(getComputedStyle(this.#nextBox).getPropertyValue(this.#prop)) + diff))}px 0 0`
+            }
+          }
+        }
+
+        onResizeStart(event) {
+          this.#prevPos = event.x;
+          this.resizing = true;
+        }
+
+        onResizeEnd() {
+          this.resizing = false;
+        }
+
+        onDestroy() {
+          window.removeEventListener("mousemove", this.onResize.bind(this), false);
+          window.removeEventListener("resize", this.onResize.bind(this), true);
+        }
+      }
 	</script>
 
 	<script id="editor">
       class CodeEditorApp extends ContextProviderComponent {
         loading = false;
+        previewCollapsed = false;
+        menuCollapsed = false;
         themes = [
           {value: 'neo', label: 'Neo'},
           {value: 'dracula', label: 'Dracula'},
@@ -561,6 +679,7 @@
         currentExample = this.examples[0].items[0];
         currentEditor = this.editors[0];
         currentTheme = this.themes[0];
+        currentCode = '';
         url = new URL(location.href);
         params = new URLSearchParams(this.url.search);
 
@@ -602,15 +721,17 @@
                     margin-left: 20px;
                 }
 
-                #examples-selector {
-                    display: none;
+                main {
+                    display: flex;
+                    flex: 1;
+                    height: calc(100% - 110px);
                 }
 
 	            .wrapper {
 	                display: flex;
 	                flex: 1;
 	                width: 100%;
-	                height: calc(100% - 110px);
+	                height: 100%;
 
 	            }
 
@@ -699,6 +820,18 @@
           this.updateUrl('example', this.currentExample.value);
         }
 
+        onCodeLoaded(event) {
+          this.currentCode = event.detail;
+		}
+
+        onPreviewCollapse(event) {
+		  this.previewCollapsed = event.detail;
+		}
+
+        onMenuCollapse(event) {
+          this.menuCollapsed = event.detail;
+        }
+
         updateUrl(key, value) {
           this.params.set(key, value);
           this.url.search = this.params.toString();
@@ -737,14 +870,16 @@
                 :host {
                     display: block;
                     max-width: 300px;
+                    min-width: 300px;
                     height: 100%;
                     overflow: auto;
                     padding: 15px 0;
                     border-right: 1px solid #555;
                 }
 
-                :host([collapsed]) {
+                :host([collapsed="true"]) {
 					max-width: 35px;
+					min-width: 35px;
 				}
 
                 :host * {
@@ -770,11 +905,11 @@
 
                 }
 
-                :host([collapsed]) h2 {
+                :host([collapsed="true"]) h2 {
                     padding: 8px 6px 4px;
                 }
 
-                :host([collapsed]) h2 span {
+                :host([collapsed="true"]) h2 span {
                     display: none;
                 }
 
@@ -802,7 +937,7 @@
                     padding: 0 10px;
                 }
 
-                :host([collapsed]) ul.items {
+                :host([collapsed="true"]) ul.items {
 					display: none;
 				}
 
@@ -866,18 +1001,24 @@
 
         toggleCollapse() {
           if (this.collapsed) {
-            this.removeAttribute('collapsed');
+            this.setAttribute('collapsed', 'false');
           } else {
             this.setAttribute('collapsed', 'true');
           }
+
+          this.dispatchEvent(new CustomEvent('collapse', {
+            detail: this.collapsed
+          }));
         }
       }
 
       class CodePreview extends WebComponent {
-        static observedAttributes = ['code'];
+        static observedAttributes = ['code', 'collapsed'];
 
         get template() {
-          return `<iframe id="editor-view" srcdoc="{code}"></iframe>`
+          return `
+			<button type="button" class="collapse-button" onclick="toggleCollapse()">{collapsed ? '<' : '>'}</button>
+			<iframe id="editor-view" srcdoc="{code}"></iframe>`
         }
 
         get stylesheet() {
@@ -886,13 +1027,59 @@
 				:host {
 					display: block;
 					width: 100%;
+					min-width: 15px;
 					height: 100%;
+					border: 1px solid #ddd;
+					position: relative;
+					background: #fff;
 				}
+
+				:host([collapsed="true"]) {
+					max-width: 15px;
+				}
+
+				iframe {
+					width: 100%;
+					height: 100%;
+					border: none;
+					background: #fff;
+				}
+				
+				.collapse-button {
+                    border-radius: 3px;
+					-webkit-appearance: none;
+					-moz-appearance: none;
+					appearance: none;
+					border: none;
+					cursor: pointer;
+					position: absolute;
+					left: 0;
+					top: 0;
+					transform: translate(calc(-100% - 15px), 0);
+					width: 25px;
+					height: 25px;
+					background: #1d75b3;
+					color: #fff;
+				}
+
+				:host([collapsed="true"]) iframe {
+					display: none;
+				}
+
+
 			</style>`;
         }
 
-        onDestroy() {
-          console.log('destroy', this);
+        toggleCollapse() {
+          if (this.collapsed) {
+            this.setAttribute('collapsed', 'false');
+          } else {
+            this.setAttribute('collapsed', 'true');
+          }
+
+          this.dispatchEvent(new CustomEvent('collapse', {
+			detail: this.collapsed
+		  }));
         }
       }
 
@@ -931,6 +1118,13 @@
 					font-weight: 500;
 					line-height: 1.4375;
 					letter-spacing: 0.035rem;
+				}
+
+				@media screen and (max-width: 600px) {
+				    .CodeMirror pre.CodeMirror-line,
+					.CodeMirror pre.CodeMirror-line-like {
+						font-size: 12px;
+					}
 				}
 			</style>
 			`
@@ -1007,6 +1201,7 @@
         // components
         ViewLoadingIndicator,
         ListSelector,
+        FlexResizer,
         CodeExamplesMenu,
         TabHead,
         TabContent,
