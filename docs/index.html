@@ -44,18 +44,29 @@
 		<view-loading-indicator attr.style.display="none, !loading"></view-loading-indicator>
 		<header>
 			<h1>BFS Web Components</h1>
-			<list-selector
-				items="{themes}"
-				value="{currentTheme.value}"
-				label="Theme:"
-				onchange="onThemeChange($event)"></list-selector>
+			<div class="controls">
+				<list-selector
+					id="examples-selector"
+					groups="{examples}"
+					value="{currentExample.value}"
+					label="Examples:"
+					onchange="onExampleSelection($event)"></list-selector>
+				<list-selector
+					id="theme-selector"
+					items="{themes}"
+					value="{currentTheme.value}"
+					label="Theme:"
+					onchange="onThemeChange($event)"></list-selector>
+			</div>
 		</header>
 		<div class="wrapper">
 			<code-examples-menu
+				collapsed
 				list="{examples}"
 				active-item="{currentExample}"
 				onselection="onExampleSelection($event)">
-			></code-examples-menu>
+				>
+			</code-examples-menu>
 			<tabs-container ontabchange="onEditorChange($event)">
 				<tab-head
 					slot="head"
@@ -314,6 +325,111 @@
 
 	</script>
 
+	<script id="global">
+      class ViewLoadingIndicator extends WebComponent {
+        static observedAttributes = ['loading'];
+
+        get template() {
+          return `<div id="loading-indicator">loading...</div>`
+        }
+
+        get stylesheet() {
+          return `
+			<style>
+				:host {
+					display: flex;
+					z-index: 10000000;
+					justify-content: center;
+					align-items: center;
+					width: 100vw;
+					height: 100vh;
+					position: fixed;
+					top: 0;
+					left: 0;
+					color: #fff;
+					background: rgba(0, 0, 0, 0.8);
+					font-size: 2rem;
+				}
+			</style>`
+        }
+
+        onDestroy() {
+          console.log('destroy', this);
+        }
+      }
+
+      class ListSelector extends WebComponent {
+        static observedAttributes = ['items', 'groups', 'value', 'name', 'label', 'aria-label'];
+
+        get template() {
+          this.groups = this.groups || [];
+          this.items = this.items || [];
+
+          return `
+			<label aria-label="{ariaLabel}">
+				<span>{label}</span>
+				<select name="{name}" onchange="onChange($event)">
+					<optgroup if="groups.length" repeat="groups; $key as $g" label="{$item.title}">
+						<option
+							repeat="$item.items as $opt"
+							value="{$g}~{$key}"
+							attr.selected="$opt.value === value">{$opt.label}</option>
+					</optgroup>
+					<option if="items.length"
+						repeat="items as $opt"
+						value="{$key}"
+						attr.selected="$opt.value === value">{$opt.label}</option>
+				</select>
+			</label>
+
+		 `;
+        }
+
+        get stylesheet() {
+          return `
+			<style>
+				:host {
+					display: block;
+				}
+
+				select {
+					height: 35px;
+					background: #c6effd;
+					color: #222;
+					padding: 0 10px;
+					border: none;
+					border-right: 10px solid #c6effd;
+					border-radius: 5px;
+					min-width: 200px;
+					cursor: pointer;
+					font-weight: 700;
+				}
+			</style>
+          `;
+        }
+
+        onChange(event) {
+          const parts = event.target.value.split('~');
+
+          if (parts.length === 2) {
+            this.dispatchEvent(new CustomEvent('change', {
+              detail: {
+                group: this.groups[parts[0]],
+                item: this.groups[parts[0]].items[parts[1]]
+              }
+            }));
+          } else {
+            this.dispatchEvent(new CustomEvent('change', {
+              detail: {
+                group: null,
+                item: this.items[parts[0]]
+              }
+            }));
+          }
+        }
+      }
+	</script>
+
 	<script id="editor">
       class CodeEditorApp extends ContextProviderComponent {
         loading = false;
@@ -477,6 +593,19 @@
                     color: #3490d0;
                 }
 
+                header .controls {
+                    display: flex;
+                    align-items: center;
+                }
+
+                header .controls > * {
+                    margin-left: 20px;
+                }
+
+                #examples-selector {
+                    display: none;
+                }
+
 	            .wrapper {
 	                display: flex;
 	                flex: 1;
@@ -517,20 +646,20 @@
           if (exampleFileName) {
             for (let example of this.examples) {
               for (let item of example.items) {
-				if (item.value === exampleFileName) {
-				  this.currentExample = item;
-				  break;
-				}
+                if (item.value === exampleFileName) {
+                  this.currentExample = item;
+                  break;
+                }
               }
             }
-		  }
+          }
 
           if (themeName) {
             const newTheme = this.themes.find(theme => theme.value === themeName);
 
-			if (newTheme) {
-			  this.currentTheme = newTheme;
-			}
+            if (newTheme) {
+              this.currentTheme = newTheme;
+            }
           }
 
           if (fileName) {
@@ -552,10 +681,10 @@
         };
 
         onThemeChange(event) {
-          const newTheme = this.themes.find(theme => theme.value === event.detail);
+          const newTheme = this.themes.find(theme => theme.value === event.detail.item.value);
 
           if (newTheme) {
-              this.currentTheme = newTheme;
+            this.currentTheme = newTheme;
           }
 
           this.updateUrl('theme', this.currentTheme.value);
@@ -566,20 +695,41 @@
         }
 
         onExampleSelection(event) {
-          this.currentExample = event.detail;
+          this.currentExample = event.detail.item ?? event.detail;
           this.updateUrl('example', this.currentExample.value);
         }
 
         updateUrl(key, value) {
           this.params.set(key, value);
-		  this.url.search = this.params.toString();
-		  history.pushState(null, null, this.url.toString());
-		}
+          this.url.search = this.params.toString();
+          history.pushState(null, null, this.url.toString());
+        }
 
       }
 
       class CodeExamplesMenu extends WebComponent {
-        static observedAttributes = ['list', 'active-item'];
+        static observedAttributes = ['list', 'active-item', 'collapsed'];
+
+        get template() {
+          this.collapsed = this.hasAttribute('collapsed');
+
+          return `
+            <nav name="main-menu">
+                <h2><span>Examples</span> <button type="button" onclick="toggleCollapse()">{collapsed ? '>' : '<'}</button></h2>
+                <ul class="items">
+                    <li repeat="list">
+                        <span>{$item.title}</span>
+                        <ul repeat="$item.items as $menuItem" class="sub-items">
+		                    <li data-item="{$menuItem.value}" attr.class.active="activeItem?.value === $menuItem.value">
+		                        <button type="button"
+		                            onclick="handleClick($event, $menuItem)">{$menuItem.label}</button>
+	                        </li>
+						</ul>
+					</li>
+				</ul>
+			</nav>
+          `;
+        }
 
         get stylesheet() {
           return `
@@ -592,6 +742,10 @@
                     padding: 15px 0;
                     border-right: 1px solid #555;
                 }
+
+                :host([collapsed]) {
+					max-width: 35px;
+				}
 
                 :host * {
                     box-sizing: border-box;
@@ -610,7 +764,32 @@
                     padding: 8px 10px 4px;
                     margin: -20px 0 0 0;
                     font-size: 1rem;
-                    border-bottom: 2px solid #1d75b3;;
+                    border-bottom: 2px solid #1d75b3;
+                    display: flex;
+                    justify-content: space-between;
+
+                }
+
+                :host([collapsed]) h2 {
+                    padding: 8px 6px 4px;
+                }
+
+                :host([collapsed]) h2 span {
+                    display: none;
+                }
+
+                :host nav h2 button {
+                    -webkit-appearance: none;
+                    -moz-appearance: none;
+                    appearance: none;
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    background: #1d75b3;
+                    color: #ffffff;
+                    border-radius: 3px;
+                    min-width: 25px;
+                    min-height: 20px;
                 }
 
                 :host ul {
@@ -622,6 +801,10 @@
                 :host ul.items {
                     padding: 0 10px;
                 }
+
+                :host([collapsed]) ul.items {
+					display: none;
+				}
 
                 :host ul.items > li span {
 					font-size: 0.9rem;
@@ -661,33 +844,14 @@
           `;
         }
 
-        get template() {
-          return `
-            <nav name="main-menu">
-                <h2>Examples</h2>
-                <ul class="items">
-                    <li repeat="list">
-                        <span>{$item.title}</span>
-                        <ul repeat="$item.items as $menuItem" class="sub-items">
-		                    <li data-item="{$menuItem.value}" attr.class.active="activeItem?.value === $menuItem.value">
-		                        <button type="button"
-		                            onclick="handleClick($event, $menuItem)">{$menuItem.label}</button>
-	                        </li>
-						</ul>
-					</li>
-				</ul>
-			</nav>
-          `;
-        }
-
         onUpdate(name, oldValue, newValue) {
           if (name === 'activeItem' && newValue) {
             this.root.querySelector(`[data-item="${newValue.value}"]`)?.scrollIntoView({
               behavior: 'smooth',
               block: 'center',
             });
-		  }
-		}
+          }
+        }
 
         handleClick(event, example) {
           event.stopPropagation();
@@ -697,8 +861,16 @@
             this.dispatchEvent(new CustomEvent('selection', {
               detail: example
             }));
-		  }
-		}
+          }
+        }
+
+        toggleCollapse() {
+          if (this.collapsed) {
+            this.removeAttribute('collapsed');
+          } else {
+            this.setAttribute('collapsed', 'true');
+          }
+        }
       }
 
       class CodePreview extends WebComponent {
@@ -782,7 +954,6 @@
           });
 
           this.editor.setSize('100%', '100%');
-          this.editor.setValue('');
 
           if (this.active) {
             this.loadExample();
@@ -793,14 +964,14 @@
           if (name === 'examplePath' || name === 'active') {
             this.loadExample();
           } else if (name === 'theme') {
-			this.editor.setOption('theme', nv);
-		  }
+            this.editor.setOption('theme', nv);
+          }
         }
 
         loadExample() {
           if (!this.examplePath || !this.active || this.#currentExamplePath === this.examplePath) {
-			return;
-		  }
+            return;
+          }
 
           this.#currentExamplePath = this.examplePath;
 
@@ -827,93 +998,6 @@
               this.dispatchEvent(new CustomEvent('content', {detail: ''}));
               this.dispatchEvent(new CustomEvent('loading', {detail: false}));
             })
-        }
-      }
-
-      class ViewLoadingIndicator extends WebComponent {
-        static observedAttributes = ['loading'];
-
-        get template() {
-          return `<div id="loading-indicator">loading...</div>`
-        }
-
-        get stylesheet() {
-          return `
-			<style>
-				:host {
-					display: flex;
-					z-index: 10000000;
-					justify-content: center;
-					align-items: center;
-					width: 100vw;
-					height: 100vh;
-					position: fixed;
-					top: 0;
-					left: 0;
-					color: #fff;
-					background: rgba(0, 0, 0, 0.8);
-					font-size: 2rem;
-				}
-			</style>`
-        }
-
-        onDestroy() {
-          console.log('destroy', this);
-        }
-      }
-
-      class ListSelector extends WebComponent {
-        static observedAttributes = ['items', 'groups', 'value', 'name', 'label', 'aria-label'];
-
-        get template() {
-          this.groups = this.groups || [];
-          this.items = this.items || [];
-
-          return `
-			<label aria-label="{ariaLabel}">
-				<span>{label}</span>
-				<select name="{name}" onchange="onChange($event)">
-					<optgroup if="groups.length" repeat="groups" label="{$item.title}">
-						<option
-							repeat="$item.options as $opt"
-							value="{$opt.value}"
-							attr.selected="$opt.value === value">{$opt.label}</option>
-					</optgroup>
-					<option if="items.length"
-						repeat="items as $opt"
-						value="{$opt.value}"
-						attr.selected="$opt.value === value">{$opt.label}</option>
-				</select>
-			</label>
-
-		 `;
-        }
-
-        get stylesheet() {
-          return `
-			<style>
-				:host {
-					display: block;
-				}
-
-				select {
-					height: 35px;
-					background: #c6effd;
-					color: #222;
-					padding: 0 10px;
-					border: none;
-					border-right: 10px solid #c6effd;
-					border-radius: 5px;
-					min-width: 200px;
-					cursor: pointer;
-					font-weight: 700;
-				}
-			</style>
-          `;
-        }
-
-        onChange(event) {
-          this.dispatchEvent(new CustomEvent('change', {detail: event.target.value}));
         }
       }
 
