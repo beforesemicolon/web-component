@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Code Editor</title>
+	<title>BFS Web Component</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<script src="https://unpkg.com/@beforesemicolon/web-component/dist/web-component.min.js"
@@ -794,6 +794,7 @@
           this.updateUrl('example', this.currentExample.value);
           this.updateUrl('theme', this.currentTheme.value);
           this.updateUrl('file', this.currentEditor.value);
+	        document.title = `${this.currentExample.label} - BFS Web Component`;
         }
 
         onEditorChange(event) {
@@ -818,6 +819,7 @@
         onExampleSelection(event) {
           this.currentExample = event.detail.item ?? event.detail;
           this.updateUrl('example', this.currentExample.value);
+					document.title = `${this.currentExample.label} - BFS Web Component`;
         }
 
         onCodeLoaded(event) {
