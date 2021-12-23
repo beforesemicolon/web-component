@@ -1087,8 +1087,9 @@
 
       class CodeEditor extends WebComponent {
         static observedAttributes = ['example-path', 'type', 'content-id', 'active', 'theme'];
-
-        commonOptions = {
+				#exampleCode = '';
+				#pattern = '';
+        #commonOptions = {
           lineNumbers: true,
           tabSize: 2,
           autoCloseBrackets: true,
@@ -1143,13 +1144,26 @@
         }
 
         onMount() {
+					this.#pattern = new RegExp(`<([a-z][a-z0-9-\\.]+)\\s*id="${this.contentId}"\\s*[^>]*>(.*)<\/\\1>`, 'is');
           this.editor = CodeMirror.fromTextArea(this.$refs.textarea, {
             mode: this.type,
             theme: this.theme,
-            ...this.commonOptions,
+            ...this.#commonOptions,
           });
 
           this.editor.setSize('100%', '100%');
+	
+					let timer;
+	        this.editor.on('change', () => {
+						const [fullMatch, tag] = this.#exampleCode.match(this.#pattern);
+						
+						clearTimeout(timer);
+		        timer = setTimeout(() => {
+			        this.dispatchEvent(new CustomEvent('content', {
+				        detail: this.#exampleCode.replace(fullMatch, `<${tag} id="${this.contentId}">${this.editor.getValue()}</${tag}>`)
+			        }));
+		        }, 1000)
+	        })
 
           if (this.active) {
             this.loadExample();
@@ -1182,9 +1196,9 @@
               return res.text();
             })
             .then(res => {
-              const pattern = new RegExp(`<([a-z][a-z0-9-\\.]+)\\s*id="${this.contentId}"\\s*[^>]*>(.*)<\/\\1>`, 'is');
-              const code = res.match(pattern);
+              const code = res.match(this.#pattern);
 
+							this.#exampleCode = res;
               this.editor.setValue(code[2].trim());
               this.dispatchEvent(new CustomEvent('content', {detail: res}));
               this.dispatchEvent(new CustomEvent('loading', {detail: false}));

@@ -102,8 +102,9 @@ class CalcApp extends ContextProviderComponent {
 	    case '*':
 	      if(typeof this.#operations[this.#operations.length - 1] !== 'number') {
 	        this.#operations.push(Number(this.value));
+		      this.value = eval(this.#operations.join(' '));
 	      }
-
+		    
 	      this.operation = value;
 	      this.#operations.push(value);
 	      break;
