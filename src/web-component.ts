@@ -37,7 +37,8 @@ export class WebComponent extends HTMLElement {
 		meta.mounted = false;
 		meta.parsed = false;
 		meta.tracks = new Map();
-		
+		meta.unsubscribeCtx = () => {};
+
 		let {mode, observedAttributes, delegatesFocus} = this.constructor as WebComponentConstructor;
 		
 		if (mode !== 'none') {
@@ -183,12 +184,6 @@ export class WebComponent extends HTMLElement {
 	
 	updateContext(ctx: ObjectLiteral) {
 		$.get(this).updateContext(ctx);
-		this.forceUpdate();
-		
-		if (this.mounted) {
-			const newCtx = $.get(this).$context;
-			this.onUpdate('$context', newCtx, newCtx)
-		}
 	}
 	
 	connectedCallback() {
@@ -202,17 +197,11 @@ export class WebComponent extends HTMLElement {
 		const {parsed, tracks, root} = $.get(this);
 		
 		try {
-			const parent = this.parentNode instanceof ShadowRoot ? this.parentNode.host : this.parentNode;
-			
-			if ($.has(parent)) {
-				$.get(parent).subscribe((newContext: ObjectLiteral) => {
-					this.forceUpdate();
-					
-					if (this.mounted) {
-						this.onUpdate('$context', newContext, newContext)
-					}
-				})
-			}
+			$.get(this).unsubscribeCtx = $.get(this).subscribe((newContext: ObjectLiteral) => {
+				if (this.mounted) {
+					this.onUpdate('$context', newContext, newContext)
+				}
+			})
 			
 			/*
 			only need to parse the element the very first time it gets mounted
@@ -296,7 +285,7 @@ export class WebComponent extends HTMLElement {
 	disconnectedCallback() {
 		try {
 			$.get(this).mounted = false;
-			$.get(this).unsubscribe();
+			$.get(this).unsubscribeCtx();
 			this.onDestroy();
 		} catch (e) {
 			this.onError(e as Error)

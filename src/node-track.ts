@@ -330,7 +330,6 @@ export class NodeTrack {
 	private _unTrackNode(n: Node) {
 		if (n !== this.node) {
 			this.tracks.delete(n);
-			$.get(n).unsubscribe();
 			n.childNodes.forEach(c => this._unTrackNode(c));
 		}
 	}

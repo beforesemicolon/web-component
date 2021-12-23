@@ -10,7 +10,7 @@ export function trackNode(node: Node | HTMLElement | DocumentFragment, component
 	}
 
 	if (nodeType !== 11 && nodeName !== 'SLOT') {
-		defineNodeContextMetadata(node, (node?.parentNode instanceof DocumentFragment ? component : node.parentNode) as HTMLElement);
+		defineNodeContextMetadata(node);
 	}
 
 	if (/#comment|SCRIPT/.test(nodeName)) {

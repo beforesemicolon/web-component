@@ -6,10 +6,11 @@ describe('defineNodeContextMetadata', () => {
 	class TestComp extends WebComponent {}
 	TestComp.register();
 
-	const node = document.createElement('div');
+	let node: HTMLElement;
 
 	beforeEach(() => {
-		$.delete(node);
+		node && $.delete(node);
+		node = document.createElement('div');
 	})
 
 	it('should set node $context', () => {
@@ -57,37 +58,28 @@ describe('defineNodeContextMetadata', () => {
 	
 	it('should unsubscribe and subscribe when remove and attached to element',  () => {
 		const parent = document.createElement('div');
-		
+
 		defineNodeContextMetadata(parent);
 		defineNodeContextMetadata(node);
-		
-		const nSubSpy = jest.spyOn($.get(node), 'subscribe');
-		const pSubSpy = jest.spyOn($.get(parent), 'subscribe');
-		
+
 		expect($.get(node).$context).toEqual({});
-		expect(nSubSpy).not.toHaveBeenCalled();
-		
+
 		$.get(parent).updateContext({
 			parent: 'content'
 		});
-		
+
 		parent.appendChild(node);
-		
+
 		expect($.get(node).$context).toEqual({parent: "content"});
-		expect(pSubSpy).toHaveBeenCalledWith(expect.any(Function));
-		
+
 		parent.removeChild(node);
 
 		expect($.get(node).$context).toEqual({});
 
-		nSubSpy.mockClear();
-		
 		// try new parent node
 		const newParent = document.createElement('div');
-		
+
 		defineNodeContextMetadata(newParent);
-		
-		const npSubSpy = jest.spyOn($.get(newParent), 'subscribe');
 
 		$.get(newParent).updateContext({
 			parent: 'new content'
@@ -96,11 +88,10 @@ describe('defineNodeContextMetadata', () => {
 		newParent.appendChild(node);
 
 		expect($.get(node).$context).toEqual({parent: "new content"});
-		expect(npSubSpy).toHaveBeenCalledWith(expect.any(Function));
-		
+
 		let subSpy = jest.fn();
 
-		$.get(node).subscribe((parentCtx: any) => {
+		const unsub = $.get(node).subscribe((parentCtx: any) => {
 			subSpy();
 			expect(parentCtx).toEqual({parent: "updated content"});
 			expect($.get(node).$context).toEqual({parent: "updated content"});
@@ -114,7 +105,7 @@ describe('defineNodeContextMetadata', () => {
 
 		subSpy.mockClear();
 
-		$.get(node).unsubscribe();
+		unsub();
 
 		$.get(newParent).updateContext({
 			parent: 'newly updated content'
@@ -122,10 +113,5 @@ describe('defineNodeContextMetadata', () => {
 
 		expect(subSpy).not.toHaveBeenCalled()
 		expect($.get(node).$context).toEqual({parent: "newly updated content"});
-		expect(npSubSpy).toHaveBeenCalledWith(expect.any(Function)); // node resubscribes on $context read
-		
-		jest.clearAllMocks();
 	});
-	
-	
 });
