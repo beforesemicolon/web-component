@@ -660,28 +660,20 @@ describe('WebComponent', () => {
 			
 			document.body.appendChild(app);
 			
-			const forceUpdateSpy = jest.spyOn(app, 'forceUpdate');
-
 			expect(app.root?.innerHTML).toBe('<div><target-comp></target-comp></div>')
 			expect(app.$context).toBeDefined()
-
-			forceUpdateSpy.mockClear();
 
 			app.updateContext({
 				title: 'Text App'
 			});
 
-			expect(forceUpdateSpy).toHaveBeenCalled();
 			expect(app.$context).toEqual({
 				title: 'Text App'
 			})
 
 			const target = app.root?.querySelector('target-comp') as WebComponent;
 
-			expect(target).toBeDefined();
-			expect(target.$context).toEqual({
-				title: "Text App"
-			})
+			expect(target.$context.title).toEqual("Text App")
 			expect(target?.root?.innerHTML).toBe('Text App');
 
 			// should unsubscribe from context and not get updates
@@ -691,7 +683,7 @@ describe('WebComponent', () => {
 				title: 'Updated Text App'
 			});
 
-			expect(target?.root?.innerHTML).toBe('');
+			expect(target?.root?.innerHTML).toBe('Text App');
 
 			// should update the DOM to grab new context and data
 			app.root?.appendChild(target);

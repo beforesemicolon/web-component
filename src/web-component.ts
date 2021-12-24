@@ -23,53 +23,47 @@ export class WebComponent extends HTMLElement {
 	$properties: Array<string> = ['$context', '$refs'];
 	templateId = '';
 	_childNodes: Array<Node> = [];
-
+	
 	constructor() {
 		super();
-
+		
 		if (!$.has(this)) {
-		   defineNodeContextMetadata(this)
+			$.set(this, {})
 		}
-
+		
 		const meta = $.get(this);
-
+		
 		meta.root = this;
 		meta.mounted = false;
 		meta.parsed = false;
-		meta.contextSource = null;
 		meta.tracks = new Map();
-		meta.contextSubscribers = [];
-		meta.updateFrame = 0;
 		meta.unsubscribeCtx = () => {};
 
-		// @ts-ignore
-		let {mode, observedAttributes, delegatesFocus, initialContext} = this.constructor;
-
+		let {mode, observedAttributes, delegatesFocus} = this.constructor as WebComponentConstructor;
+		
 		if (mode !== 'none') {
 			$.get(this).root = this.attachShadow({mode, delegatesFocus});
 		}
-
-		$.get(this).updateContext(initialContext);
-
+		
 		this.$properties.push(
 			...setComponentPropertiesFromObservedAttributes(this, observedAttributes,
 				(prop, oldValue, newValue) => {
 					this.forceUpdate();
-
+					
 					if (this.mounted) {
 						this.onUpdate(prop, oldValue, newValue);
 					}
 				})
 		);
 	}
-
+	
 	/**
 	 * an array of attribute names as they will look in the html tag
 	 * https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elementsusing_the_lifecycle_callbacks
 	 * @type {[]}
 	 */
 	static observedAttributes: Array<string> = [];
-
+	
 	/**
 	 * shadow root mode
 	 * https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot/mode
@@ -78,25 +72,25 @@ export class WebComponent extends HTMLElement {
 	 * @type {string}
 	 */
 	static mode = ShadowRootModeExtended.OPEN;
-
+	
 	/**
 	 * shadow root delegate focus option
 	 * https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot/delegatesFocus
 	 * @type {boolean}
 	 */
 	static delegatesFocus = false;
-
+	
 	/**
 	 * a valid name of the html tag
 	 * @type {string}
 	 */
 	static tagName = '';
-
+	
 	/**
 	 * the initial context data for the component
 	 */
 	static initialContext = {};
-
+	
 	/**
 	 * parses special template HTML string taking in consideration
 	 * all the additional syntax specific to this framework
@@ -104,7 +98,7 @@ export class WebComponent extends HTMLElement {
 	static parseHTML(markup: string): DocumentFragment {
 		return parse(markup)
 	}
-
+	
 	/**
 	 * registers the component with the CustomElementRegistry taking an optional tag name if not
 	 * specified as static member of the class as tagName
@@ -116,14 +110,14 @@ export class WebComponent extends HTMLElement {
 			: typeof this.tagName === 'string' && this.tagName
 				? this.tagName
 				: turnCamelToKebabCasing(this.name);
-
+		
 		this.tagName = tagName;
-
+		
 		if (!customElements.get(tagName)) {
 			customElements.define(tagName, this);
 		}
 	}
-
+	
 	/**
 	 * registers a list of provided web component classes
 	 * @param components
@@ -131,14 +125,14 @@ export class WebComponent extends HTMLElement {
 	static registerAll(components: Array<WebComponentConstructor>) {
 		components.forEach(comp => comp.register());
 	}
-
+	
 	/**
 	 * returns whether the component is registered or not
 	 */
 	static get isRegistered() {
 		return customElements.get(this.tagName) !== undefined;
 	}
-
+	
 	/**
 	 * whether or not the component should use the real slot element or mimic its behavior
 	 * when rendering template
@@ -146,7 +140,7 @@ export class WebComponent extends HTMLElement {
 	get customSlot() {
 		return false;
 	}
-
+	
 	/**
 	 * the root element. If shadow root present it will be the shadow root otherwise
 	 * the actual element
@@ -155,15 +149,15 @@ export class WebComponent extends HTMLElement {
 	get root(): HTMLElement | ShadowRoot | null {
 		return (this.constructor as WebComponentConstructor).mode === 'closed' ? null : $.get(this).root;
 	}
-
+	
 	/**
 	 * whether or not the element is attached to the DOM and works differently than Element.isConnected
 	 * @returns {boolean}
 	 */
 	get mounted() {
-		return $.get(this).mounted;
+		return $.get(this)?.mounted ?? false;
 	}
-
+	
 	/**
 	 * style for the component whether inside the style tag, as object or straight CSS string
 	 * @returns {string | {type: string, content: string}}
@@ -171,7 +165,7 @@ export class WebComponent extends HTMLElement {
 	get stylesheet() {
 		return '';
 	}
-
+	
 	/**
 	 * template for the element HTML content
 	 * @returns {string}
@@ -179,50 +173,36 @@ export class WebComponent extends HTMLElement {
 	get template() {
 		return '';
 	}
-
-	get $context(): ObjectLiteral {
-		// make sure the subscribe method is part of the prototype
-		// so it is hidden unless the prototype is checked
-		return Object.setPrototypeOf({
-			...$.get(this).contextSource?.$context, // context from the nearest ancestor component
-			...$.get(this).$context, // context from the component node itself
-		}, {
-			subscribe: ctxSubscriberHandler($.get(this).contextSubscribers),
-		});
-	}
-
+	
 	get parsed() {
 		return $.get(this).parsed;
 	}
-
+	
+	get $context(): ObjectLiteral {
+		return $.get(this).$context;
+	}
+	
 	updateContext(ctx: ObjectLiteral) {
 		$.get(this).updateContext(ctx);
-
-		if (this.mounted) {
-			this.forceUpdate();
-			$.get(this).contextSubscribers.forEach((cb: (ctx: {}) => void) => cb($.get(this).$context));
-		}
 	}
-
+	
 	connectedCallback() {
-		const {parsed} = $.get(this);
+		defineNodeContextMetadata(this);
+		const {initialContext} = this.constructor as WebComponentConstructor;
+		
+		if (Object.keys(initialContext).length) {
+			$.get(this).updateContext(initialContext);
+		}
+		
+		const {parsed, tracks, root} = $.get(this);
+		
 		try {
-			// @ts-ignore
-			$.get(this).contextSource = getClosestWebComponentAncestor(this);
-
-			if ($.get(this).contextSource) {
-				// force update the component if the ancestor context gets updated as well
-				$.get(this).unsubscribeCtx = $.get(this).contextSource.$context.subscribe((newContext: ObjectLiteral) => {
-					this.forceUpdate();
-
-					if (this.mounted) {
-						this.onUpdate('$context', $.get(this).$context, newContext)
-					}
-
-					$.get(this).contextSubscribers.forEach((cb: (ctx: {}) => void) => cb(newContext));
-				})
-			}
-
+			$.get(this).unsubscribeCtx = $.get(this).subscribe((newContext: ObjectLiteral) => {
+				if (this.mounted) {
+					this.onUpdate('$context', newContext, newContext)
+				}
+			})
+			
 			/*
 			only need to parse the element the very first time it gets mounted
 
@@ -235,48 +215,48 @@ export class WebComponent extends HTMLElement {
 				this.$properties.push(
 					...setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
 						this.forceUpdate();
-
+						
 						if (this.mounted) {
 							this.onUpdate(prop, oldValue, newValue);
 						}
 					})
 				)
-
+				
 				Object.freeze(this.$properties);
-
+				
 				let contentNode;
 				const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
 				const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
 				let temp: string = this.template;
-
+				
 				if (!temp && this.templateId) {
 					const t = document.getElementById(this.templateId);
-
+					
 					temp = t?.nodeName === 'TEMPLATE' ? t.innerHTML : temp;
 				}
-
+				
 				contentNode = parse(style + temp);
-
+				
 				this._childNodes = Array.from(this.childNodes);
-
+				
 				if (this.customSlot) {
 					this.innerHTML = '';
 				}
-
+				
 				trackNode(contentNode, this, {
 					customSlot: this.customSlot,
 					customSlotChildNodes: this.customSlot ? this._childNodes : [],
-					tracks: $.get(this).tracks,
+					tracks,
 				});
-
+				
 				const {tagName, mode} = (this.constructor as WebComponentConstructor);
-
+				
 				if (mode === 'none') {
 					const styles = contentNode.querySelectorAll('style');
-
+					
 					styles.forEach((style: HTMLStyleElement) => {
 						const existingStyleElement: HTMLStyleElement | null = document.head.querySelector(`style.${tagName}`);
-
+						
 						if (existingStyleElement) {
 							existingStyleElement.textContent = `${style?.textContent}${existingStyleElement.textContent}`;
 						} else {
@@ -284,27 +264,26 @@ export class WebComponent extends HTMLElement {
 						}
 					})
 				}
-
+				
 				$.get(this).parsed = true;
-				$.get(this).root.appendChild(contentNode);
+				root.appendChild(contentNode);
 			}
-
+			
 			$.get(this).mounted = true;
 			this.onMount();
 		} catch (e) {
 			this.onError(e as ErrorEvent);
 		}
 	}
-
+	
 	/**
 	 * livecycle callback for when the element is attached to the DOM
 	 */
 	onMount() {
 	}
-
+	
 	disconnectedCallback() {
 		try {
-			$.get(this).contextSource = null;
 			$.get(this).mounted = false;
 			$.get(this).unsubscribeCtx();
 			this.onDestroy();
@@ -312,25 +291,25 @@ export class WebComponent extends HTMLElement {
 			this.onError(e as Error)
 		}
 	}
-
+	
 	/**
 	 * livecycle callback for when the element is removed from the DOM
 	 */
 	onDestroy() {
 	}
-
+	
 	attributeChangedCallback(name: string, oldValue: any, newValue: any) {
 		try {
 			if (!(name.startsWith('data-') || name === 'class' || name === 'style')) {
 				const prop: any = turnKebabToCamelCasing(name);
-
+				
 				// @ts-ignore
 				this[prop] = booleanAttr.hasOwnProperty(prop)
 					? this.hasAttribute(name)
 					: jsonParse(newValue);
 			} else {
 				this.forceUpdate();
-
+				
 				if (this.mounted) {
 					this.onUpdate(name, oldValue, newValue);
 				}
@@ -339,13 +318,13 @@ export class WebComponent extends HTMLElement {
 			this.onError(e as ErrorEvent)
 		}
 	}
-
+	
 	/**
 	 * livecycle callback for when the element attributes or class properties are updated
 	 */
 	onUpdate(name: string, oldValue: unknown, newValue: unknown) {
 	}
-
+	
 	/**
 	 * updates any already tracked node with current component data including context and node level data.
 	 */
@@ -359,7 +338,7 @@ export class WebComponent extends HTMLElement {
 
 		return true;
 	}
-
+	
 	adoptedCallback() {
 		try {
 			this.onAdoption();
@@ -367,37 +346,18 @@ export class WebComponent extends HTMLElement {
 			this.onError(e as Error)
 		}
 	}
-
+	
 	/**
 	 * livecycle callback for when element is moved into a new document
 	 */
 	onAdoption() {
 	}
-
+	
 	/**
 	 * error callback for when an error occurs
 	 */
 	onError(error: ErrorEvent | Error) {
 		console.error(this.constructor.name, error);
 	}
-}
-
-function ctxSubscriberHandler(subs: Array<ObserverCallback>) {
-	return (cb: ObserverCallback) => {
-		subs.push(cb);
-		return () => {
-			subs = subs.filter((c: ObserverCallback) => c !== cb);
-		}
-	}
-}
-
-function getClosestWebComponentAncestor(component: WebComponent): WebComponent | null {
-	let parent = component.parentNode;
-
-	while (parent && !(parent instanceof WebComponent)) {
-		parent = parent instanceof ShadowRoot ? parent.host : parent.parentNode;
-	}
-
-	return parent instanceof WebComponent ? parent : null;
 }
 
