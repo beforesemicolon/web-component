@@ -278,9 +278,7 @@ export class NodeTrack {
 
 		if (dirIsArray) {
 			for (let el of (dirNode as Array<Element>)) {
-				if (el.isConnected) {
-					this._deepUpdateNode(el);
-				} else {
+				if (!el.isConnected) {
 					nextEl.after(el);
 					this._trackNode(el);
 					$.get(el).shadowNode = this.node;
@@ -291,11 +289,7 @@ export class NodeTrack {
 		} else {
 			nextEl.after(dirNode as Node);
 
-			if ($.has(dirNode)) {
-				if (dirNode !== this.node) {
-					this._deepUpdateNode(dirNode as Node);
-				}
-			} else {
+			if (!$.has(dirNode)) {
 				this._trackNode(dirNode as Node);
 			}
 		}
@@ -332,11 +326,6 @@ export class NodeTrack {
 			this.tracks.delete(n);
 			n.childNodes.forEach(c => this._unTrackNode(c));
 		}
-	}
-
-	private _deepUpdateNode(n: Node) {
-		$.get(n)?.track?.updateNode();
-		n.childNodes.forEach(c => this._deepUpdateNode(c));
 	}
 
 }

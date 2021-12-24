@@ -339,6 +339,21 @@ describe('proxify', () => {
         expect(cb).toHaveBeenCalledWith({sample: 'test'});
       });
 
+      it('get own keys', () => {
+        expect(Object.keys(prx)).toEqual(['numb', 'str', 'valid', 'deep']);
+      });
+
+      it('get own values', () => {
+        expect(Object.values(prx)).toEqual([
+          10,
+          "test",
+          true,
+          {
+            "sample": "test"
+          }
+        ]);
+      });
+
     });
   });
 

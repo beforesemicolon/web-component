@@ -1,27 +1,73 @@
 import {$} from "../metadata";
 
 export function defineNodeContextMetadata(node: Node) {
-	if ($.get(node)?.$context) {
+	if ($.has(node) && $.get(node)?.$context) {
 		return;
 	}
 
-	if (!$.has(node)) {
-		$.set(node, {});
+	let ctx: ObjectLiteral = proxyCtx({}, node);
+	let subs: Array<ObserverCallback> = [];
+	const dt: ObjectLiteral = $.get(node) || {};
+
+	dt.subscribe = (cb: ObserverCallback) => {
+		subs.push(cb);
+		return () => {
+			subs = subs.filter((c) => c !== cb);
+		}
 	}
 
-	let ctx: {[key: string]: any} = {};
+	dt.updateContext = (newCtx: ObjectLiteral | null = null) => {
+		if (newCtx && typeof newCtx === 'object') {
+			ctx = proxyCtx({...ctx, ...newCtx}, node);
+		}
 
-	Object.defineProperty($.get(node), '$context', {
+		$.get(node)?.track?.updateNode();
+		notify();
+	}
+
+	Object.defineProperty(dt, '$context', {
 		get() {
-			// all node context is shared with children deeply
-			// and this allows that
-			return {...$.get(node.parentNode)?.$context, ...ctx};
+			return ctx;
 		}
 	})
 
-	$.get(node).updateContext = (newCtx: ObjectLiteral) => {
-		if (typeof newCtx === 'object') {
-			ctx = {...ctx, ...newCtx};
-		}
+	function notify() {
+		((node as WebComponent).root ?? node).childNodes
+			.forEach((n) => {
+				if (typeof $.get(n)?.updateContext === 'function') {
+					$.get(n).updateContext();
+				}
+			});
+
+		subs.forEach((cb) => {
+			cb(dt.$context);
+		});
 	}
+
+	$.set(node, dt);
 }
+
+function getParent(node: Node) {
+	return node.parentNode instanceof ShadowRoot
+		? node.parentNode.host
+		: node.parentNode
+}
+
+function proxyCtx(obj: ObjectLiteral, node: Node) {
+	let keys = Object.keys(obj);
+
+	return new Proxy(obj, {
+		get(obj: ObjectLiteral, n: string) {
+			let res = Reflect.get(obj, n);
+
+			return res ?? Reflect.get($.get(getParent(node))?.$context ?? {}, n);
+		},
+		ownKeys(): ArrayLike<string | symbol> {
+			return Array.from(new Set([
+				...keys,
+				...Reflect.ownKeys($.get(getParent(node))?.$context ?? {})
+			]));
+		},
+	});
+}
+
