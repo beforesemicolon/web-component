@@ -16,12 +16,13 @@ export function defineNodeContextMetadata(node: Node) {
 		}
 	}
 
-	dt.updateContext = (newCtx: ObjectLiteral) => {
-		if (typeof newCtx === 'object') {
+	dt.updateContext = (newCtx: ObjectLiteral | null = null) => {
+		if (newCtx && typeof newCtx === 'object') {
 			ctx = proxyCtx({...ctx, ...newCtx}, node);
-			$.get(node)?.track?.updateNode();
-			notify();
 		}
+
+		$.get(node)?.track?.updateNode();
+		notify();
 	}
 
 	Object.defineProperty(dt, '$context', {
@@ -38,7 +39,7 @@ export function defineNodeContextMetadata(node: Node) {
 		((node as WebComponent).root ?? node).childNodes
 			.forEach((n) => {
 				if (typeof $.get(n)?.updateContext === 'function') {
-					$.get(n).updateContext({});
+					$.get(n).updateContext();
 				}
 			});
 	}
@@ -53,15 +54,17 @@ function getParent(node: Node) {
 }
 
 function proxyCtx(obj: ObjectLiteral, node: Node) {
+	let keys = Object.keys(obj);
+
 	return new Proxy(obj, {
 		get(obj: ObjectLiteral, n: string) {
 			let res = Reflect.get(obj, n);
 
 			return res ?? Reflect.get($.get(getParent(node))?.$context ?? {}, n);
 		},
-		ownKeys(target: ObjectLiteral): ArrayLike<string | symbol> {
+		ownKeys(): ArrayLike<string | symbol> {
 			return Array.from(new Set([
-				...Reflect.ownKeys(target),
+				...keys,
 				...Reflect.ownKeys($.get(getParent(node))?.$context ?? {})
 			]));
 		},
