@@ -673,9 +673,7 @@ describe('WebComponent', () => {
 
 			const target = app.root?.querySelector('target-comp') as WebComponent;
 
-			expect(target.$context).toEqual({
-				title: "Text App"
-			})
+			expect(target.$context.title).toEqual("Text App")
 			expect(target?.root?.innerHTML).toBe('Text App');
 
 			// should unsubscribe from context and not get updates

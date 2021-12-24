@@ -1,11 +1,10 @@
 import {defineNodeContextMetadata} from "./define-node-context-metadata";
 import {$} from "../metadata";
 import {WebComponent} from "../web-component";
+import {parse} from "./parse";
+import {trackNode} from "./track-node";
 
 describe('defineNodeContextMetadata', () => {
-	class TestComp extends WebComponent {}
-	TestComp.register();
-
 	let node: HTMLElement;
 
 	beforeEach(() => {
@@ -47,12 +46,12 @@ describe('defineNodeContextMetadata', () => {
 		expect($.get(node).$context).toEqual({});
 		
 		$.get(node).subscribe((parentCtx: any) => {
-			expect(parentCtx).toEqual({parent: "content"});
-			expect($.get(node).$context).toEqual({parent: "content"});
+			expect(parentCtx.some).toEqual("content");
+			expect($.get(node).$context.some).toEqual("content");
 		})
 
 		$.get(parent).updateContext({
-			parent: 'content'
+			some: 'content'
 		});
 	});
 	
@@ -65,12 +64,12 @@ describe('defineNodeContextMetadata', () => {
 		expect($.get(node).$context).toEqual({});
 
 		$.get(parent).updateContext({
-			parent: 'content'
+			some: 'content'
 		});
 
 		parent.appendChild(node);
 
-		expect($.get(node).$context).toEqual({parent: "content"});
+		expect($.get(node).$context.some).toEqual("content");
 
 		parent.removeChild(node);
 
@@ -82,23 +81,23 @@ describe('defineNodeContextMetadata', () => {
 		defineNodeContextMetadata(newParent);
 
 		$.get(newParent).updateContext({
-			parent: 'new content'
+			some: 'new content'
 		});
 
 		newParent.appendChild(node);
 
-		expect($.get(node).$context).toEqual({parent: "new content"});
+		expect($.get(node).$context.some).toEqual("new content");
 
 		let subSpy = jest.fn();
 
 		const unsub = $.get(node).subscribe((parentCtx: any) => {
 			subSpy();
-			expect(parentCtx).toEqual({parent: "updated content"});
-			expect($.get(node).$context).toEqual({parent: "updated content"});
+			expect(parentCtx.some).toEqual("updated content");
+			expect($.get(node).$context.some).toEqual("updated content");
 		})
 
 		$.get(newParent).updateContext({
-			parent: 'updated content'
+			some: 'updated content'
 		});
 
 		expect(subSpy).toHaveBeenCalled();
@@ -108,10 +107,30 @@ describe('defineNodeContextMetadata', () => {
 		unsub();
 
 		$.get(newParent).updateContext({
-			parent: 'newly updated content'
+			some: 'newly updated content'
 		});
 
 		expect(subSpy).not.toHaveBeenCalled()
-		expect($.get(node).$context).toEqual({parent: "newly updated content"});
+		expect($.get(node).$context.some).toEqual("newly updated content");
+	});
+
+	it('should list all keys including inherited ones', () => {
+		const parent = document.createElement('div');
+
+		defineNodeContextMetadata(parent);
+		defineNodeContextMetadata(node);
+
+		parent.appendChild(node);
+
+		$.get(parent).updateContext({
+			some: 'content'
+		});
+
+		$.get(node).updateContext({
+			my: 'content'
+		});
+
+		expect(Object.keys($.get(node).$context)).toEqual(['my']);
+		expect(Object.getOwnPropertyNames($.get(node).$context)).toEqual(['my', 'some']);
 	});
 });
