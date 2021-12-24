@@ -1087,8 +1087,8 @@
 
       class CodeEditor extends WebComponent {
         static observedAttributes = ['example-path', 'type', 'content-id', 'active', 'theme'];
-				#exampleCode = '';
-				#pattern = '';
+		#exampleCode = '';
+		#pattern = '';
         #commonOptions = {
           lineNumbers: true,
           tabSize: 2,
@@ -1152,22 +1152,26 @@
           });
 
           this.editor.setSize('100%', '100%');
-	
-					let timer;
-	        this.editor.on('change', () => {
-						const [fullMatch, tag] = this.#exampleCode.match(this.#pattern);
-						
-						clearTimeout(timer);
-		        timer = setTimeout(() => {
-			        this.dispatchEvent(new CustomEvent('content', {
-				        detail: this.#exampleCode.replace(fullMatch, `<${tag} id="${this.contentId}">${this.editor.getValue()}</${tag}>`)
-			        }));
-		        }, 1000)
-	        })
 
           if (this.active) {
             this.loadExample();
           }
+
+          let timer;
+          this.editor.on('change', () => {
+            const [fullMatch, tag] = this.#exampleCode.match(this.#pattern);
+
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+              const newCode = this.#exampleCode.replace(fullMatch, `<${tag} id="${this.contentId}">${this.editor.getValue()}</${tag}>`);
+
+              if (newCode !== this.#exampleCode) {
+                this.dispatchEvent(new CustomEvent('content', {
+                  detail: newCode
+                }));
+              }
+            }, 1000)
+          })
         }
 
         onUpdate(name, olv, nv) {
