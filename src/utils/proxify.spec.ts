@@ -344,14 +344,14 @@ describe('proxify', () => {
       });
 
       it('get own values', () => {
-        expect(Object.values(prx)).toEqual([[
+        expect(Object.values(prx)).toEqual([
           10,
           "test",
           true,
           {
             "sample": "test"
           }
-        ]]);
+        ]);
       });
 
     });
