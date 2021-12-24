@@ -32,16 +32,16 @@ export function defineNodeContextMetadata(node: Node) {
 	})
 
 	function notify() {
-		subs.forEach((cb) => {
-			cb(dt.$context);
-		});
-
 		((node as WebComponent).root ?? node).childNodes
 			.forEach((n) => {
 				if (typeof $.get(n)?.updateContext === 'function') {
 					$.get(n).updateContext();
 				}
 			});
+
+		subs.forEach((cb) => {
+			cb(dt.$context);
+		});
 	}
 
 	$.set(node, dt);
