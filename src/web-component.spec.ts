@@ -818,7 +818,7 @@ describe('WebComponent', () => {
 					}
 
 					onError(error: ErrorEvent) {
-						expect(error.message).toEqual('Cannot read property \'nodeName\' of undefined');
+						expect(error.message).toMatch('nodeName');
 						done();
 					}
 				}
