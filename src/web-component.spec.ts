@@ -246,6 +246,21 @@ describe('WebComponent', () => {
 
 			expect(l.root?.innerHTML).toBe('<div>test</div>')
 		});
+
+		it('should render html entities', () => {
+			class PComp extends WebComponent {
+				get template() {
+					return "&copy;"
+				}
+			}
+
+			PComp.register();
+			const s = new PComp();
+
+			document.body.appendChild(s);
+
+			expect(s.root?.innerHTML).toBe('©');
+		});
 	});
 
 	describe('liveCycles', () => {

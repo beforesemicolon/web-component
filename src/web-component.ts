@@ -13,6 +13,7 @@ import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
 import {trackNode} from "./utils/track-node";
 import {jsonParse} from "./utils/json-parse";
 import {defineNodeContextMetadata} from "./utils/define-node-context-metadata";
+import {resolveHtmlEntities} from "./utils/resolve-html-entities";
 
 /**
  * a extension on the native web component API to simplify and automate most of the pain points
@@ -235,7 +236,7 @@ export class WebComponent extends HTMLElement {
 					temp = t?.nodeName === 'TEMPLATE' ? t.innerHTML : temp;
 				}
 				
-				contentNode = parse(style + temp);
+				contentNode = parse(resolveHtmlEntities(style + temp));
 				
 				this._childNodes = Array.from(this.childNodes);
 				
