@@ -20,20 +20,18 @@ export function trackNode(node: Node | HTMLElement | DocumentFragment, component
 	let {customSlot = false, customSlotChildNodes = [], trackOnly = false, tracks} = opt
 	
 	if (nodeName === 'SLOT') {
+		const attrs = Array.from((node as HTMLSlotElement).attributes);
+
 		if (customSlot) {
-			return renderCustomSlot(node as HTMLSlotElement, customSlotChildNodes)
+			return renderCustomSlot(node as HTMLSlotElement, customSlotChildNodes, attrs)
 				.forEach((child: Node) => trackNode(child, component, opt));
 		}
-		
-		node.addEventListener('slotchange', () => {
-			(node as HTMLSlotElement).assignedNodes().forEach((n: HTMLElement | Node) => {
+
+		renderSlot(node as HTMLSlotElement, attrs, (nodes) => {
+			nodes.forEach((n: HTMLElement | Node) => {
 				trackNode(n, component, opt);
 			});
-		});
-		
-		childNodes.forEach((n: HTMLElement | Node) => {
-			trackNode(n, component, opt);
-		});
+		})
 	} else {
 		// avoid fragments
 		if (nodeType !== 11) {
@@ -64,12 +62,32 @@ export function trackNode(node: Node | HTMLElement | DocumentFragment, component
 				return;
 			}
 		}
-		
+
 		Array.from(childNodes).forEach(c => trackNode(c, component, {...opt, trackOnly, tracks}));
 	}
 }
 
-function renderCustomSlot(node: HTMLSlotElement, childNodes: Array<Node>) {
+function renderSlot(node: HTMLSlotElement, attrs: Attr[], cb: (c: Node[]) => void) {
+	const onSlotChange = () => {
+		const nodes = (node as HTMLSlotElement).assignedNodes();
+
+		nodes.forEach((n: HTMLElement | Node) => {
+			if (n.nodeType === 1) {
+				attrs.forEach(({name, value}) => name !== 'name' && (n as HTMLElement).setAttribute(name, value));
+			}
+		});
+
+		cb(nodes);
+
+		node.removeEventListener('slotchange', onSlotChange, false);
+	};
+
+	node.addEventListener('slotchange', onSlotChange, false);
+
+	cb(Array.from(node.childNodes));
+}
+
+function renderCustomSlot(node: HTMLSlotElement, childNodes: Array<Node>, attrs: Array<Attr>) {
 	const name = node.getAttribute('name');
 	let nodeList: any;
 	let comment = document.createComment(`slotted [${name || ''}]`);
@@ -92,6 +110,9 @@ function renderCustomSlot(node: HTMLSlotElement, childNodes: Array<Node>) {
 	let anchor = comment;
 	
 	for (let n of nodeList) {
+		if (n.nodeType === 1) {
+			attrs.forEach(a => a.name !== 'name' && (n as HTMLElement).setAttribute(a.name, a.value));
+		}
 		anchor.after(n);
 		anchor = n;
 	}

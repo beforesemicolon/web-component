@@ -269,32 +269,36 @@ describe('WebComponent', () => {
 		const updateFn = jest.fn();
 		const adoptionFn = jest.fn();
 
-		class MComp extends WebComponent {
-			static observedAttributes = ['sample', 'style', 'class', 'data-x'];
-			numb = 12;
-			deep = {
-				value: 2000
+		let k: any;
+
+		beforeAll(() => {
+			class MComp extends WebComponent {
+				static observedAttributes = ['sample', 'style', 'class', 'data-x'];
+				numb = 12;
+				deep = {
+					value: 2000
+				}
+
+				onMount() {
+					mountFn();
+				}
+
+				onDestroy() {
+					destroyFn();
+				}
+
+				onUpdate(...args: string[]) {
+					updateFn(...args)
+				}
+
+				onAdoption() {
+					adoptionFn();
+				}
 			}
 
-			onMount() {
-				mountFn();
-			}
-
-			onDestroy() {
-				destroyFn();
-			}
-
-			onUpdate(...args: string[]) {
-				updateFn(...args)
-			}
-
-			onAdoption() {
-				adoptionFn();
-			}
-		}
-
-		MComp.register();
-		const k = new MComp();
+			MComp.register();
+			k = new MComp();
+		})
 
 		beforeEach(() => {
 			k.remove();
@@ -788,8 +792,28 @@ describe('WebComponent', () => {
 			const sSlot = s.root?.children[0];
 
 			expect(sSlot?.outerHTML).toBe('<slot>content</slot>')
-			expect(sSlot?.innerHTML).toBe('content')
 		})
+
+		it('should reflect slot attributes to elements', (done) => {
+			class SlotD extends WebComponent {
+				get template() {
+					return '<ul><slot name="item" class="item" repeat="2"></slot></ul>'
+				}
+			}
+
+			SlotD.register();
+
+			document.body.innerHTML = '<slot-d><li slot="item">{$item}</li></slot-d>';
+
+			let s = document.body.children[0] as WebComponent;
+
+			setTimeout(() => {
+				expect(s.innerHTML).toEqual(
+					'<li slot="item" class="item">1</li>' +
+					'<li slot="item" class="item">2</li>');
+				done();
+			})
+		});
 	})
 
 	describe('directives', () => {
@@ -842,6 +866,22 @@ describe('WebComponent', () => {
 				const s = new RefC();
 
 				document.body.appendChild(s);
+			});
+
+			it('should collect multiple refs', () => {
+				class RefD extends WebComponent {
+					get template() {
+						return '<ul><li ref="item">item 1</li><li ref="item">item 2</li></ul>'
+					}
+				}
+
+				RefD.register();
+				const s = new RefD();
+
+				document.body.appendChild(s);
+
+				expect(s.$refs.item).toEqual(expect.any(Array))
+				expect((s.$refs.item as Node[]).length).toBe(2)
 			});
 		});
 
@@ -1468,7 +1508,7 @@ describe('WebComponent', () => {
 				document.body.appendChild(s);
 
 				expect(s.root?.innerHTML).toBe('<li>1-0</li><li>2-1</li>');
-				// expect(s.$refs.sample).toBeUndefined();
+				expect(s.$refs.sample).toEqual(Array.from(s.root?.children as HTMLCollection));
 			});
 
 			it('repeat and attr', () => {
