@@ -79,15 +79,15 @@ describe('ContextProviderComponent', () => {
 		});
 
 		it('should reflect slot attributes to elements', (done) => {
-			class SlotD extends ContextProviderComponent {
+			class SlotG extends ContextProviderComponent {
 				get template() {
 					return '<ul><slot name="item" class="item" repeat="2"></slot></ul>'
 				}
 			}
 
-			SlotD.register();
+			SlotG.register();
 
-			document.body.innerHTML = '<slot-d><li slot="item">{$item}</li></slot-d>';
+			document.body.innerHTML = '<slot-g><li slot="item">{$item}</li></slot-g>';
 
 			let s = document.body.children[0] as WebComponent;
 

@@ -53,10 +53,11 @@ export class WebComponent extends HTMLElement {
 		this.$properties.push(
 			...setComponentPropertiesFromObservedAttributes(this, observedAttributes, meta.attrPropsMap,
 				(prop, oldValue, newValue) => {
-					this.forceUpdate();
-					
 					if (this.mounted) {
+						this.forceUpdate();
 						this.onUpdate(prop, oldValue, newValue);
+					} else if(this.parsed) {
+						this.onError(new Error(`[Possibly a memory leak]: Cannot set property "${prop}" on unmounted component.`));
 					}
 				})
 		);
@@ -205,9 +206,13 @@ export class WebComponent extends HTMLElement {
 			$.get(this).unsubscribeCtx = $.get(this).subscribe((newContext: ObjectLiteral) => {
 				if (this.mounted) {
 					this.onUpdate('$context', newContext, newContext)
+				} else if(this.parsed) {
+					this.onError(new Error(`[Possibly a memory leak]: Cannot update "$content" on unmounted component.`));
 				}
 			})
-			
+
+			$.get(this).mounted = true;
+
 			/*
 			only need to parse the element the very first time it gets mounted
 
@@ -215,14 +220,15 @@ export class WebComponent extends HTMLElement {
 			all that needs to be done if update the DOM to grab the possible new context and updated data
 			 */
 			if (parsed) {
-				this.forceUpdate();
+				this.updateContext({});
 			} else {
 				this.$properties.push(
 					...setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
-						this.forceUpdate();
-						
 						if (this.mounted) {
+							this.forceUpdate();
 							this.onUpdate(prop, oldValue, newValue);
+						} else if(this.parsed) {
+							this.onError(new Error(`[Possibly a memory leak]: Cannot set property "${prop}" on unmounted component.`));
 						}
 					})
 				)
@@ -274,7 +280,7 @@ export class WebComponent extends HTMLElement {
 				root.appendChild(contentNode);
 			}
 
-			$.get(this).mounted = true;
+
 			this.onMount();
 		} catch (e) {
 			this.onError(e as ErrorEvent);
@@ -334,14 +340,18 @@ export class WebComponent extends HTMLElement {
 	 * updates any already tracked node with current component data including context and node level data.
 	 */
 	forceUpdate() {
-		cancelAnimationFrame($.get(this).updateFrame);
-		$.get(this).updateFrame = requestAnimationFrame(() => {
-			$.get(this).tracks.forEach((t: NodeTrack) => {
-				t.updateNode();
+		if (this.mounted) {
+			cancelAnimationFrame($.get(this).updateFrame);
+			$.get(this).updateFrame = requestAnimationFrame(() => {
+				$.get(this).tracks.forEach((t: NodeTrack) => {
+					t.updateNode();
+				});
 			});
-		});
 
-		return true;
+			return true;
+		}
+
+		return false;
 	}
 	
 	adoptedCallback() {
