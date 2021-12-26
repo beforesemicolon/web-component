@@ -35,7 +35,6 @@ export class NodeTrack {
 	readonly component: WebComponent;
 	anchor: HTMLElement | Node | Comment | Array<Element>;
 	empty = false;
-	isComponentNode = false;
 	tracks = new Map();
 	readonly dirAnchors = new WeakMap();
 
@@ -43,7 +42,6 @@ export class NodeTrack {
 		this.node = node;
 		this.anchor = node;
 		this.component = component;
-		this.isComponentNode = node.nodeName.includes('-');
 
 		$.get(this.node).rawNodeString = /#text|#comment/.test(node.nodeName)
 			? node.nodeValue

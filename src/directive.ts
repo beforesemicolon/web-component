@@ -24,7 +24,17 @@ export class Directive {
 	}
 
 	setRef(name: string, node: Node) {
-		$.get(this).component.$refs[name] = node;
+		const currRef = $.get(this).component.$refs[name];
+
+		if (currRef !== undefined) {
+			if(Array.isArray(currRef)) {
+				currRef.push(node);
+			} else {
+				$.get(this).component.$refs[name] = [currRef, node];
+			}
+		} else {
+			$.get(this).component.$refs[name] = node;
+		}
 	}
 
 	getContext(node: Node) {
