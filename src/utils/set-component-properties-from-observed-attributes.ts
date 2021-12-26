@@ -2,6 +2,7 @@ import {proxify} from './proxify';
 import boolAttr from './boolean-attributes.json';
 import {directives} from "../directives";
 import {jsonParse} from "./json-parse";
+import {$} from "../metadata";
 
 export function setComponentPropertiesFromObservedAttributes(
 	comp: WebComponent,
@@ -29,11 +30,21 @@ export function setComponentPropertiesFromObservedAttributes(
 				prop = (boolAttr as booleanAttributes)[prop].name;
 			}
 
+
+			if (value && typeof value === 'object') {
+				comp.removeAttribute(attr);
+			}
+
 			Object.defineProperty(comp, prop, {
 				get() {
 					return value;
 				},
 				set(newValue) {
+					if (comp.hasAttribute(attr) && typeof newValue === 'object') {
+						$.get(comp).clearAttr = true;
+						comp.removeAttribute(attr);
+					}
+
 					if (value !== newValue) {
 						const oldValue = value;
 						value = proxify(prop, newValue, () => {

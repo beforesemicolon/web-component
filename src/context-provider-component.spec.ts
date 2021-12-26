@@ -95,4 +95,31 @@ describe('ContextProviderComponent', () => {
 			done();
 		});
 	})
+
+	it('should remove component tag object  observed attributes before render', () => {
+		class ZComp extends WebComponent {
+			static observedAttributes = ['foo'];
+
+			get template() {
+				return "{foo.value}"
+			}
+		}
+
+		class RComp extends ContextProviderComponent {
+			bar = {
+				value: 'bar'
+			};
+		}
+
+		ZComp.register();
+		RComp.register();
+
+		document.body.innerHTML = "<r-comp><z-comp foo='{bar}'></z-comp></r-comp>";
+
+		const r = document.body.children[0] as WebComponent;
+		const t = r.root?.children[0] as WebComponent;
+
+		expect(r.root?.innerHTML).toBe('<z-comp></z-comp>');
+		expect(t.root?.innerHTML).toBe('bar');
+	});
 });

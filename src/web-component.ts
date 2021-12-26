@@ -39,6 +39,7 @@ export class WebComponent extends HTMLElement {
 		meta.root = this;
 		meta.mounted = false;
 		meta.parsed = false;
+		meta.clearAttr = false;
 		meta.tracks = new Map();
 		meta.unsubscribeCtx = () => {};
 		meta.attrPropsMap = observedAttributes.reduce((map, attr) => ({
@@ -310,23 +311,24 @@ export class WebComponent extends HTMLElement {
 	}
 	
 	attributeChangedCallback(name: string, oldValue: any, newValue: any) {
-		try {
-			if (!(name.startsWith('data-') || name === 'class' || name === 'style')) {
-				const prop: any = $.get(this).attrPropsMap[name];
-				
-				// @ts-ignore
-				this[prop] = booleanAttr.hasOwnProperty(prop)
-					? this.hasAttribute(name)
-					: jsonParse(newValue);
-			} else {
-				this.forceUpdate();
-				
-				if (this.mounted) {
+		if (newValue === null && !this.hasAttribute(name) && $.get(this).clearAttr) {
+			$.get(this).clearAttr = false;
+		} else if (this.mounted) {
+			try {
+				if (!(name.startsWith('data-') || name === 'class' || name === 'style')) {
+					const prop: any = $.get(this).attrPropsMap[name];
+
+					// @ts-ignore
+					this[prop] = booleanAttr.hasOwnProperty(prop)
+						? this.hasAttribute(name)
+						: jsonParse(newValue);
+				} else {
+					this.forceUpdate();
 					this.onUpdate(name, oldValue, newValue);
 				}
+			} catch (e) {
+				this.onError(e as ErrorEvent)
 			}
-		} catch (e) {
-			this.onError(e as ErrorEvent)
 		}
 	}
 	

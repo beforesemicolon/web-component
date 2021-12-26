@@ -265,24 +265,26 @@ describe('WebComponent', () => {
 			expect(s.root?.innerHTML).toBe('©');
 		});
 
-		xit('should remove component tag observed attributes before render', () => {
-			class TargetComp extends WebComponent {
+		it('should remove component tag object observed attributes before render', () => {
+			class TComp extends WebComponent {
 				static observedAttributes = ['foo'];
 
 				get template() {
-					return "{foo}"
+					return "{foo.value}"
 				}
 			}
 
 			class QComp extends WebComponent {
-				bar = 'bar';
+				bar = {
+					value: 'bar'
+				};
 
 				get template() {
-					return "<target-comp foo='{bar}'></target-comp>"
+					return "<t-comp foo='{bar}'></t-comp>"
 				}
 			}
 
-			TargetComp.register();
+			TComp.register();
 			QComp.register();
 
 			const q = new QComp();
@@ -291,7 +293,7 @@ describe('WebComponent', () => {
 
 			const t = q.root?.children[0] as WebComponent;
 
-			expect(q.root?.innerHTML).toBe('<target-comp></target-comp>');
+			expect(q.root?.innerHTML).toBe('<t-comp></t-comp>');
 			expect(t.root?.innerHTML).toBe('bar');
 		});
 
@@ -376,7 +378,7 @@ describe('WebComponent', () => {
 			k.setAttribute('sample', 'diff');
 
 			expect(updateFn).toHaveBeenCalledTimes(0);
-			expect(errorFn).toHaveBeenCalledTimes(3);
+			expect(errorFn).toHaveBeenCalledTimes(2);
 
 			document.body.appendChild(k);
 
