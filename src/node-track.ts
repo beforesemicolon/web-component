@@ -18,6 +18,7 @@ export class NodeTrack {
 	node: HTMLElement | Node;
 	attributes: Array<{
 		name: string;
+		propName: string;
 		value: string;
 		executables: Array<Executable>;
 	}> = []
@@ -34,6 +35,7 @@ export class NodeTrack {
 	readonly component: WebComponent;
 	anchor: HTMLElement | Node | Comment | Array<Element>;
 	empty = false;
+	isComponentNode = false;
 	tracks = new Map();
 	readonly dirAnchors = new WeakMap();
 
@@ -41,6 +43,7 @@ export class NodeTrack {
 		this.node = node;
 		this.anchor = node;
 		this.component = component;
+		this.isComponentNode = node.nodeName.includes('-');
 
 		$.get(this.node).rawNodeString = /#text|#comment/.test(node.nodeName)
 			? node.nodeValue
@@ -102,19 +105,17 @@ export class NodeTrack {
 				}
 			}
 
-			for (let {name, value, executables} of this.attributes) {
+			for (let {name, propName, value, executables} of this.attributes) {
 				if (executables.length) {
 					let newValue = executables.reduce((val, exc) => {
 						return resolveExecutable(this.component, this.$context, exc, val);
-					}, value)
+					}, value);
 
-					const camelName = turnKebabToCamelCasing(name);
-
-					if ((this.node as ObjectLiteral)[camelName] !== undefined) {
+					if ((this.node as WebComponent)[propName] !== undefined) {
 						newValue = jsonParse(newValue);
 
-						if (newValue !== (this.node as ObjectLiteral)[camelName]) {
-							(this.node as ObjectLiteral)[camelName] = newValue;
+						if (newValue !== (this.node as WebComponent)[propName]) {
+							(this.node as WebComponent)[propName] = newValue;
 						}
 					} else if ((this.node as HTMLElement).getAttribute(name) !== newValue) {
 						(this.node as HTMLElement).setAttribute(name, newValue);
@@ -231,6 +232,7 @@ export class NodeTrack {
 				if (attr.value.trim()) {
 					this.attributes.push({
 						name: attr.name,
+						propName: turnKebabToCamelCasing(attr.name),
 						value: attr.value,
 						executables: extractExecutableSnippetFromString(attr.value)
 					})

@@ -27,6 +27,8 @@ export class WebComponent extends HTMLElement {
 	
 	constructor() {
 		super();
+
+		let {mode, observedAttributes, delegatesFocus} = this.constructor as WebComponentConstructor;
 		
 		if (!$.has(this)) {
 			$.set(this, {})
@@ -39,15 +41,17 @@ export class WebComponent extends HTMLElement {
 		meta.parsed = false;
 		meta.tracks = new Map();
 		meta.unsubscribeCtx = () => {};
-
-		let {mode, observedAttributes, delegatesFocus} = this.constructor as WebComponentConstructor;
+		meta.attrPropsMap = observedAttributes.reduce((map, attr) => ({
+			...map,
+			[attr]: turnKebabToCamelCasing(attr)
+		}), {} as ObjectLiteral);
 		
 		if (mode !== 'none') {
 			$.get(this).root = this.attachShadow({mode, delegatesFocus});
 		}
 		
 		this.$properties.push(
-			...setComponentPropertiesFromObservedAttributes(this, observedAttributes,
+			...setComponentPropertiesFromObservedAttributes(this, observedAttributes, meta.attrPropsMap,
 				(prop, oldValue, newValue) => {
 					this.forceUpdate();
 					
@@ -190,7 +194,7 @@ export class WebComponent extends HTMLElement {
 	connectedCallback() {
 		defineNodeContextMetadata(this);
 		const {initialContext} = this.constructor as WebComponentConstructor;
-		
+
 		if (Object.keys(initialContext).length) {
 			$.get(this).updateContext(initialContext);
 		}
@@ -269,7 +273,7 @@ export class WebComponent extends HTMLElement {
 				$.get(this).parsed = true;
 				root.appendChild(contentNode);
 			}
-			
+
 			$.get(this).mounted = true;
 			this.onMount();
 		} catch (e) {
@@ -302,7 +306,7 @@ export class WebComponent extends HTMLElement {
 	attributeChangedCallback(name: string, oldValue: any, newValue: any) {
 		try {
 			if (!(name.startsWith('data-') || name === 'class' || name === 'style')) {
-				const prop: any = turnKebabToCamelCasing(name);
+				const prop: any = $.get(this).attrPropsMap[name];
 				
 				// @ts-ignore
 				this[prop] = booleanAttr.hasOwnProperty(prop)
