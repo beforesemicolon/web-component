@@ -12,7 +12,10 @@ describe('WebComponent', () => {
 
 	afterEach(() => {
 		// @ts-ignore
-		window.requestAnimationFrame.mockRestore();
+		if (typeof window.requestAnimationFrame.mockRestore === 'function') {
+			// @ts-ignore
+			window.requestAnimationFrame.mockRestore();
+		}
 	});
 
 	describe('constructor and configuration', () => {
@@ -261,6 +264,39 @@ describe('WebComponent', () => {
 
 			expect(s.root?.innerHTML).toBe('©');
 		});
+
+		it('should remove component tag object observed attributes before render', () => {
+			class TComp extends WebComponent {
+				static observedAttributes = ['foo'];
+
+				get template() {
+					return "{foo.value}"
+				}
+			}
+
+			class QComp extends WebComponent {
+				bar = {
+					value: 'bar'
+				};
+
+				get template() {
+					return "<t-comp foo='{bar}'></t-comp>"
+				}
+			}
+
+			TComp.register();
+			QComp.register();
+
+			const q = new QComp();
+
+			document.body.appendChild(q);
+
+			const t = q.root?.children[0] as WebComponent;
+
+			expect(q.root?.innerHTML).toBe('<t-comp></t-comp>');
+			expect(t.root?.innerHTML).toBe('bar');
+		});
+
 	});
 
 	describe('liveCycles', () => {
@@ -268,6 +304,7 @@ describe('WebComponent', () => {
 		const destroyFn = jest.fn();
 		const updateFn = jest.fn();
 		const adoptionFn = jest.fn();
+		const errorFn = jest.fn();
 
 		class MComp extends WebComponent {
 			static observedAttributes = ['sample', 'style', 'class', 'data-x'];
@@ -291,17 +328,26 @@ describe('WebComponent', () => {
 			onAdoption() {
 				adoptionFn();
 			}
+
+			onError(error: ErrorEvent | Error) {
+				errorFn(error);
+			}
 		}
 
 		MComp.register();
-		const k = new MComp();
+
+		let k: any;
+
+		beforeAll(() => {
+			k = new MComp();
+		})
 
 		beforeEach(() => {
-			k.remove();
-			mountFn.mockClear()
-			destroyFn.mockClear()
-			updateFn.mockClear()
-			adoptionFn.mockClear()
+			mountFn.mockClear();
+			destroyFn.mockClear();
+			updateFn.mockClear();
+			adoptionFn.mockClear();
+			errorFn.mockClear();
 		})
 
 		it('should trigger onMount when added and onDestroy when removed from the DOM', () => {
@@ -325,12 +371,14 @@ describe('WebComponent', () => {
 		});
 
 		it('should trigger onUpdate when properties and observed attributes update only if mounted', () => {
+			k.remove();
 			k.numb = 1000;
 			// @ts-ignore
 			k.sample = 'unique';
 			k.setAttribute('sample', 'diff');
 
 			expect(updateFn).toHaveBeenCalledTimes(0);
+			expect(errorFn).toHaveBeenCalledTimes(2);
 
 			document.body.appendChild(k);
 
@@ -345,9 +393,11 @@ describe('WebComponent', () => {
 		});
 
 		it('should trigger onUpdate when properties DEEP update only if mounted', () => {
+			k.remove();
 			k.deep.value = 1000
 
 			expect(updateFn).toHaveBeenCalledTimes(0);
+			expect(errorFn).toHaveBeenCalledWith(new Error('[Possibly a memory leak]: Cannot set property "deep" on unmounted component.'));
 			expect(k.deep).toEqual({"value": 1000});
 
 			document.body.appendChild(k);
@@ -440,18 +490,6 @@ describe('WebComponent', () => {
 			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="">12 items</strong>')
 		});
 
-		it.todo('should update DOM when forceUpdate is called')
-		// no longer valid test but need a way to test the forceUpdate
-		// it('should update DOM when forceUpdate is called', () => {
-		// 	const spy = jest.spyOn(n, '_updateTrackValue');
-		//
-		// 	n.forceUpdate();
-		//
-		// 	expect(n._updateTrackValue).toHaveBeenCalledTimes(n._trackers.size);
-		//
-		// 	spy.mockReset();
-		// });
-
 		it('should update DOM when class gets updated', () => {
 			n.className = 'my-items';
 			n.classList.add('unique')
@@ -474,6 +512,8 @@ describe('WebComponent', () => {
 
 			expect(n.root?.innerHTML).toBe('300<strong class="" style="" data-x="test">12 </strong>');
 		});
+
+
 	})
 
 	describe('data bind', () => {
@@ -788,8 +828,28 @@ describe('WebComponent', () => {
 			const sSlot = s.root?.children[0];
 
 			expect(sSlot?.outerHTML).toBe('<slot>content</slot>')
-			expect(sSlot?.innerHTML).toBe('content')
 		})
+
+		it('should reflect slot attributes to elements', (done) => {
+			class SlotD extends WebComponent {
+				get template() {
+					return '<ul><slot name="item" class="item" repeat="2"></slot></ul>'
+				}
+			}
+
+			SlotD.register();
+
+			document.body.innerHTML = '<slot-d><li slot="item">{$item}</li></slot-d>';
+
+			let s = document.body.children[0] as WebComponent;
+
+			setTimeout(() => {
+				expect(s.innerHTML).toEqual(
+					'<li slot="item" class="item">1</li>' +
+					'<li slot="item" class="item">2</li>');
+				done();
+			})
+		});
 	})
 
 	describe('directives', () => {
@@ -842,6 +902,22 @@ describe('WebComponent', () => {
 				const s = new RefC();
 
 				document.body.appendChild(s);
+			});
+
+			it('should collect multiple refs', () => {
+				class RefD extends WebComponent {
+					get template() {
+						return '<ul><li ref="item">item 1</li><li ref="item">item 2</li></ul>'
+					}
+				}
+
+				RefD.register();
+				const s = new RefD();
+
+				document.body.appendChild(s);
+
+				expect(s.$refs.item).toEqual(expect.any(Array))
+				expect((s.$refs.item as Node[]).length).toBe(2)
 			});
 		});
 
@@ -1468,7 +1544,7 @@ describe('WebComponent', () => {
 				document.body.appendChild(s);
 
 				expect(s.root?.innerHTML).toBe('<li>1-0</li><li>2-1</li>');
-				// expect(s.$refs.sample).toBeUndefined();
+				expect(s.$refs.sample).toEqual(Array.from(s.root?.children as HTMLCollection));
 			});
 
 			it('repeat and attr', () => {
@@ -1504,5 +1580,45 @@ describe('WebComponent', () => {
 				expect(s.$refs.item).toBeDefined();
 			});
 		});
+	});
+
+	it('should detect memory leak', () => {
+		jest.useFakeTimers()
+		const errorSpy = jest.fn();
+
+		class LeakA extends WebComponent {
+			sample = 12;
+
+			onMount() {
+				setTimeout(() => {
+					this.sample = 200;
+				}, 0)
+			}
+
+			onError(error: ErrorEvent | Error) {
+				errorSpy(error);
+			}
+
+			get template() {
+				return '{sample}'
+			}
+		}
+
+		LeakA.register();
+
+		const l = new LeakA();
+
+		document.body.appendChild(l);
+
+		expect(l.root?.innerHTML).toBe('12');
+
+		l.remove();
+
+		jest.runOnlyPendingTimers();
+
+		expect(errorSpy).toHaveBeenCalledWith(new Error('[Possibly a memory leak]: Cannot set property "sample" on unmounted component.'));
+		expect(l.root?.innerHTML).toBe('12');
+
+		jest.resetAllMocks()
 	});
 });

@@ -80,7 +80,7 @@ export declare global {
 
 	export type ObserverCallback = (ctx: ObjectLiteral) => void;
 
-	export type Refs = {[key: string]: Node};
+	export type Refs = {[key: string]: Node | Node[]};
 
 	export type Executable = {
 		from: number;

@@ -7,7 +7,14 @@ describe('', () => {
 		const comp = document.createElement('div') as any;
 		const onUpdate = jest.fn();
 
-		setComponentPropertiesFromObservedAttributes(comp, observedAttributes, onUpdate);
+		setComponentPropertiesFromObservedAttributes(comp, observedAttributes, {
+			'sample-test': 'sampleTest',
+			'disabled': 'disabled',
+			'formnovlidate': 'formnovlidate',
+			'class': 'class',
+			'style': 'style',
+			'data-x': 'dataX',
+		}, onUpdate);
 
 		expect(comp.sampleTest).toEqual('');
 		expect(comp.disabled).toEqual(false);

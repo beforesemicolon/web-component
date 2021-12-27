@@ -27,6 +27,8 @@ export class WebComponent extends HTMLElement {
 	
 	constructor() {
 		super();
+
+		let {mode, observedAttributes, delegatesFocus} = this.constructor as WebComponentConstructor;
 		
 		if (!$.has(this)) {
 			$.set(this, {})
@@ -37,22 +39,26 @@ export class WebComponent extends HTMLElement {
 		meta.root = this;
 		meta.mounted = false;
 		meta.parsed = false;
+		meta.clearAttr = false;
 		meta.tracks = new Map();
 		meta.unsubscribeCtx = () => {};
-
-		let {mode, observedAttributes, delegatesFocus} = this.constructor as WebComponentConstructor;
+		meta.attrPropsMap = observedAttributes.reduce((map, attr) => ({
+			...map,
+			[attr]: turnKebabToCamelCasing(attr)
+		}), {} as ObjectLiteral);
 		
 		if (mode !== 'none') {
 			$.get(this).root = this.attachShadow({mode, delegatesFocus});
 		}
 		
 		this.$properties.push(
-			...setComponentPropertiesFromObservedAttributes(this, observedAttributes,
+			...setComponentPropertiesFromObservedAttributes(this, observedAttributes, meta.attrPropsMap,
 				(prop, oldValue, newValue) => {
-					this.forceUpdate();
-					
 					if (this.mounted) {
+						this.forceUpdate();
 						this.onUpdate(prop, oldValue, newValue);
+					} else if(this.parsed) {
+						this.onError(new Error(`[Possibly a memory leak]: Cannot set property "${prop}" on unmounted component.`));
 					}
 				})
 		);
@@ -190,7 +196,7 @@ export class WebComponent extends HTMLElement {
 	connectedCallback() {
 		defineNodeContextMetadata(this);
 		const {initialContext} = this.constructor as WebComponentConstructor;
-		
+
 		if (Object.keys(initialContext).length) {
 			$.get(this).updateContext(initialContext);
 		}
@@ -201,9 +207,11 @@ export class WebComponent extends HTMLElement {
 			$.get(this).unsubscribeCtx = $.get(this).subscribe((newContext: ObjectLiteral) => {
 				if (this.mounted) {
 					this.onUpdate('$context', newContext, newContext)
+				} else if(this.parsed) {
+					this.onError(new Error(`[Possibly a memory leak]: Cannot update "$content" on unmounted component.`));
 				}
 			})
-			
+
 			/*
 			only need to parse the element the very first time it gets mounted
 
@@ -211,14 +219,16 @@ export class WebComponent extends HTMLElement {
 			all that needs to be done if update the DOM to grab the possible new context and updated data
 			 */
 			if (parsed) {
-				this.forceUpdate();
+				$.get(this).mounted = true;
+				this.updateContext({});
 			} else {
 				this.$properties.push(
 					...setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
-						this.forceUpdate();
-						
 						if (this.mounted) {
+							this.forceUpdate();
 							this.onUpdate(prop, oldValue, newValue);
+						} else if(this.parsed) {
+							this.onError(new Error(`[Possibly a memory leak]: Cannot set property "${prop}" on unmounted component.`));
 						}
 					})
 				)
@@ -267,10 +277,10 @@ export class WebComponent extends HTMLElement {
 				}
 				
 				$.get(this).parsed = true;
+				$.get(this).mounted = true;
 				root.appendChild(contentNode);
 			}
-			
-			$.get(this).mounted = true;
+
 			this.onMount();
 		} catch (e) {
 			this.onError(e as ErrorEvent);
@@ -300,23 +310,24 @@ export class WebComponent extends HTMLElement {
 	}
 	
 	attributeChangedCallback(name: string, oldValue: any, newValue: any) {
-		try {
-			if (!(name.startsWith('data-') || name === 'class' || name === 'style')) {
-				const prop: any = turnKebabToCamelCasing(name);
-				
-				// @ts-ignore
-				this[prop] = booleanAttr.hasOwnProperty(prop)
-					? this.hasAttribute(name)
-					: jsonParse(newValue);
-			} else {
-				this.forceUpdate();
-				
-				if (this.mounted) {
+		if (newValue === null && !this.hasAttribute(name) && $.get(this).clearAttr) {
+			$.get(this).clearAttr = false;
+		} else if (this.mounted) {
+			try {
+				if (!(name.startsWith('data-') || name === 'class' || name === 'style')) {
+					const prop: any = $.get(this).attrPropsMap[name];
+
+					// @ts-ignore
+					this[prop] = booleanAttr.hasOwnProperty(prop)
+						? this.hasAttribute(name)
+						: jsonParse(newValue);
+				} else {
+					this.forceUpdate();
 					this.onUpdate(name, oldValue, newValue);
 				}
+			} catch (e) {
+				this.onError(e as ErrorEvent)
 			}
-		} catch (e) {
-			this.onError(e as ErrorEvent)
 		}
 	}
 	
@@ -330,14 +341,18 @@ export class WebComponent extends HTMLElement {
 	 * updates any already tracked node with current component data including context and node level data.
 	 */
 	forceUpdate() {
-		cancelAnimationFrame($.get(this).updateFrame);
-		$.get(this).updateFrame = requestAnimationFrame(() => {
-			$.get(this).tracks.forEach((t: NodeTrack) => {
-				t.updateNode();
+		if (this.mounted) {
+			cancelAnimationFrame($.get(this).updateFrame);
+			$.get(this).updateFrame = requestAnimationFrame(() => {
+				$.get(this).tracks.forEach((t: NodeTrack) => {
+					t.updateNode();
+				});
 			});
-		});
 
-		return true;
+			return true;
+		}
+
+		return false;
 	}
 	
 	adoptedCallback() {
