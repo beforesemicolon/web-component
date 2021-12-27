@@ -212,8 +212,6 @@ export class WebComponent extends HTMLElement {
 				}
 			})
 
-			$.get(this).mounted = true;
-
 			/*
 			only need to parse the element the very first time it gets mounted
 
@@ -221,6 +219,7 @@ export class WebComponent extends HTMLElement {
 			all that needs to be done if update the DOM to grab the possible new context and updated data
 			 */
 			if (parsed) {
+				$.get(this).mounted = true;
 				this.updateContext({});
 			} else {
 				this.$properties.push(
@@ -278,9 +277,9 @@ export class WebComponent extends HTMLElement {
 				}
 				
 				$.get(this).parsed = true;
+				$.get(this).mounted = true;
 				root.appendChild(contentNode);
 			}
-
 
 			this.onMount();
 		} catch (e) {
