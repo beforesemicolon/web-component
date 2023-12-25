@@ -1,16 +1,52 @@
-// @beforesemicolon/web-component, copyright (c) by Elson Correia
-// Distributed under an MIT license: https://github.com/beforesemicolon/web-component/blob/master/LICENSE
+import { WebComponent } from './web-component'
+import {
+    html,
+    state,
+    and,
+    effect,
+    Helper,
+    helper,
+    is,
+    isNot,
+    oneOf,
+    or,
+    pick,
+    when,
+    element,
+    repeat,
+    suspense,
+    val,
+} from '@beforesemicolon/markup'
 
-import {WebComponent} from './web-component';
-import {Directive} from './directive';
-import {ContextProviderComponent} from './context-provider-component';
-
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 if (window) {
-	// @ts-ignore
-	window.WebComponent = WebComponent;
-	// @ts-ignore
-	window.ContextProviderComponent = ContextProviderComponent;
-	// @ts-ignore
-	window.Directive = Directive;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    window.BFS = {
+        MARKUP: {
+            html,
+            state,
+            // helpers
+            and,
+            effect,
+            Helper,
+            helper,
+            is,
+            isNot,
+            oneOf,
+            or,
+            pick,
+            repeat,
+            when,
+            // utils
+            element,
+            suspense,
+            val,
+        },
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        ...(window.BFS || {}),
+        WebComponent,
+    }
 }

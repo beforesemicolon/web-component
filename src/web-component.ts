@@ -1,379 +1,216 @@
-// simply importing directive here will automatically register them and make them available for
-// anything later on
-import './directives';
-import booleanAttr from './utils/boolean-attributes.json';
-import {$} from "./metadata";
-import {parse} from './utils/parse';
-import {setComponentPropertiesFromObservedAttributes} from './utils/set-component-properties-from-observed-attributes';
-import {setupComponentPropertiesForAutoUpdate} from './utils/setup-component-properties-for-auto-update';
-import {turnCamelToKebabCasing} from './utils/turn-camel-to-kebab-casing';
-import {turnKebabToCamelCasing} from './utils/turn-kebab-to-camel-casing';
-import {getStyleString} from './utils/get-style-string';
-import {ShadowRootModeExtended} from "./enums/ShadowRootModeExtended.enum";
-import {trackNode} from "./utils/track-node";
-import {jsonParse} from "./utils/json-parse";
-import {defineNodeContextMetadata} from "./utils/define-node-context-metadata";
-import {resolveHtmlEntities} from "./utils/resolve-html-entities";
+import { state, HtmlTemplate, jsonParse } from '@beforesemicolon/markup'
+import {
+    ObjectLiteral,
+    StateSetters,
+    State,
+    PropsSetters,
+    Props,
+} from './types'
 
-/**
- * a extension on the native web component API to simplify and automate most of the pain points
- * when it comes to creating and working with web components on the browser
- */
-export class WebComponent extends HTMLElement {
-	readonly $refs: Refs = {};
-	$properties: Array<string> = ['$context', '$refs'];
-	templateId = '';
-	_childNodes: Array<Node> = [];
-	
-	constructor() {
-		super();
+export class WebComponent<
+    P extends ObjectLiteral<P>,
+    S extends ObjectLiteral<S>,
+> extends HTMLElement {
+    #el: ShadowRoot | HTMLElement = this
+    #props: Props<P> = {} as Props<P>
+    #state: State<S> = {} as State<S>
+    #propsSetters: PropsSetters<P> = {} as PropsSetters<P>
+    #stateSetters: StateSetters<S> = {} as StateSetters<S>
+    #mounted = false
+    #temp: HtmlTemplate | string | Element | void = ''
+    #propNames: Array<keyof P> = []
+    shadow = true
+    mode: ShadowRootMode = 'open'
+    delegatesFocus = false
+    stylesheet: CSSStyleSheet | string | null = null
+    initialState: S = {} as S
 
-		let {mode, observedAttributes, delegatesFocus} = this.constructor as WebComponentConstructor;
-		
-		if (!$.has(this)) {
-			$.set(this, {})
-		}
-		
-		const meta = $.get(this);
-		
-		meta.root = this;
-		meta.mounted = false;
-		meta.parsed = false;
-		meta.clearAttr = false;
-		meta.tracks = new Map();
-		meta.unsubscribeCtx = () => {};
-		meta.attrPropsMap = observedAttributes.reduce((map, attr) => ({
-			...map,
-			[attr]: turnKebabToCamelCasing(attr)
-		}), {} as ObjectLiteral);
-		
-		if (mode !== 'none') {
-			$.get(this).root = this.attachShadow({mode, delegatesFocus});
-		}
-		
-		this.$properties.push(
-			...setComponentPropertiesFromObservedAttributes(this, observedAttributes, meta.attrPropsMap,
-				(prop, oldValue, newValue) => {
-					if (this.mounted) {
-						this.forceUpdate();
-						this.onUpdate(prop, oldValue, newValue);
-					} else if(this.parsed) {
-						this.onError(new Error(`[Possibly a memory leak]: Cannot set property "${prop}" on unmounted component.`));
-					}
-				})
-		);
-	}
-	
-	/**
-	 * an array of attribute names as they will look in the html tag
-	 * https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elementsusing_the_lifecycle_callbacks
-	 * @type {[]}
-	 */
-	static observedAttributes: Array<string> = [];
-	
-	/**
-	 * shadow root mode
-	 * https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot/mode
-	 * plus an additional option of "none" to signal you dont want
-	 * the content to be places inside the shadow root but directly under the tag
-	 * @type {string}
-	 */
-	static mode = ShadowRootModeExtended.OPEN;
-	
-	/**
-	 * shadow root delegate focus option
-	 * https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot/delegatesFocus
-	 * @type {boolean}
-	 */
-	static delegatesFocus = false;
-	
-	/**
-	 * a valid name of the html tag
-	 * @type {string}
-	 */
-	static tagName = '';
-	
-	/**
-	 * the initial context data for the component
-	 */
-	static initialContext = {};
-	
-	/**
-	 * parses special template HTML string taking in consideration
-	 * all the additional syntax specific to this framework
-	 */
-	static parseHTML(markup: string): DocumentFragment {
-		return parse(markup)
-	}
-	
-	/**
-	 * registers the component with the CustomElementRegistry taking an optional tag name if not
-	 * specified as static member of the class as tagName
-	 * @param tagName
-	 */
-	static register(tagName?: string | undefined) {
-		tagName = typeof tagName === 'string' && tagName
-			? tagName
-			: typeof this.tagName === 'string' && this.tagName
-				? this.tagName
-				: turnCamelToKebabCasing(this.name);
-		
-		this.tagName = tagName;
-		
-		if (!customElements.get(tagName)) {
-			customElements.define(tagName, this);
-		}
-	}
-	
-	/**
-	 * registers a list of provided web component classes
-	 * @param components
-	 */
-	static registerAll(components: Array<WebComponentConstructor>) {
-		components.forEach(comp => comp.register());
-	}
-	
-	/**
-	 * returns whether the component is registered or not
-	 */
-	static get isRegistered() {
-		return customElements.get(this.tagName) !== undefined;
-	}
-	
-	/**
-	 * whether or not the component should use the real slot element or mimic its behavior
-	 * when rendering template
-	 */
-	get customSlot() {
-		return false;
-	}
-	
-	/**
-	 * the root element. If shadow root present it will be the shadow root otherwise
-	 * the actual element
-	 * @returns {*}
-	 */
-	get root(): HTMLElement | ShadowRoot | null {
-		return (this.constructor as WebComponentConstructor).mode === 'closed' ? null : $.get(this).root;
-	}
-	
-	/**
-	 * whether or not the element is attached to the DOM and works differently than Element.isConnected
-	 * @returns {boolean}
-	 */
-	get mounted() {
-		return $.get(this)?.mounted ?? false;
-	}
-	
-	/**
-	 * style for the component whether inside the style tag, as object or straight CSS string
-	 * @returns {string | {type: string, content: string}}
-	 */
-	get stylesheet() {
-		return '';
-	}
-	
-	/**
-	 * template for the element HTML content
-	 * @returns {string}
-	 */
-	get template() {
-		return '';
-	}
-	
-	get parsed() {
-		return $.get(this).parsed;
-	}
-	
-	get $context(): ObjectLiteral {
-		return $.get(this).$context;
-	}
-	
-	updateContext(ctx: ObjectLiteral) {
-		$.get(this).updateContext(ctx);
-	}
-	
-	connectedCallback() {
-		defineNodeContextMetadata(this);
-		const {initialContext} = this.constructor as WebComponentConstructor;
+    get props(): Props<P> {
+        return this.#props
+    }
 
-		if (Object.keys(initialContext).length) {
-			$.get(this).updateContext(initialContext);
-		}
-		
-		const {parsed, tracks, root} = $.get(this);
-		
-		try {
-			$.get(this).unsubscribeCtx = $.get(this).subscribe((newContext: ObjectLiteral) => {
-				if (this.mounted) {
-					this.onUpdate('$context', newContext, newContext)
-				} else if(this.parsed) {
-					this.onError(new Error(`[Possibly a memory leak]: Cannot update "$content" on unmounted component.`));
-				}
-			})
+    get state(): State<S> {
+        return this.#state
+    }
 
-			/*
-			only need to parse the element the very first time it gets mounted
+    get mounted() {
+        return this.#mounted
+    }
 
-			this will make sure that if the element is removed from the dom and mounted again
-			all that needs to be done if update the DOM to grab the possible new context and updated data
-			 */
-			if (parsed) {
-				$.get(this).mounted = true;
-				this.updateContext({});
-			} else {
-				this.$properties.push(
-					...setupComponentPropertiesForAutoUpdate(this, (prop, oldValue, newValue) => {
-						if (this.mounted) {
-							this.forceUpdate();
-							this.onUpdate(prop, oldValue, newValue);
-						} else if(this.parsed) {
-							this.onError(new Error(`[Possibly a memory leak]: Cannot set property "${prop}" on unmounted component.`));
-						}
-					})
-				)
-				
-				Object.freeze(this.$properties);
-				
-				let contentNode;
-				const hasShadowRoot = (this.constructor as WebComponentConstructor).mode !== 'none';
-				const style = getStyleString(this.stylesheet, (this.constructor as WebComponentConstructor).tagName, hasShadowRoot);
-				let temp: string = this.template;
-				
-				if (!temp && this.templateId) {
-					const t = document.getElementById(this.templateId);
-					
-					temp = t?.nodeName === 'TEMPLATE' ? t.innerHTML : temp;
-				}
-				
-				contentNode = parse(resolveHtmlEntities(style + temp));
-				
-				this._childNodes = Array.from(this.childNodes);
-				
-				if (this.customSlot) {
-					this.innerHTML = '';
-				}
-				
-				trackNode(contentNode, this, {
-					customSlot: this.customSlot,
-					customSlotChildNodes: this.customSlot ? this._childNodes : [],
-					tracks,
-				});
-				
-				const {tagName, mode} = (this.constructor as WebComponentConstructor);
-				
-				if (mode === 'none') {
-					const styles = contentNode.querySelectorAll('style');
-					
-					styles.forEach((style: HTMLStyleElement) => {
-						const existingStyleElement: HTMLStyleElement | null = document.head.querySelector(`style.${tagName}`);
-						
-						if (existingStyleElement) {
-							existingStyleElement.textContent = `${style?.textContent}${existingStyleElement.textContent}`;
-						} else {
-							document.head.appendChild(style);
-						}
-					})
-				}
-				
-				$.get(this).parsed = true;
-				$.get(this).mounted = true;
-				root.appendChild(contentNode);
-			}
+    constructor() {
+        super()
 
-			this.onMount();
-		} catch (e) {
-			this.onError(e as ErrorEvent);
-		}
-	}
-	
-	/**
-	 * livecycle callback for when the element is attached to the DOM
-	 */
-	onMount() {
-	}
-	
-	disconnectedCallback() {
-		try {
-			$.get(this).mounted = false;
-			$.get(this).unsubscribeCtx();
-			this.onDestroy();
-		} catch (e) {
-			this.onError(e as Error)
-		}
-	}
-	
-	/**
-	 * livecycle callback for when the element is removed from the DOM
-	 */
-	onDestroy() {
-	}
-	
-	attributeChangedCallback(name: string, oldValue: any, newValue: any) {
-		if (newValue === null && !this.hasAttribute(name) && $.get(this).clearAttr) {
-			$.get(this).clearAttr = false;
-		} else if (this.mounted) {
-			try {
-				if (!(name.startsWith('data-') || name === 'class' || name === 'style')) {
-					const prop: any = $.get(this).attrPropsMap[name];
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        this.#propNames = this.constructor.observedAttributes ?? []
 
-					// @ts-ignore
-					this[prop] = booleanAttr.hasOwnProperty(prop)
-						? this.hasAttribute(name)
-						: jsonParse(newValue);
-				} else {
-					this.forceUpdate();
-					this.onUpdate(name, oldValue, newValue);
-				}
-			} catch (e) {
-				this.onError(e as ErrorEvent)
-			}
-		}
-	}
-	
-	/**
-	 * livecycle callback for when the element attributes or class properties are updated
-	 */
-	onUpdate(name: string, oldValue: unknown, newValue: unknown) {
-	}
-	
-	/**
-	 * updates any already tracked node with current component data including context and node level data.
-	 */
-	forceUpdate() {
-		if (this.mounted) {
-			cancelAnimationFrame($.get(this).updateFrame);
-			$.get(this).updateFrame = requestAnimationFrame(() => {
-				$.get(this).tracks.forEach((t: NodeTrack) => {
-					t.updateNode();
-				});
-			});
+        if (this.shadow) {
+            this.#el = this.attachShadow({
+                mode: this.mode,
+                delegatesFocus: this.delegatesFocus,
+            })
+        }
 
-			return true;
-		}
+        this.#propNames.forEach((propName) => {
+            const [getter, setter] = state<P[keyof P]>('' as P[keyof P])
 
-		return false;
-	}
-	
-	adoptedCallback() {
-		try {
-			this.onAdoption();
-		} catch (e) {
-			this.onError(e as Error)
-		}
-	}
-	
-	/**
-	 * livecycle callback for when element is moved into a new document
-	 */
-	onAdoption() {
-	}
-	
-	/**
-	 * error callback for when an error occurs
-	 */
-	onError(error: ErrorEvent | Error) {
-		console.error(this.constructor.name, error);
-	}
+            this.#props[propName] = getter
+            this.#propsSetters[propName] = setter
+        })
+    }
+
+    render(): HtmlTemplate | string | Element | void {}
+
+    setState(
+        newStateOrCallback: Partial<S> | ((currentState: S) => Partial<S>) = {}
+    ) {
+        const newState =
+            typeof newStateOrCallback === 'function'
+                ? newStateOrCallback(
+                      Object.keys(this.state).reduce((acc, key: keyof S) => {
+                          acc[key] = this.state[key]()
+                          return acc
+                      }, {} as S)
+                  )
+                : newStateOrCallback
+
+        Object.keys(newState).forEach((name: keyof S) => {
+            if (this.#stateSetters.hasOwnProperty(name)) {
+                this.#stateSetters[name](newState[name] as S[keyof S])
+            }
+        })
+    }
+
+    dispatch(name: string, detail: Record<string, unknown> = {}) {
+        this.dispatchEvent(
+            new CustomEvent(name, {
+                detail,
+            })
+        )
+    }
+
+    updateStylesheet(sheet: CSSStyleSheet | string) {
+        if (typeof sheet === 'string') {
+            const css = sheet
+            sheet = new CSSStyleSheet()
+            sheet.insertRule(css)
+        }
+
+        if (!(sheet instanceof CSSStyleSheet)) {
+            return
+        }
+
+        if (this.shadow === true && this.#el instanceof ShadowRoot) {
+            this.#el.adoptedStyleSheets = [sheet]
+        } else {
+            document.adoptedStyleSheets = [
+                ...(document.adoptedStyleSheets || []).filter(
+                    (s) => s !== this.stylesheet
+                ),
+                sheet,
+            ]
+        }
+
+        this.stylesheet = sheet
+    }
+
+    connectedCallback() {
+        requestAnimationFrame(() => {
+            this.#propNames.forEach((propName: keyof P) => {
+                const desc = Object.getOwnPropertyDescriptor(this, propName)
+
+                this.#propsSetters[propName](desc?.value ?? '')
+
+                if (!desc || desc.configurable) {
+                    Object.defineProperty(this, propName, {
+                        get() {
+                            return this.#props[propName]()
+                        },
+                        set(newVal) {
+                            const oldVal = this.#props[propName]()
+                            this.#propsSetters[propName](newVal)
+                            if (this.mounted) {
+                                this.onUpdate(propName, newVal, oldVal)
+                            }
+                        },
+                    })
+                }
+            })
+
+            Object.keys(this.initialState).forEach((name: keyof S) => {
+                const [getter, setter] = state<S[keyof S]>(
+                    this.initialState[name]
+                )
+
+                this.#state[name] = getter
+                this.#stateSetters[name] = setter
+            })
+
+            this.#temp = this.render()
+
+            if (this.#temp instanceof HtmlTemplate) {
+                this.#temp?.render(this.#el)
+            } else if (typeof this.#temp === 'string') {
+                this.#el.innerHTML = this.#temp
+            } else if (this.#temp instanceof Element) {
+                this.#el.appendChild(this.#temp)
+            }
+
+            if (this.stylesheet) {
+                this.updateStylesheet(this.stylesheet)
+            }
+
+            this.#mounted = true
+            this.onMount()
+        })
+    }
+
+    onMount() {}
+
+    attributeChangedCallback(
+        name: keyof P,
+        oldVal: P[keyof P] | null,
+        newVal: P[keyof P]
+    ) {
+        try {
+            newVal = jsonParse(newVal)
+        } catch (e) {
+            // empty
+        }
+
+        const desc = Object.getOwnPropertyDescriptor(this, name)
+
+        if (desc?.writable || desc?.set || desc?.configurable) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            this[name] = newVal
+        }
+    }
+
+    onUpdate(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        name: keyof P,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        newValue: P[keyof P] | null,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        oldValue: P[keyof P] | null
+    ) {}
+
+    disconnectedCallback() {
+        requestAnimationFrame(() => {
+            if (this.#temp instanceof HtmlTemplate) {
+                this.#temp?.unmount()
+            }
+            this.#mounted = false
+            this.onDestroy()
+        })
+    }
+
+    onDestroy() {}
+
+    adoptedCallback() {
+        this.onAdoption()
+    }
+
+    onAdoption() {}
 }
-
