@@ -93,7 +93,12 @@ export class WebComponent<
         if (typeof sheet === 'string') {
             const css = sheet
             sheet = new CSSStyleSheet()
-            sheet.insertRule(css)
+
+            if (sheet.replaceSync) {
+                sheet.replaceSync(css)
+            } else {
+                sheet.insertRule(css)
+            }
         }
 
         if (!(sheet instanceof CSSStyleSheet)) {
