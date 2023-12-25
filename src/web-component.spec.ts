@@ -1,7 +1,7 @@
 import {WebComponent} from './web-component';
 import { element, html } from "@beforesemicolon/markup";
 
-class CompOne extends WebComponent<{}, {}> {}
+class CompOne extends WebComponent {}
 
 customElements.define('comp-one', CompOne)
 
@@ -9,7 +9,7 @@ const mountMock = jest.fn();
 const updateMock = jest.fn();
 const destroyMock = jest.fn();
 const adoptMock = jest.fn();
-class CompTwo extends WebComponent<{sample: string}, {}> {
+class CompTwo extends WebComponent<{sample: string}> {
 	static observedAttributes = ['sample'];
 	sample = '';
 	
@@ -64,7 +64,7 @@ class CompThree extends WebComponent<{label: string}, {count: number}> {
 
 customElements.define('comp-three', CompThree)
 
-class CompFour extends WebComponent<{}, {}> {
+class CompFour extends WebComponent {
 	shadow = false;
 	stylesheet = `
 		button {

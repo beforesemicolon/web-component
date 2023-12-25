@@ -8,8 +8,8 @@ import {
 } from './types'
 
 export class WebComponent<
-    P extends ObjectLiteral<P>,
-    S extends ObjectLiteral<S>,
+    P extends ObjectLiteral<P> = Record<string, unknown>,
+    S extends ObjectLiteral<S> = Record<string, unknown>,
 > extends HTMLElement {
     #el: ShadowRoot | HTMLElement = this
     #props: Props<P> = {} as Props<P>

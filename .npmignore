@@ -11,5 +11,6 @@ coverage
 .github
 .prettierrc
 .prettierignore
-.eslintrc.js
+.eslintrc.cjs
 .eslintignore
+jest.config.cjs
