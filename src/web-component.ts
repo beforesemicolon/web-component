@@ -1,15 +1,18 @@
 import { state, HtmlTemplate, jsonParse } from '@beforesemicolon/markup'
 import {
-    ObjectLiteral,
+    ObjectInterface,
     StateSetters,
     State,
     PropsSetters,
     Props,
 } from './types'
 
+export type HTMLComponentElement<P extends ObjectInterface<P>> = P &
+    WebComponent<P>
+
 export class WebComponent<
-    P extends ObjectLiteral<P> = Record<string, unknown>,
-    S extends ObjectLiteral<S> = Record<string, unknown>,
+    P extends ObjectInterface<P> = Record<string, unknown>,
+    S extends ObjectInterface<S> = Record<string, unknown>,
 > extends HTMLElement {
     #el: ShadowRoot | HTMLElement = this
     #props: Props<P> = {} as Props<P>
@@ -24,6 +27,7 @@ export class WebComponent<
     delegatesFocus = false
     stylesheet: CSSStyleSheet | string | null = null
     initialState: S = {} as S
+    __ROOT__: ShadowRoot | null = null
 
     get props(): Props<P> {
         return this.#props
@@ -49,6 +53,7 @@ export class WebComponent<
                 mode: this.mode,
                 delegatesFocus: this.delegatesFocus,
             })
+            this.__ROOT__ = this.#el
         }
 
         this.#propNames.forEach((propName) => {
@@ -64,109 +69,151 @@ export class WebComponent<
     setState(
         newStateOrCallback: Partial<S> | ((currentState: S) => Partial<S>) = {}
     ) {
-        const newState =
-            typeof newStateOrCallback === 'function'
-                ? newStateOrCallback(
-                      Object.keys(this.state).reduce((acc, key: keyof S) => {
-                          acc[key] = this.state[key]()
-                          return acc
-                      }, {} as S)
-                  )
-                : newStateOrCallback
+        try {
+            const newState = (
+                typeof newStateOrCallback === 'function'
+                    ? newStateOrCallback(
+                          (Object.keys(this.state) as Array<keyof S>).reduce(
+                              (acc, key) => {
+                                  acc[key] = this.state[key]()
+                                  return acc
+                              },
+                              {} as S
+                          )
+                      )
+                    : newStateOrCallback
+            ) as S
 
-        Object.keys(newState).forEach((name: keyof S) => {
-            if (this.#stateSetters.hasOwnProperty(name)) {
-                this.#stateSetters[name](newState[name] as S[keyof S])
-            }
-        })
+            ;(Object.keys(newState) as Array<keyof S>).forEach((name) => {
+                if (this.#stateSetters.hasOwnProperty(name)) {
+                    this.#stateSetters[name](newState[name] as S[keyof S])
+                }
+            })
+        } catch (e) {
+            this.onError(e as Error)
+        }
     }
 
     dispatch(name: string, detail: Record<string, unknown> = {}) {
-        this.dispatchEvent(
-            new CustomEvent(name, {
-                detail,
-            })
-        )
+        try {
+            this.dispatchEvent(
+                new CustomEvent(name, {
+                    detail,
+                })
+            )
+        } catch (e) {
+            this.onError(e as Error)
+        }
     }
 
-    updateStylesheet(sheet: CSSStyleSheet | string) {
-        if (typeof sheet === 'string') {
-            const css = sheet
-            sheet = new CSSStyleSheet()
-
-            if (sheet.replaceSync) {
-                sheet.replaceSync(css)
-            } else {
-                sheet.insertRule(css)
+    updateStylesheet(sheet: CSSStyleSheet | string | null) {
+        try {
+            if (sheet === null) {
+                if (this.shadow === true && this.#el instanceof ShadowRoot) {
+                    this.#el.adoptedStyleSheets = []
+                } else {
+                    document.adoptedStyleSheets = (
+                        document.adoptedStyleSheets || []
+                    ).filter((s) => s !== this.stylesheet)
+                }
+                return
             }
-        }
 
-        if (!(sheet instanceof CSSStyleSheet)) {
-            return
-        }
+            if (typeof sheet === 'string' && sheet.trim().length) {
+                const css = sheet
+                sheet = new CSSStyleSheet()
 
-        if (this.shadow === true && this.#el instanceof ShadowRoot) {
-            this.#el.adoptedStyleSheets = [sheet]
-        } else {
-            document.adoptedStyleSheets = [
-                ...(document.adoptedStyleSheets || []).filter(
-                    (s) => s !== this.stylesheet
-                ),
-                sheet,
-            ]
-        }
+                if (sheet.replaceSync) {
+                    sheet.replaceSync(css)
+                } else {
+                    sheet.insertRule(css)
+                }
+            }
 
-        this.stylesheet = sheet
+            if (!(sheet instanceof CSSStyleSheet)) {
+                return
+            }
+
+            if (this.shadow === true && this.#el instanceof ShadowRoot) {
+                this.#el.adoptedStyleSheets = [sheet]
+            } else {
+                document.adoptedStyleSheets = [
+                    ...(document.adoptedStyleSheets || []).filter(
+                        (s) => s !== this.stylesheet
+                    ),
+                    sheet,
+                ]
+            }
+
+            this.stylesheet = sheet
+        } catch (e) {
+            this.onError(e as Error)
+        }
     }
 
     connectedCallback() {
         requestAnimationFrame(() => {
-            this.#propNames.forEach((propName: keyof P) => {
-                const desc = Object.getOwnPropertyDescriptor(this, propName)
+            try {
+                this.#propNames.forEach((propName: keyof P) => {
+                    const desc = Object.getOwnPropertyDescriptor(this, propName)
 
-                this.#propsSetters[propName](desc?.value ?? '')
+                    this.#propsSetters[propName](desc?.value ?? '')
 
-                if (!desc || desc.configurable) {
-                    Object.defineProperty(this, propName, {
-                        get() {
-                            return this.#props[propName]()
-                        },
-                        set(newVal) {
-                            const oldVal = this.#props[propName]()
-                            this.#propsSetters[propName](newVal)
-                            if (this.mounted) {
-                                this.onUpdate(propName, newVal, oldVal)
-                            }
-                        },
-                    })
-                }
-            })
+                    if (!desc || desc.configurable) {
+                        Object.defineProperty(this, propName, {
+                            get() {
+                                return this.#props[propName]()
+                            },
+                            set(newVal) {
+                                const oldVal = this.#props[propName]()
+                                if (newVal !== oldVal) {
+                                    this.#propsSetters[propName](newVal)
+                                    if (this.mounted) {
+                                        try {
+                                            this.onUpdate(
+                                                propName,
+                                                newVal,
+                                                oldVal
+                                            )
+                                        } catch (e) {
+                                            this.onError(e as Error)
+                                        }
+                                    }
+                                }
+                            },
+                        })
+                    }
+                })
+                ;(Object.keys(this.initialState) as Array<keyof S>).forEach(
+                    (name) => {
+                        const [getter, setter] = state<S[keyof S]>(
+                            this.initialState[name]
+                        )
 
-            Object.keys(this.initialState).forEach((name: keyof S) => {
-                const [getter, setter] = state<S[keyof S]>(
-                    this.initialState[name]
+                        this.#state[name] = getter
+                        this.#stateSetters[name] = setter
+                    }
                 )
 
-                this.#state[name] = getter
-                this.#stateSetters[name] = setter
-            })
+                this.#temp = this.render()
 
-            this.#temp = this.render()
+                if (this.#temp instanceof HtmlTemplate) {
+                    this.#temp?.render(this.#el)
+                } else if (typeof this.#temp === 'string') {
+                    this.#el.innerHTML = this.#temp
+                } else if (this.#temp instanceof Element) {
+                    this.#el.appendChild(this.#temp)
+                }
 
-            if (this.#temp instanceof HtmlTemplate) {
-                this.#temp?.render(this.#el)
-            } else if (typeof this.#temp === 'string') {
-                this.#el.innerHTML = this.#temp
-            } else if (this.#temp instanceof Element) {
-                this.#el.appendChild(this.#temp)
+                if (this.stylesheet) {
+                    this.updateStylesheet(this.stylesheet)
+                }
+
+                this.#mounted = true
+                this.onMount()
+            } catch (e) {
+                this.onError(e as Error)
             }
-
-            if (this.stylesheet) {
-                this.updateStylesheet(this.stylesheet)
-            }
-
-            this.#mounted = true
-            this.onMount()
         })
     }
 
@@ -179,16 +226,16 @@ export class WebComponent<
     ) {
         try {
             newVal = jsonParse(newVal)
+
+            const desc = Object.getOwnPropertyDescriptor(this, name)
+
+            if (desc?.writable || desc?.set || desc?.configurable) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                this[name] = newVal
+            }
         } catch (e) {
-            // empty
-        }
-
-        const desc = Object.getOwnPropertyDescriptor(this, name)
-
-        if (desc?.writable || desc?.set || desc?.configurable) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
-            this[name] = newVal
+            this.onError(e as Error)
         }
     }
 
@@ -203,19 +250,32 @@ export class WebComponent<
 
     disconnectedCallback() {
         requestAnimationFrame(() => {
-            if (this.#temp instanceof HtmlTemplate) {
-                this.#temp?.unmount()
+            try {
+                if (this.#temp instanceof HtmlTemplate) {
+                    this.#temp?.unmount()
+                }
+                this.#mounted = false
+                this.onDestroy()
+            } catch (e) {
+                this.onError(e as Error)
             }
-            this.#mounted = false
-            this.onDestroy()
         })
     }
 
     onDestroy() {}
 
     adoptedCallback() {
-        this.onAdoption()
+        try {
+            this.onAdoption()
+        } catch (e) {
+            this.onError(e as Error)
+        }
     }
 
     onAdoption() {}
+
+    onError(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        error: Error
+    ) {}
 }

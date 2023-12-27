@@ -9,6 +9,7 @@ const mountMock = jest.fn();
 const updateMock = jest.fn();
 const destroyMock = jest.fn();
 const adoptMock = jest.fn();
+const errorMock = jest.fn();
 class CompTwo extends WebComponent<{sample: string}> {
 	static observedAttributes = ['sample'];
 	sample = '';
@@ -27,6 +28,10 @@ class CompTwo extends WebComponent<{sample: string}> {
 	
 	onAdoption() {
 		adoptMock();
+	}
+	
+	onError(error: Error) {
+		errorMock(error);
 	}
 }
 
@@ -165,6 +170,17 @@ describe('WebComponent', () => {
 			expect(mountMock).toHaveBeenCalled()
 			expect(adoptMock).toHaveBeenCalled()
 		});
+		
+		it("onError", () => {
+			mountMock.mockImplementation(() => {
+				throw new Error('failed')
+			})
+			
+			document.body.append(two);
+			
+			expect(mountMock).toHaveBeenCalled()
+			expect(errorMock).toHaveBeenCalled()
+		});
 	})
 	
 	describe('should handle props', () => {
@@ -287,13 +303,10 @@ describe('WebComponent', () => {
 			expect(document?.adoptedStyleSheets[0]).not.toEqual(sheet)
 		});
 		
-		it("ignore update style", () => {
-			const sheet = four.stylesheet;
-			
-			// @ts-ignore
+		it("remove style", () => {
 			four.updateStylesheet(null);
 			
-			expect(document?.adoptedStyleSheets[0]).toEqual(sheet)
+			expect(document?.adoptedStyleSheets).toHaveLength(0)
 		});
 	})
 	

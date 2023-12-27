@@ -100,6 +100,7 @@ In the browser
     -   [onUpdate](#onupdate)
     -   [onDestroy](#ondestroy)
     -   [onAdoption](#onadoption)
+    -   [onError](#onerror)
 
 ### Create a Component
 
@@ -390,6 +391,58 @@ move a component from an iframe to the main document.
 class MyButton extends WebComponent {
     onAdoption() {
         console.log(document)
+    }
+}
+
+customElements.define('my-button', MyButton)
+```
+
+#### onError
+
+The `onError` method is called whenever the component fails to perform internal actions. These action can also be related to
+code executed inside any lifecycle methods, render, state or style update.
+
+```ts
+class MyButton extends WebComponent {
+    onError(error: Error) {
+        console.log(document)
+    }
+}
+
+customElements.define('my-button', MyButton)
+```
+
+You may also use this method as a single place to expose and handle all the errors.
+
+```ts
+class MyButton extends WebComponent {
+    onClick() {
+        execAsyncAction().catch(this.onErrror)
+    }
+
+    onError(error) {
+        // handle error
+    }
+}
+
+customElements.define('my-button', MyButton)
+```
+
+You can also enhance components so all errors are handled in the same place.
+
+```ts
+// have your global componenent that extends WebComponent
+// and that you can use to handle all global related things, for example, error tracking
+class Component extends WebComponent {
+    onError(error: Error) {
+        trackError(error)
+        console.error(error)
+    }
+}
+
+class MyButton extends Component {
+    onClick() {
+        execAsyncAction().catch(this.onErrror)
     }
 }
 

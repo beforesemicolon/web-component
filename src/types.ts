@@ -1,8 +1,14 @@
 import { StateGetter, StateSetter } from '@beforesemicolon/markup'
 
-export interface ObjectLiteral<P> {
-    [key: string]: P[keyof P]
+type ObjectKeyTypes = string | symbol | number
+
+export type ObjectInterface<P> = {
+    [K in keyof P & ObjectKeyTypes]: P[K]
 }
+
+export type ObjectLiteral = ObjectInterface<
+    Record<string | number | symbol, unknown>
+>
 
 export type Props<P> = {
     [K in keyof P]: StateGetter<P[K]>
