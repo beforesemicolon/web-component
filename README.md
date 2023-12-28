@@ -1,6 +1,11 @@
 # Web Component
 
-Simplified way to interact with Web Component APIs with [Markup](https://markup.beforesemicolon.com/) templating and state.
+[![Static Badge](https://img.shields.io/badge/based_on-markup.beforesemicolon.com-blue)](https://markup.beforesemicolon.com)
+[![Test](https://github.com/beforesemicolon/web-component/actions/workflows/test.yml/badge.svg)](https://github.com/beforesemicolon/web-component/actions/workflows/test.yml)
+[![npm](https://img.shields.io/npm/v/%40beforesemicolon%2Fweb-component)](https://www.npmjs.com/package/@beforesemicolon/web-component)
+![npm](https://img.shields.io/npm/l/%40beforesemicolon%2Fweb-component)
+
+Enhanced [Markup](https://markup.beforesemicolon.com/) with Web Component capability.
 
 ## Motivation
 
@@ -11,7 +16,8 @@ Simplified way to interact with Web Component APIs with [Markup](https://markup.
 With all these reasons, it only made sense to introduce a simple API to handle everything for you.
 
 ```ts
-import { WebComponent, html } from '@beforesemicolon/web-component'
+// import everything from Markup as if you are using it directly
+import { WebComponent, html, style, repeat } from '@beforesemicolon/web-component'
 import stylesheet from './counter-app.css' assert { type: 'css' }
 
 interface Props {
