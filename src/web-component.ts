@@ -57,7 +57,7 @@ export class WebComponent<
         }
 
         this.#propNames.forEach((propName) => {
-            const [getter, setter] = state<P[keyof P]>('' as P[keyof P])
+            const [getter, setter] = state<P[keyof P]>(undefined as P[keyof P])
 
             this.#props[propName] = getter
             this.#propsSetters[propName] = setter
@@ -109,7 +109,7 @@ export class WebComponent<
     updateStylesheet(sheet: CSSStyleSheet | string | null) {
         try {
             if (sheet === null) {
-                if (this.shadow === true && this.#el instanceof ShadowRoot) {
+                if (this.shadow && this.#el instanceof ShadowRoot) {
                     this.#el.adoptedStyleSheets = []
                 } else {
                     document.adoptedStyleSheets = (
@@ -134,7 +134,7 @@ export class WebComponent<
                 return
             }
 
-            if (this.shadow === true && this.#el instanceof ShadowRoot) {
+            if (this.shadow && this.#el instanceof ShadowRoot) {
                 this.#el.adoptedStyleSheets = [sheet]
             } else {
                 document.adoptedStyleSheets = [
