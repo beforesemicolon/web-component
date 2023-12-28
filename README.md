@@ -17,7 +17,12 @@ With all these reasons, it only made sense to introduce a simple API to handle e
 
 ```ts
 // import everything from Markup as if you are using it directly
-import { WebComponent, html, style, repeat } from '@beforesemicolon/web-component'
+import {
+    WebComponent,
+    html,
+    style,
+    repeat,
+} from '@beforesemicolon/web-component'
 import stylesheet from './counter-app.css' assert { type: 'css' }
 
 interface Props {
