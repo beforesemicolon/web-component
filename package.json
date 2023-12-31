@@ -1,6 +1,6 @@
 {
     "name": "@beforesemicolon/web-component",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "description": "Enhanced Markup with ability to create native Web Components",
     "engines": {
         "node": ">=18.16.0"
@@ -15,7 +15,7 @@
     "scripts": {
         "test": "jest",
         "test:coverage": "jest --coverage",
-        "local": "nodemon --watch src -e ts --exec npm run build:local",
+        "local": "nodemon --watch src -e ts --exec npm run build",
         "build:cjs-min": "esbuild `find src \\( -name '*.ts' ! -name '*.spec.ts' ! -name 'client.ts' \\)` --minify --outdir=dist/cjs --platform=node --format=cjs --keep-names --target=esnext",
         "build:esm-min": "esbuild `find src \\( -name '*.ts' ! -name '*.spec.ts' ! -name 'client.ts' \\)` --minify --outdir=dist/esm --platform=node --format=esm --keep-names --target=esnext",
         "build:browser": "esbuild src/client.ts --bundle --minify --keep-names --sourcemap --target=esnext --outfile=dist/client.js",
@@ -65,6 +65,6 @@
         "typescript": "^5.3.3"
     },
     "dependencies": {
-        "@beforesemicolon/markup": "^0.14.1"
+        "@beforesemicolon/markup": "^0.14.2"
     }
 }

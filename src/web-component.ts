@@ -41,6 +41,10 @@ export class WebComponent<
         return this.#mounted
     }
 
+    get refs() {
+        return this.#temp instanceof HtmlTemplate ? this.#temp.refs : {}
+    }
+
     constructor() {
         super()
 
@@ -277,5 +281,7 @@ export class WebComponent<
     onError(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         error: Error
-    ) {}
+    ) {
+        console.error(error)
+    }
 }
