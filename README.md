@@ -10,19 +10,16 @@ Enhanced [Markup](https://markup.beforesemicolon.com/) with Web Component capabi
 ## Motivation
 
 -   Native Web Components APIs are too robust. This means you need to write so much code for the simplest components.
--   Even if you manage to handle all the APIs fine, you still need to deal with DOM manipulation and handle your own reactivity.
--   [Markup](https://markup.beforesemicolon.com/) offers the simplest and more powerful templating system that can be used on the client without setup.
+-   Even if you manage to handle all the APIs fine, you still need to deal with DOM manipulation and handle your own
+    reactivity.
+-   [Markup](https://markup.beforesemicolon.com/) offers the simplest and more powerful templating system that can be used
+    on the client without setup.
 
 With all these reasons, it only made sense to introduce a simple API to handle everything for you.
 
 ```ts
 // import everything from Markup as if you are using it directly
-import {
-    WebComponent,
-    html,
-    style,
-    repeat,
-} from '@beforesemicolon/web-component'
+import { WebComponent, html } from '@beforesemicolon/web-component'
 import stylesheet from './counter-app.css' assert { type: 'css' }
 
 interface Props {
@@ -97,6 +94,8 @@ In the browser
     -   [ShadowRoot](#shadowroot)
         -   [mode](#mode)
         -   [delegatesFocus](#delegatesfocus)
+-   [Internals](#internals)
+-   [Root](#root)
 -   [Props](#props)
 -   [State](#state)
     -   [initialState](#initialstate)
@@ -119,7 +118,7 @@ To create a component, all you need to do is create a class that extends `WebCom
 
 ```ts
 class MyButton extends WebComponent {
-  ...
+...
 }
 
 customElements.define('my-button', MyButton)
@@ -127,7 +126,8 @@ customElements.define('my-button', MyButton)
 
 #### ShadowRoot
 
-By default, all components you create add a [ShadowRoot](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot) in `open` mode.
+By default, all components you create add a [ShadowRoot](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot)
+in `open` mode.
 
 If you don't want `ShadowRoot` in your components, you can set the `shadow` property to `false`
 
@@ -141,7 +141,8 @@ customElements.define('my-button', MyButton)
 
 ##### mode
 
-You can set the mode your `ShadowRoot` should be created with by setting the `mode` property. By default, it is set to `open`.
+You can set the mode your `ShadowRoot` should be created with by setting the `mode` property. By default, it is set
+to `open`.
 
 ```ts
 class MyButton extends WebComponent {
@@ -153,7 +154,8 @@ customElements.define('my-button', MyButton)
 
 ##### delegatesFocus
 
-You may also set whether the `ShadowRoot` delegates focus by setting the `delegatesFocus`. By default, it is set to `false`.
+You may also set whether the `ShadowRoot` delegates focus by setting the `delegatesFocus`. By default, it is set
+to `false`.
 
 ```ts
 class MyButton extends WebComponent {
@@ -163,9 +165,54 @@ class MyButton extends WebComponent {
 customElements.define('my-button', MyButton)
 ```
 
+### Internals
+
+WebComponent exposes the [ElementInternals](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals)
+via the `internals` property that you can access for accessibility purposes.
+
+```ts
+class TextField extends WebComponent {
+    static formAssociated = true // add this to form-related components
+    static observedAttributes = ['disabled', 'placeholder']
+    disabled = false
+    placeholder = ''
+
+    render() {
+        return html`
+            <input
+                type="text"
+                placeholder="${this.props.placeholder}"
+                disabled="${this.props.disabled}"
+            />
+        `
+    }
+}
+
+const field = new TextField()
+
+field.internals // ElementInternals object
+```
+
+### Root
+
+WebComponent exposes the root of the component via the `root` property. If the component has a `shadowRoot`,
+it will expose it here regardless of the `mode`. If not, it will be the component itself.
+
+```ts
+const field = new TextField()
+
+field.internals // ShadowRoot object
+```
+
+This is not to be confused with the `Node` returned by calling
+the [getRootNode()](https://developer.mozilla.org/en-US/docs/Web/API/Node/getRootNode) on an element.
+The `getRootNode` will return the element context root node and `root` will contain the node where the template
+was rendered to.
+
 ### Props
 
-If your component expects props (inputs), you can set the `observedAttributes` static array with all the attribute names.
+If your component expects props (inputs), you can set the `observedAttributes` static array with all the attribute
+names.
 
 ```ts
 class MyButton extends WebComponent {
@@ -265,7 +312,8 @@ class MyButton extends WebComponent<{}, State> {
 customElements.define('my-button', MyButton)
 ```
 
-if you provide a partial state object it will be merged with the current state object. No need to spread state when updating it.
+if you provide a partial state object it will be merged with the current state object. No need to spread state when
+updating it.
 
 ### render
 
@@ -290,12 +338,15 @@ customElements.define('my-button', MyButton)
 
 #### Templating
 
-In the `render` method you can return a string, a DOM element or a [Markup template](https://markup.beforesemicolon.com/documentation/creating-and-rendering).
-To learn more about Markup, check its [documentation](https://markup.beforesemicolon.com/documentation/creating-and-rendering).
+In the `render` method you can return a string, a DOM element or
+a [Markup template](https://markup.beforesemicolon.com/documentation/creating-and-rendering).
+To learn more about Markup, check
+its [documentation](https://markup.beforesemicolon.com/documentation/creating-and-rendering).
 
 #### Stylesheet
 
-You have the ability to specify a style for your component either by providing a CSS string or a [CSSStyleSheet](https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet).
+You have the ability to specify a style for your component either by providing a CSS string or
+a [CSSStyleSheet](https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet).
 
 ```ts
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -308,7 +359,8 @@ class MyButton extends WebComponent {
 customElements.define('my-button', MyButton)
 ```
 
-If your component uses a `ShadowRoot`, the style will be placed inside, otherwise, the style will be placed in the document.
+If your component uses a `ShadowRoot`, the style will be placed inside, otherwise, the style will be placed in the
+document.
 
 ##### updateStylesheet
 
@@ -344,7 +396,8 @@ customElements.define('my-button', MyButton)
 ### Lifecycles
 
 You could consider the `constructor` and `render` method as some type of "lifecycle" where anything inside the
-constructor happen when the component is instantiated and everything in the `render` method happens before the `onMount`.
+constructor happen when the component is instantiated and everything in the `render` method happens before
+the `onMount`.
 
 #### onMount
 
@@ -410,7 +463,8 @@ customElements.define('my-button', MyButton)
 
 #### onError
 
-The `onError` method is called whenever the component fails to perform internal actions. These action can also be related to
+The `onError` method is called whenever the component fails to perform internal actions. These action can also be
+related to
 code executed inside any lifecycle methods, render, state or style update.
 
 ```ts

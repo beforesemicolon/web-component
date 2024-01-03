@@ -14,6 +14,8 @@ export class WebComponent<
     P extends ObjectInterface<P> = Record<string, unknown>,
     S extends ObjectInterface<S> = Record<string, unknown>,
 > extends HTMLElement {
+    static observedAttributes: Array<string> = []
+    static formAssociated = false
     #el: ShadowRoot | HTMLElement = this
     #props: Props<P> = {} as Props<P>
     #state: State<S> = {} as State<S>
@@ -22,12 +24,12 @@ export class WebComponent<
     #mounted = false
     #temp: HtmlTemplate | string | Element | void = ''
     #propNames: Array<keyof P> = []
+    #internals = this.attachInternals?.()
     shadow = true
     mode: ShadowRootMode = 'open'
     delegatesFocus = false
     stylesheet: CSSStyleSheet | string | null = null
     initialState: S = {} as S
-    __ROOT__: ShadowRoot | null = null
 
     get props(): Props<P> {
         return this.#props
@@ -45,6 +47,14 @@ export class WebComponent<
         return this.#temp instanceof HtmlTemplate ? this.#temp.refs : {}
     }
 
+    get root() {
+        return this.#el
+    }
+
+    get internals() {
+        return this.#internals
+    }
+
     constructor() {
         super()
 
@@ -57,7 +67,6 @@ export class WebComponent<
                 mode: this.mode,
                 delegatesFocus: this.delegatesFocus,
             })
-            this.__ROOT__ = this.#el
         }
 
         this.#propNames.forEach((propName) => {
@@ -113,8 +122,8 @@ export class WebComponent<
     updateStylesheet(sheet: CSSStyleSheet | string | null) {
         try {
             if (sheet === null) {
-                if (this.shadow && this.#el instanceof ShadowRoot) {
-                    this.#el.adoptedStyleSheets = []
+                if (this.shadow && this.root instanceof ShadowRoot) {
+                    this.root.adoptedStyleSheets = []
                 } else {
                     document.adoptedStyleSheets = (
                         document.adoptedStyleSheets || []
@@ -138,8 +147,8 @@ export class WebComponent<
                 return
             }
 
-            if (this.shadow && this.#el instanceof ShadowRoot) {
-                this.#el.adoptedStyleSheets = [sheet]
+            if (this.shadow && this.root instanceof ShadowRoot) {
+                this.root.adoptedStyleSheets = [sheet]
             } else {
                 document.adoptedStyleSheets = [
                     ...(document.adoptedStyleSheets || []).filter(
@@ -202,11 +211,11 @@ export class WebComponent<
                 this.#temp = this.render()
 
                 if (this.#temp instanceof HtmlTemplate) {
-                    this.#temp?.render(this.#el)
+                    this.#temp?.render(this.root)
                 } else if (typeof this.#temp === 'string') {
-                    this.#el.innerHTML = this.#temp
-                } else if (this.#temp instanceof Element) {
-                    this.#el.appendChild(this.#temp)
+                    this.root.innerHTML = this.#temp
+                } else if (this.#temp instanceof Node) {
+                    this.root.appendChild(this.#temp)
                 }
 
                 if (this.stylesheet) {
