@@ -10,7 +10,7 @@ import {
 export type HTMLComponentElement<P extends ObjectInterface<P>> = P &
     WebComponent<P>
 
-export class WebComponent<
+export abstract class WebComponent<
     P extends ObjectInterface<P> = Record<string, unknown>,
     S extends ObjectInterface<S> = Record<string, unknown>,
 > extends HTMLElement {
@@ -164,7 +164,7 @@ export class WebComponent<
         }
     }
 
-    connectedCallback() {
+    private connectedCallback() {
         requestAnimationFrame(() => {
             try {
                 this.#propNames.forEach((propName: keyof P) => {
@@ -232,7 +232,7 @@ export class WebComponent<
 
     onMount() {}
 
-    attributeChangedCallback(
+    private attributeChangedCallback(
         name: keyof P,
         oldVal: P[keyof P] | null,
         newVal: P[keyof P]
@@ -261,7 +261,7 @@ export class WebComponent<
         oldValue: P[keyof P] | null
     ) {}
 
-    disconnectedCallback() {
+    private disconnectedCallback() {
         requestAnimationFrame(() => {
             try {
                 if (this.#temp instanceof HtmlTemplate) {
@@ -277,7 +277,7 @@ export class WebComponent<
 
     onDestroy() {}
 
-    adoptedCallback() {
+    private adoptedCallback() {
         try {
             this.onAdoption()
         } catch (e) {
