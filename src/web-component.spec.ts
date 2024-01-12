@@ -9,7 +9,7 @@ const mountMock = jest.fn();
 const updateMock = jest.fn();
 const destroyMock = jest.fn();
 const adoptMock = jest.fn();
-const errorMock = jest.fn();
+const errorMock = jest.fn(console.error);
 class CompTwo extends WebComponent<{sample: string}> {
 	static observedAttributes = ['sample'];
 	sample = '';
@@ -126,16 +126,15 @@ describe('WebComponent', () => {
 			expect(two.sample).toBe('');
 			
 			two.setAttribute('sample', 'works')
-			
 			expect(document.body.innerHTML).toBe('<comp-two sample="works"></comp-two>')
 			expect(updateMock).toHaveBeenCalled()
 			expect(two.props.sample()).toBe('works');
 			expect(two.sample).toBe('works');
-			
+
 			updateMock.mockClear()
-			
+
 			two.sample = 'works again';
-			
+
 			expect(document.body.innerHTML).toBe('<comp-two sample="works"></comp-two>')
 			expect(updateMock).toHaveBeenCalled()
 			expect(two.props.sample()).toBe('works again');
@@ -157,9 +156,9 @@ describe('WebComponent', () => {
 		it("onAdoption", () => {
 			const iframe = document.createElement('iframe');
 			
-			document.body.append(two, iframe);
-			
-			expect(document.body.innerHTML).toBe('<comp-two sample="works"></comp-two><iframe></iframe>')
+			document.body.append(iframe);
+			document.body.append(two);
+			expect(document.body.innerHTML).toBe('<iframe></iframe><comp-two sample="works"></comp-two>')
 			expect(mountMock).toHaveBeenCalled()
 			
 			mountMock.mockClear();
@@ -289,6 +288,11 @@ describe('WebComponent', () => {
 		
 		beforeEach(() => {
 			document.body.append(four)
+		})
+		
+		it('with no shadow', () => {
+			expect(four.shadow).toBe(false)
+			expect(four.root).toEqual(four)
 		})
 		
 		it("render style", () => {

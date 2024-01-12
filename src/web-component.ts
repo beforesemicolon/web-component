@@ -1,4 +1,9 @@
-import { state, HtmlTemplate, jsonParse } from '@beforesemicolon/markup'
+import {
+    state,
+    HtmlTemplate,
+    jsonParse,
+    booleanAttributes,
+} from '@beforesemicolon/markup'
 import {
     ObjectInterface,
     StateSetters,
@@ -62,15 +67,14 @@ export abstract class WebComponent<
         // @ts-expect-error
         this.#propNames = this.constructor.observedAttributes ?? []
 
-        if (this.shadow) {
-            this.#el = this.attachShadow({
-                mode: this.mode,
-                delegatesFocus: this.delegatesFocus,
-            })
-        }
-
         this.#propNames.forEach((propName) => {
-            const [getter, setter] = state<P[keyof P]>(undefined as P[keyof P])
+            const p = String(propName).toLowerCase()
+            const isBool = Boolean(
+                booleanAttributes[p as keyof typeof booleanAttributes]
+            )
+            const [getter, setter] = state<P[keyof P]>(
+                (isBool ? this.hasAttribute(p) : undefined) as P[keyof P]
+            )
 
             this.#props[propName] = getter
             this.#propsSetters[propName] = setter
@@ -167,6 +171,13 @@ export abstract class WebComponent<
     private connectedCallback() {
         requestAnimationFrame(() => {
             try {
+                if (this.shadow && !(this.#el instanceof ShadowRoot)) {
+                    this.#el = this.attachShadow({
+                        mode: this.mode,
+                        delegatesFocus: this.delegatesFocus,
+                    })
+                }
+
                 this.#propNames.forEach((propName: keyof P) => {
                     const desc = Object.getOwnPropertyDescriptor(this, propName)
 
