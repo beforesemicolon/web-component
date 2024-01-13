@@ -15,6 +15,29 @@ import {
 export type HTMLComponentElement<P extends ObjectInterface<P>> = P &
     WebComponent<P>
 
+const replaceCssHost = (css: string, tagName: string) => {
+    tagName = tagName.toLowerCase()
+
+    return css.replace(
+        /:(host-context|host)(?:\s*\(([^,{]*)\))?/gim,
+        (_, h, s) => {
+            if (h === 'host-context') {
+                return `${(s || '').trim()} ${tagName}`
+            }
+
+            return `${tagName}${(s || '').trim()}`
+        }
+    )
+}
+
+const stringToSheet = (css: string) => {
+    const sheet = new CSSStyleSheet()
+
+    sheet.replaceSync(css)
+
+    return sheet
+}
+
 export abstract class WebComponent<
     P extends ObjectInterface<P> = Record<string, unknown>,
     S extends ObjectInterface<S> = Record<string, unknown>,
@@ -30,6 +53,7 @@ export abstract class WebComponent<
     #temp: HtmlTemplate | string | Element | void = ''
     #propNames: Array<keyof P> = []
     #internals = this.attachInternals?.()
+    #closestRoot: ShadowRoot | Document = document
     shadow = true
     mode: ShadowRootMode = 'open'
     delegatesFocus = false
@@ -52,8 +76,12 @@ export abstract class WebComponent<
         return this.#temp instanceof HtmlTemplate ? this.#temp.refs : {}
     }
 
-    get root() {
+    get contentRoot() {
         return this.#el
+    }
+
+    get root() {
+        return this.#closestRoot
     }
 
     get internals() {
@@ -126,8 +154,8 @@ export abstract class WebComponent<
     updateStylesheet(sheet: CSSStyleSheet | string | null) {
         try {
             if (sheet === null) {
-                if (this.shadow && this.root instanceof ShadowRoot) {
-                    this.root.adoptedStyleSheets = []
+                if (this.shadow && this.contentRoot instanceof ShadowRoot) {
+                    this.contentRoot.adoptedStyleSheets = []
                 } else {
                     document.adoptedStyleSheets = (
                         document.adoptedStyleSheets || []
@@ -136,30 +164,49 @@ export abstract class WebComponent<
                 return
             }
 
-            if (typeof sheet === 'string' && sheet.trim().length) {
-                const css = sheet
-                sheet = new CSSStyleSheet()
+            const isShadowRoot =
+                this.shadow && this.contentRoot instanceof ShadowRoot
 
-                if (sheet.replaceSync) {
-                    sheet.replaceSync(css)
-                } else {
-                    sheet.insertRule(css)
+            if (isShadowRoot) {
+                if (typeof sheet === 'string' && sheet.trim().length) {
+                    sheet = stringToSheet(sheet)
                 }
-            }
 
-            if (!(sheet instanceof CSSStyleSheet)) {
-                return
-            }
+                if (!(sheet instanceof CSSStyleSheet)) {
+                    return
+                }
 
-            if (this.shadow && this.root instanceof ShadowRoot) {
-                this.root.adoptedStyleSheets = [sheet]
-            } else {
-                document.adoptedStyleSheets = [
-                    ...(document.adoptedStyleSheets || []).filter(
+                this.contentRoot.adoptedStyleSheets = [
+                    ...(this.contentRoot.adoptedStyleSheets || []).filter(
                         (s) => s !== this.stylesheet
                     ),
                     sheet,
                 ]
+            } else {
+                if (typeof sheet === 'string' && sheet.trim().length) {
+                    sheet = stringToSheet(replaceCssHost(sheet, this.tagName))
+                } else if (sheet instanceof CSSStyleSheet) {
+                    sheet = stringToSheet(
+                        replaceCssHost(
+                            Array.from(
+                                sheet.cssRules,
+                                (rule) => rule.cssText
+                            ).join(''),
+                            this.tagName
+                        )
+                    )
+                } else {
+                    return
+                }
+
+                if (this.#closestRoot) {
+                    this.#closestRoot.adoptedStyleSheets = [
+                        ...(this.#closestRoot.adoptedStyleSheets || []).filter(
+                            (s) => s !== this.stylesheet
+                        ),
+                        sheet,
+                    ]
+                }
             }
 
             this.stylesheet = sheet
@@ -171,6 +218,18 @@ export abstract class WebComponent<
     private connectedCallback() {
         requestAnimationFrame(() => {
             try {
+                // find the closest ancestor shadow root
+                let parent = this.#el as ParentNode | null
+
+                while (parent) {
+                    parent = parent?.parentNode
+
+                    if (parent instanceof ShadowRoot) {
+                        this.#closestRoot = parent
+                        break
+                    }
+                }
+
                 if (this.shadow && !(this.#el instanceof ShadowRoot)) {
                     this.#el = this.attachShadow({
                         mode: this.mode,
@@ -222,11 +281,11 @@ export abstract class WebComponent<
                 this.#temp = this.render()
 
                 if (this.#temp instanceof HtmlTemplate) {
-                    this.#temp?.render(this.root)
+                    this.#temp?.render(this.contentRoot)
                 } else if (typeof this.#temp === 'string') {
-                    this.root.innerHTML = this.#temp
+                    this.contentRoot.innerHTML = this.#temp
                 } else if (this.#temp instanceof Node) {
-                    this.root.appendChild(this.#temp)
+                    this.contentRoot.appendChild(this.#temp)
                 }
 
                 if (this.stylesheet) {

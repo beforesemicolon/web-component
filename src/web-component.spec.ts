@@ -1,3 +1,12 @@
+global.CSSStyleSheet = class extends CSSStyleSheet {
+	replaceSync(text: string) {
+		(text.match(/[^{]+{[^}]+}/g) ?? [])
+			.forEach(rule => {
+				this.insertRule(rule)
+			})
+	}
+}
+
 import {WebComponent} from './web-component';
 import { element, html } from "@beforesemicolon/markup";
 
@@ -72,6 +81,9 @@ customElements.define('comp-three', CompThree)
 class CompFour extends WebComponent {
 	shadow = false;
 	stylesheet = `
+		:host {
+			display: inline-block;
+		}
 		button {
 			color: blue;
 		}
@@ -222,14 +234,14 @@ describe('WebComponent', () => {
 			expect(three.state.count()).toEqual(0)
 			
 			expect(document.body.innerHTML).toBe('<comp-three></comp-three>')
-			expect(three.shadowRoot?.innerHTML).toBe('<p>0</p>\n' +
+			expect(three.contentRoot.innerHTML).toBe('<p>0</p>\n' +
 				'\t\t\t<button type="button">+</button>')
 		});
 		
 		it("when prop updates", () => {
 			three.label = 'count up';
 			
-			expect(three.shadowRoot?.innerHTML).toBe('<p>0</p>\n' +
+			expect(three.contentRoot.innerHTML).toBe('<p>0</p>\n' +
 				'\t\t\t<button type="button">count up</button>')
 		});
 		
@@ -246,7 +258,7 @@ describe('WebComponent', () => {
 			
 			document.body.appendChild(el);
 			
-			expect(el.shadowRoot?.innerHTML).toBe('Hello World')
+			expect(el.contentRoot.innerHTML).toBe('Hello World')
 		});
 		
 		it("if DOM elements rendered", () => {
@@ -264,7 +276,7 @@ describe('WebComponent', () => {
 			
 			document.body.appendChild(el);
 			
-			expect(el.shadowRoot?.innerHTML).toBe('<p>Hello World</p>')
+			expect(el.contentRoot?.innerHTML).toBe('<p>Hello World</p>')
 		});
 	});
 	
@@ -277,7 +289,7 @@ describe('WebComponent', () => {
 		three.addEventListener('click', clickMock)
 		
 		three.click();
-		three.shadowRoot?.querySelector('button')?.click();
+		three.contentRoot.querySelector('button')?.click();
 		
 		expect(clickMock).toHaveBeenCalledWith(expect.any(CustomEvent))
 		expect(clickMock).toHaveBeenCalledWith(expect.any(Event))
@@ -292,11 +304,14 @@ describe('WebComponent', () => {
 		
 		it('with no shadow', () => {
 			expect(four.shadow).toBe(false)
-			expect(four.root).toEqual(four)
+			expect(four.contentRoot).toEqual(four)
 		})
 		
 		it("render style", () => {
 			expect(document?.adoptedStyleSheets).toHaveLength(1)
+			expect(document?.adoptedStyleSheets[0].cssRules).toHaveLength(2)
+			expect(document?.adoptedStyleSheets[0].cssRules[0].cssText).toBe('comp-four {display: inline-block;}')
+			expect(document?.adoptedStyleSheets[0].cssRules[1].cssText).toBe('button {color: blue;}')
 		});
 		
 		it("update style", () => {
@@ -322,14 +337,14 @@ describe('WebComponent', () => {
 		expect(three.state.count()).toEqual(0)
 		
 		expect(document.body.innerHTML).toBe('<comp-three></comp-three>')
-		expect(three.shadowRoot?.innerHTML).toBe('<p>0</p>\n' +
+		expect(three.contentRoot.innerHTML).toBe('<p>0</p>\n' +
 			'\t\t\t<button type="button">+</button>')
 		
 		three.setState({
 			count: 10
 		})
 		
-		expect(three.shadowRoot?.innerHTML).toBe('<p>10</p>\n' +
+		expect(three.contentRoot.innerHTML).toBe('<p>10</p>\n' +
 			'\t\t\t<button type="button">+</button>')
 	});
 });

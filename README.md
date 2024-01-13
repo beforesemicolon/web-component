@@ -95,6 +95,7 @@ In the browser
         -   [mode](#mode)
         -   [delegatesFocus](#delegatesfocus)
 -   [Internals](#internals)
+-   [ContentRoot](#content-root)
 -   [Root](#root)
 -   [Props](#props)
 -   [State](#state)
@@ -193,21 +194,25 @@ const field = new TextField()
 field.internals // ElementInternals object
 ```
 
-### Root
+### Content Root
 
-WebComponent exposes the root of the component via the `root` property. If the component has a `shadowRoot`,
+WebComponent exposes the root of the component via the `contentRoot` property. If the component has a `shadowRoot`,
 it will expose it here regardless of the `mode`. If not, it will be the component itself.
 
 ```ts
 const field = new TextField()
 
-field.internals // ShadowRoot object
+field.contentRoot // ShadowRoot object
 ```
 
 This is not to be confused with the `Node` returned by calling
 the [getRootNode()](https://developer.mozilla.org/en-US/docs/Web/API/Node/getRootNode) on an element.
-The `getRootNode` will return the element context root node and `root` will contain the node where the template
+The `getRootNode` will return the element context root node and `contentRoot` will contain the node where the template
 was rendered to.
+
+### Root
+
+The root is about where the component was rendered at. It can either be the document itself, or the ancestor element shadow root.
 
 ### Props
 
@@ -359,8 +364,10 @@ class MyButton extends WebComponent {
 customElements.define('my-button', MyButton)
 ```
 
-If your component uses a `ShadowRoot`, the style will be placed inside, otherwise, the style will be placed in the
-document.
+Where the style is added will depend on whether the `shadow` option is true or false. If
+the component has shadow style will be added to its own [content root](#content-root). Otherwise,
+style will be added to the closest [root](#root) node the component was rendered in. It can be the document
+itself or root of an ancestor web component.
 
 ##### updateStylesheet
 
