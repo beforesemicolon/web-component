@@ -3,6 +3,7 @@ import {
     HtmlTemplate,
     jsonParse,
     booleanAttributes,
+    val,
 } from '@beforesemicolon/markup'
 import {
     ObjectInterface,
@@ -275,7 +276,7 @@ export abstract class WebComponent<
                 ;(Object.keys(this.initialState) as Array<keyof S>).forEach(
                     (name) => {
                         const [getter, setter] = state<S[keyof S]>(
-                            this.initialState[name]
+                            val(this.initialState[name])
                         )
 
                         this.#state[name] = getter
