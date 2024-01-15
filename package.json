@@ -1,6 +1,6 @@
 {
     "name": "@beforesemicolon/web-component",
-    "version": "1.2.5",
+    "version": "1.2.6",
     "description": "Enhanced Markup with ability to create native Web Components",
     "engines": {
         "node": ">=18.16.0"
@@ -10,7 +10,8 @@
     "exports": {
         "import": "./dist/esm/index.js",
         "require": "./dist/cjs/index.js",
-        "default": "./dist/cjs/index.js"
+        "default": "./dist/cjs/index.js",
+        "types": "./dist/types/index.d.ts"
     },
     "scripts": {
         "test": "jest",
