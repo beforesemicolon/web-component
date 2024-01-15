@@ -219,7 +219,7 @@ describe('WebComponent', () => {
 			
 			expect(two.sample).toBe('works fine')
 			expect(two.props.sample()).toBe('works fine')
-			expect(updateMock).toHaveBeenCalledWith('sample', 'works fine', '')
+			expect(updateMock).toHaveBeenCalledWith('sample', 'works fine', 'works')
 		});
 	})
 	

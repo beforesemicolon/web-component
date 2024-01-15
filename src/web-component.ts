@@ -240,26 +240,31 @@ export abstract class WebComponent<
                 this.#propNames.forEach((propName: keyof P) => {
                     const desc = Object.getOwnPropertyDescriptor(this, propName)
 
-                    this.#propsSetters[propName](desc?.value ?? '')
+                    this.#propsSetters[propName](
+                        desc?.value ?? desc?.get?.() ?? ''
+                    )
+
+                    // eslint-disable-next-line @typescript-eslint/no-this-alias
+                    const self = this
 
                     if (!desc || desc.configurable) {
-                        Object.defineProperty(this, propName, {
+                        Object.defineProperty(self, propName, {
                             get() {
-                                return this.#props[propName]()
+                                return self.#props[propName]()
                             },
                             set(newVal) {
-                                const oldVal = this.#props[propName]()
+                                const oldVal = self.#props[propName]()
                                 if (newVal !== oldVal) {
-                                    this.#propsSetters[propName](newVal)
-                                    if (this.mounted) {
+                                    self.#propsSetters[propName](newVal)
+                                    if (self.mounted) {
                                         try {
-                                            this.onUpdate(
+                                            self.onUpdate(
                                                 propName,
                                                 newVal,
                                                 oldVal
                                             )
                                         } catch (e) {
-                                            this.onError(e as Error)
+                                            self.onError(e as Error)
                                         }
                                     }
                                 }
