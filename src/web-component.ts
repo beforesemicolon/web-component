@@ -39,6 +39,12 @@ const stringToSheet = (css: string) => {
     return sheet
 }
 
+interface WebComponentConfig {
+    shadow?: boolean
+    mode?: ShadowRootMode
+    delegatesFocus?: boolean
+}
+
 export abstract class WebComponent<
     P extends ObjectInterface<P> = Record<string, unknown>,
     S extends ObjectInterface<S> = Record<string, unknown>,
@@ -55,9 +61,11 @@ export abstract class WebComponent<
     #propNames: Array<keyof P> = []
     #internals = this.attachInternals?.()
     #closestRoot: ShadowRoot | Document = document
-    shadow = true
-    mode: ShadowRootMode = 'open'
-    delegatesFocus = false
+    config: WebComponentConfig = {
+        shadow: true,
+        mode: 'open',
+        delegatesFocus: false,
+    }
     stylesheet: CSSStyleSheet | string | null = null
     initialState: S = {} as S
 
@@ -155,7 +163,10 @@ export abstract class WebComponent<
     updateStylesheet(sheet: CSSStyleSheet | string | null) {
         try {
             if (sheet === null) {
-                if (this.shadow && this.contentRoot instanceof ShadowRoot) {
+                if (
+                    this.config.shadow &&
+                    this.contentRoot instanceof ShadowRoot
+                ) {
                     this.contentRoot.adoptedStyleSheets = []
                 } else {
                     document.adoptedStyleSheets = (
@@ -166,7 +177,7 @@ export abstract class WebComponent<
             }
 
             const isShadowRoot =
-                this.shadow && this.contentRoot instanceof ShadowRoot
+                this.config.shadow && this.contentRoot instanceof ShadowRoot
 
             if (isShadowRoot) {
                 if (typeof sheet === 'string' && sheet.trim().length) {
@@ -231,10 +242,10 @@ export abstract class WebComponent<
                     }
                 }
 
-                if (this.shadow && !(this.#el instanceof ShadowRoot)) {
+                if (this.config.shadow && !(this.#el instanceof ShadowRoot)) {
                     this.#el = this.attachShadow({
-                        mode: this.mode,
-                        delegatesFocus: this.delegatesFocus,
+                        mode: this.config.mode ?? 'open',
+                        delegatesFocus: this.config.delegatesFocus,
                     })
                 }
 

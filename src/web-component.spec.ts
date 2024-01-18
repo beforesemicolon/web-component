@@ -79,7 +79,9 @@ class CompThree extends WebComponent<{label: string}, {count: number}> {
 customElements.define('comp-three', CompThree)
 
 class CompFour extends WebComponent {
-	shadow = false;
+	config = {
+		shadow: false
+	}
 	stylesheet = `
 		:host {
 			display: inline-block;
@@ -112,10 +114,10 @@ describe('WebComponent', () => {
 		
 		expect(document.body.innerHTML).toBe('<comp-one></comp-one>')
 		expect(one.shadowRoot).toBeDefined()
-		expect(one.shadow).toBe(true)
-		expect(one.mode).toBe('open')
+		expect(one.config.shadow).toBe(true)
+		expect(one.config.mode).toBe('open')
 		expect(one.shadowRoot?.mode).toBe('open')
-		expect(one.delegatesFocus).toBe(false)
+		expect(one.config.delegatesFocus).toBe(false)
 	});
 	
 	describe('should handle lifecycles', () => {
@@ -303,7 +305,7 @@ describe('WebComponent', () => {
 		})
 		
 		it('with no shadow', () => {
-			expect(four.shadow).toBe(false)
+			expect(four.config.shadow).toBe(false)
 			expect(four.contentRoot).toEqual(four)
 		})
 		

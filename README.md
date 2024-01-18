@@ -134,7 +134,9 @@ If you don't want `ShadowRoot` in your components, you can set the `shadow` prop
 
 ```ts
 class MyButton extends WebComponent {
-    shadow = false
+    config = {
+        shadow: false,
+    }
 }
 
 customElements.define('my-button', MyButton)
@@ -147,7 +149,9 @@ to `open`.
 
 ```ts
 class MyButton extends WebComponent {
-    mode = 'closed'
+    config = {
+        mode: 'closed',
+    }
 }
 
 customElements.define('my-button', MyButton)
@@ -160,7 +164,9 @@ to `false`.
 
 ```ts
 class MyButton extends WebComponent {
-    delegatesFocus = 'closed'
+    config = {
+        delegatesFocus: 'closed',
+    }
 }
 
 customElements.define('my-button', MyButton)
