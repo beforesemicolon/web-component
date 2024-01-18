@@ -4,6 +4,7 @@ import {
     jsonParse,
     booleanAttributes,
     val,
+    turnKebabToCamelCasing,
 } from '@beforesemicolon/markup'
 import {
     ObjectInterface,
@@ -102,15 +103,20 @@ export abstract class WebComponent<
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        this.#propNames = this.constructor.observedAttributes ?? []
+        this.#propNames = (this.constructor.observedAttributes ?? []).map(
+            turnKebabToCamelCasing
+        )
 
         this.#propNames.forEach((propName) => {
-            const p = String(propName).toLowerCase()
             const isBool = Boolean(
-                booleanAttributes[p as keyof typeof booleanAttributes]
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                booleanAttributes[propName]
             )
             const [getter, setter] = state<P[keyof P]>(
-                (isBool ? this.hasAttribute(p) : undefined) as P[keyof P]
+                (isBool
+                    ? this.hasAttribute(propName as string)
+                    : undefined) as P[keyof P]
             )
 
             this.#props[propName] = getter
@@ -330,6 +336,7 @@ export abstract class WebComponent<
             const desc = Object.getOwnPropertyDescriptor(this, name)
 
             if (desc?.writable || desc?.set || desc?.configurable) {
+                name = turnKebabToCamelCasing(name as string) as keyof P
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
                 this[name] = newVal

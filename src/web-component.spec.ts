@@ -10,7 +10,8 @@ global.CSSStyleSheet = class extends CSSStyleSheet {
 import {WebComponent} from './web-component';
 import { element, html } from "@beforesemicolon/markup";
 
-class CompOne extends WebComponent {}
+class CompOne extends WebComponent {
+}
 
 customElements.define('comp-one', CompOne)
 
@@ -19,9 +20,10 @@ const updateMock = jest.fn();
 const destroyMock = jest.fn();
 const adoptMock = jest.fn();
 const errorMock = jest.fn(console.error);
-class CompTwo extends WebComponent<{sample: string}> {
-	static observedAttributes = ['sample'];
+class CompTwo extends WebComponent<{sample: string, sampleVal: string}> {
+	static observedAttributes = ['sample', 'sample-val'];
 	sample = '';
+	sampleVal = '';
 	
 	onMount() {
 		mountMock();
@@ -206,14 +208,21 @@ describe('WebComponent', () => {
 		it("has default prop value", () => {
 			expect(two.sample).toBe('')
 			expect(two.props.sample()).toBe('')
+			expect(two.sampleVal).toBe('')
+			expect(two.props.sampleVal()).toBe('')
 		});
 		
 		it("updates via property", () => {
 			two.sample = 'works';
+			two.sampleVal = 'works too';
 			
 			expect(two.sample).toBe('works')
 			expect(two.props.sample()).toBe('works')
 			expect(updateMock).toHaveBeenCalledWith('sample', 'works', '')
+			
+			expect(two.sampleVal).toBe('works too')
+			expect(two.props.sampleVal()).toBe('works too')
+			expect(updateMock).toHaveBeenCalledWith('sampleVal', 'works too', '')
 		});
 		
 		it("updates via setAttribute", () => {
