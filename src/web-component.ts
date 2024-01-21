@@ -332,11 +332,11 @@ export abstract class WebComponent<
     ) {
         try {
             newVal = jsonParse(newVal)
+            name = turnKebabToCamelCasing(name as string) as keyof P
 
             const desc = Object.getOwnPropertyDescriptor(this, name)
 
             if (desc?.writable || desc?.set || desc?.configurable) {
-                name = turnKebabToCamelCasing(name as string) as keyof P
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
                 this[name] = newVal
