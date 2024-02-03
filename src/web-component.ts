@@ -5,6 +5,7 @@ import {
     booleanAttributes,
     val,
     turnKebabToCamelCasing,
+    html,
 } from '@beforesemicolon/markup'
 import {
     ObjectInterface,
@@ -301,15 +302,8 @@ export abstract class WebComponent<
                     }
                 )
 
-                this.#temp = this.render()
-
-                if (this.#temp instanceof HtmlTemplate) {
-                    this.#temp?.render(this.contentRoot)
-                } else if (typeof this.#temp === 'string') {
-                    this.contentRoot.innerHTML = this.#temp
-                } else if (this.#temp instanceof Node) {
-                    this.contentRoot.appendChild(this.#temp)
-                }
+                this.contentRoot.innerHTML = ''
+                this.#temp = html`${this.render()}`.render(this.contentRoot)
 
                 if (this.stylesheet) {
                     this.updateStylesheet(this.stylesheet)
