@@ -1,3 +1,5 @@
+import { css } from "./css";
+
 global.CSSStyleSheet = class extends CSSStyleSheet {
 	replaceSync(text: string) {
 		(text.match(/[^{]+{[^}]+}/g) ?? [])
@@ -54,7 +56,7 @@ class CompThree extends WebComponent<{label: string}, {count: number}> {
 	initialState = {
 		count: 0
 	}
-	stylesheet = `
+	stylesheet = css`
 		button {
 			color: blue;
 		}
@@ -84,7 +86,7 @@ class CompFour extends WebComponent {
 	config = {
 		shadow: false
 	}
-	stylesheet = `
+	stylesheet = css`
 		:host {
 			display: inline-block;
 		}

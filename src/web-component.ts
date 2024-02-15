@@ -6,6 +6,7 @@ import {
     val,
     turnKebabToCamelCasing,
     html,
+    Helper,
 } from '@beforesemicolon/markup'
 import {
     ObjectInterface,
@@ -125,7 +126,13 @@ export abstract class WebComponent<
         })
     }
 
-    render(): HtmlTemplate | string | Element | void {}
+    render<E extends (...args: unknown[]) => unknown>():
+        | HtmlTemplate
+        | string
+        | Element
+        | HTMLElement
+        | Helper<E>
+        | void {}
 
     setState(
         newStateOrCallback: Partial<S> | ((currentState: S) => Partial<S>) = {}
@@ -303,7 +310,9 @@ export abstract class WebComponent<
                 )
 
                 this.contentRoot.innerHTML = ''
-                this.#temp = html`${this.render()}`.render(this.contentRoot)
+                this.#temp = html`${this.render() ?? ''}`.render(
+                    this.contentRoot
+                )
 
                 if (this.stylesheet) {
                     this.updateStylesheet(this.stylesheet)

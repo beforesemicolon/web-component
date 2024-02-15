@@ -104,6 +104,7 @@ In the browser
 -   [render](#render)
     -   [Templating](#templating)
     -   [Stylesheet](#stylesheet)
+      - [css](#css)
     -   [updateStylesheet](#updatestylesheet)
 -   [Events](#events)
 -   [Lifecycles](#lifecycles)
@@ -374,6 +375,26 @@ Where the style is added will depend on whether the `shadow` option is true or f
 the component has shadow style will be added to its own [content root](#content-root). Otherwise,
 style will be added to the closest [root](#root) node the component was rendered in. It can be the document
 itself or root of an ancestor web component.
+
+###### css
+you can use the `css` utility to define your style inside the component as well.
+
+```ts
+class MyButton extends WebComponent {
+  stylesheet = css`
+    :host {
+        display: inline-block;
+    }
+    button {
+        color: blue;
+    }
+  `;
+}
+
+customElements.define('my-button', MyButton)
+```
+
+It helps your IDE give you better CSS syntax highlight and autocompletion.
 
 ##### updateStylesheet
 
