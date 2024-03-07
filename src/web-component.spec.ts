@@ -245,6 +245,7 @@ describe('WebComponent', () => {
 		
 		it("should render", () => {
 			expect(three.state.count()).toEqual(0)
+			expect(three.label).toEqual("+")
 			
 			expect(document.body.innerHTML).toBe('<comp-three></comp-three>')
 			expect(three.contentRoot.innerHTML).toBe('<p>0</p>\n' +
