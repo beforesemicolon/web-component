@@ -18,13 +18,20 @@ import {
     val,
 } from '@beforesemicolon/markup'
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
+declare global {
+    interface Window {
+        BFS: {
+            MARKUP: typeof import('@beforesemicolon/markup')
+            WebComponent: typeof WebComponent
+        }
+    }
+}
+
 if (window) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     window.BFS = {
+        ...(window.BFS || {}),
         MARKUP: {
+            ...window.BFS.MARKUP,
             html,
             state,
             // helpers
@@ -43,10 +50,7 @@ if (window) {
             element,
             suspense,
             val,
-        },
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        ...(window.BFS || {}),
+        } as typeof import('@beforesemicolon/markup'),
         WebComponent,
     }
 }
