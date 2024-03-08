@@ -48,6 +48,32 @@ interface WebComponentConfig {
     delegatesFocus?: boolean
 }
 
+const reservedPropNames = new Set([
+    'config',
+    'stylesheet',
+    'props',
+    'initialState',
+    'state',
+    'mounted',
+    'refs',
+    'contentRoot',
+    'root',
+    'internals',
+    'render',
+    'setState',
+    'dispatch',
+    'updateStylesheet',
+    'connectedCallback',
+    'onMount',
+    'attributeChangedCallback',
+    'onUpdate',
+    'disconnectedCallback',
+    'onDestroy',
+    'adoptedCallback',
+    'onAdoption',
+    'onError',
+])
+
 export abstract class WebComponent<
     P extends ObjectInterface<P> = Record<string, unknown>,
     S extends ObjectInterface<S> = Record<string, unknown>,
@@ -110,6 +136,14 @@ export abstract class WebComponent<
         )
 
         this.#propNames.forEach((propName) => {
+            if (reservedPropNames.has(propName as string)) {
+                throw new Error(
+                    `The "prop" name "${String(
+                        propName
+                    )}" is a reserved keyword for the WebComponent. Please rename your prop to something else.`
+                )
+            }
+
             const isBool = Boolean(
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
