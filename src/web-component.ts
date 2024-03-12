@@ -72,6 +72,9 @@ const reservedPropNames = new Set([
     'adoptedCallback',
     'onAdoption',
     'onError',
+    'style',
+    'class',
+    'classList',
 ])
 
 export abstract class WebComponent<
