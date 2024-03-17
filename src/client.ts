@@ -31,7 +31,7 @@ if (window) {
     window.BFS = {
         ...(window.BFS || {}),
         MARKUP: {
-            ...window.BFS.MARKUP,
+            ...(window.BFS?.MARKUP || {}),
             html,
             state,
             // helpers

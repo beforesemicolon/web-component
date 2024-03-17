@@ -7,6 +7,7 @@ import {
     turnKebabToCamelCasing,
     html,
     Helper,
+    jsonStringify,
 } from '@beforesemicolon/markup'
 import {
     ObjectInterface,
@@ -44,38 +45,18 @@ const stringToSheet = (css: string) => {
 
 interface WebComponentConfig {
     shadow?: boolean
-    mode?: ShadowRootMode
+    mode?: 'closed' | 'open'
     delegatesFocus?: boolean
 }
 
-const reservedPropNames = new Set([
-    'config',
-    'stylesheet',
-    'props',
-    'initialState',
-    'state',
-    'mounted',
-    'refs',
-    'contentRoot',
-    'root',
-    'internals',
-    'render',
-    'setState',
-    'dispatch',
-    'updateStylesheet',
-    'connectedCallback',
-    'onMount',
-    'attributeChangedCallback',
-    'onUpdate',
-    'disconnectedCallback',
-    'onDestroy',
-    'adoptedCallback',
-    'onAdoption',
-    'onError',
-    'style',
-    'class',
-    'classList',
-])
+const defaultConfig: WebComponentConfig = {
+    shadow: true,
+    mode: 'open',
+    delegatesFocus: false,
+}
+
+const reservedPropNames =
+    /^(config|stylesheet|props|initialState|state|mounted|refs|contentRoot|root|internals|render|setState|dispatch|updateStylesheet|connectedCallback|onMount|attributeChangedCallback|onUpdate|disconnectedCallback|onDestroy|adoptedCallback|onAdoption|onError|style|className|classList)$/
 
 export abstract class WebComponent<
     P extends ObjectInterface<P> = Record<string, unknown>,
@@ -89,15 +70,12 @@ export abstract class WebComponent<
     #propsSetters: PropsSetters<P> = {} as PropsSetters<P>
     #stateSetters: StateSetters<S> = {} as StateSetters<S>
     #mounted = false
-    #temp: HtmlTemplate | string | Element | void = ''
+    #temp: HtmlTemplate | null = null
     #propNames: Array<keyof P> = []
     #internals = this.attachInternals?.()
     #closestRoot: ShadowRoot | Document = document
-    config: WebComponentConfig = {
-        shadow: true,
-        mode: 'open',
-        delegatesFocus: false,
-    }
+    #initiated = false
+    config: WebComponentConfig = defaultConfig
     stylesheet: CSSStyleSheet | string | null = null
     initialState: S = {} as S
 
@@ -132,24 +110,22 @@ export abstract class WebComponent<
     constructor() {
         super()
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
+        // @ts-expect-error observedAttributes is part of constructor for web components
         this.#propNames = (this.constructor.observedAttributes ?? []).map(
             turnKebabToCamelCasing
         )
 
         this.#propNames.forEach((propName) => {
-            if (reservedPropNames.has(propName as string)) {
+            if (reservedPropNames.test(propName as string)) {
                 throw new Error(
                     `The "prop" name "${String(
                         propName
-                    )}" is a reserved keyword for the WebComponent. Please rename your prop to something else.`
+                    )}" is a reserved keyword for the WebComponent or HTMLElement and may break things.`
                 )
             }
 
             const isBool = Boolean(
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
+                // @ts-expect-error keyof P which is actually a string cant be used to key booleanAttributes
                 booleanAttributes[propName]
             )
             const [getter, setter] = state<P[keyof P]>(
@@ -163,18 +139,23 @@ export abstract class WebComponent<
         })
     }
 
-    render<E extends (...args: unknown[]) => unknown>():
-        | HtmlTemplate
-        | string
-        | Element
-        | HTMLElement
-        | Helper<E>
-        | void {}
+    render(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        data?: unknown
+    ): HtmlTemplate | string | Node | Helper<() => unknown> | void {}
 
     setState(
         newStateOrCallback: Partial<S> | ((currentState: S) => Partial<S>) = {}
     ) {
         try {
+            if (!this.#mounted) {
+                throw new Error(
+                    `Cannot update state while component is unmounted. Received "${jsonStringify(
+                        newStateOrCallback
+                    )}"`
+                )
+            }
+
             const newState = (
                 typeof newStateOrCallback === 'function'
                     ? newStateOrCallback(
@@ -195,7 +176,7 @@ export abstract class WebComponent<
                 }
             })
         } catch (e) {
-            this.onError(e as Error)
+            this.onError(e)
         }
     }
 
@@ -207,17 +188,15 @@ export abstract class WebComponent<
                 })
             )
         } catch (e) {
-            this.onError(e as Error)
+            this.onError(e)
         }
     }
 
     updateStylesheet(sheet: CSSStyleSheet | string | null) {
+        const config = { ...defaultConfig, ...(this.config ?? {}) }
         try {
             if (sheet === null) {
-                if (
-                    this.config.shadow &&
-                    this.contentRoot instanceof ShadowRoot
-                ) {
+                if (config.shadow && this.contentRoot instanceof ShadowRoot) {
                     this.contentRoot.adoptedStyleSheets = []
                 } else {
                     document.adoptedStyleSheets = (
@@ -228,7 +207,7 @@ export abstract class WebComponent<
             }
 
             const isShadowRoot =
-                this.config.shadow && this.contentRoot instanceof ShadowRoot
+                config.shadow && this.contentRoot instanceof ShadowRoot
 
             if (isShadowRoot) {
                 if (typeof sheet === 'string' && sheet.trim().length) {
@@ -274,29 +253,32 @@ export abstract class WebComponent<
 
             this.stylesheet = sheet
         } catch (e) {
-            this.onError(e as Error)
+            this.onError(e)
         }
     }
 
     private connectedCallback() {
-        requestAnimationFrame(() => {
-            try {
-                // find the closest ancestor shadow root
-                let parent = this.#el as ParentNode | null
+        const config = { ...defaultConfig, ...(this.config ?? {}) }
+        try {
+            // find the closest ancestor shadow root
+            let parent = this.#el as ParentNode | null
 
-                while (parent) {
-                    parent = parent?.parentNode
+            while (parent) {
+                parent = parent?.parentNode
 
-                    if (parent instanceof ShadowRoot) {
-                        this.#closestRoot = parent
-                        break
-                    }
+                if (parent instanceof ShadowRoot) {
+                    this.#closestRoot = parent
+                    break
                 }
+            }
 
-                if (this.config.shadow && !(this.#el instanceof ShadowRoot)) {
+            if (this.#initiated) {
+                this.#renderContent()
+            } else {
+                if (config.shadow && !(this.#el instanceof ShadowRoot)) {
                     this.#el = this.attachShadow({
-                        mode: this.config.mode ?? 'open',
-                        delegatesFocus: this.config.delegatesFocus,
+                        mode: config.mode ?? 'open',
+                        delegatesFocus: config.delegatesFocus,
                     })
                 }
 
@@ -327,7 +309,7 @@ export abstract class WebComponent<
                                                 oldVal
                                             )
                                         } catch (e) {
-                                            self.onError(e as Error)
+                                            self.onError(e)
                                         }
                                     }
                                 }
@@ -346,21 +328,19 @@ export abstract class WebComponent<
                     }
                 )
 
-                this.contentRoot.innerHTML = ''
-                this.#temp = html`${this.render() ?? ''}`.render(
-                    this.contentRoot
-                )
+                this.#renderContent()
 
                 if (this.stylesheet) {
                     this.updateStylesheet(this.stylesheet)
                 }
-
-                this.#mounted = true
-                this.onMount()
-            } catch (e) {
-                this.onError(e as Error)
+                this.#initiated = true
             }
-        })
+
+            this.#mounted = true
+            this.onMount()
+        } catch (e) {
+            this.onError(e)
+        }
     }
 
     onMount() {}
@@ -377,12 +357,11 @@ export abstract class WebComponent<
             const desc = Object.getOwnPropertyDescriptor(this, name)
 
             if (desc?.writable || desc?.set || desc?.configurable) {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
+                // @ts-expect-error property is set directly in the element when mounted
                 this[name] = newVal
             }
         } catch (e) {
-            this.onError(e as Error)
+            this.onError(e)
         }
     }
 
@@ -396,17 +375,15 @@ export abstract class WebComponent<
     ) {}
 
     private disconnectedCallback() {
-        requestAnimationFrame(() => {
-            try {
-                if (this.#temp instanceof HtmlTemplate) {
-                    this.#temp?.unmount()
-                }
-                this.#mounted = false
-                this.onDestroy()
-            } catch (e) {
-                this.onError(e as Error)
+        try {
+            if (this.#temp instanceof HtmlTemplate) {
+                this.#temp.unmount()
             }
-        })
+            this.#mounted = false
+            this.onDestroy()
+        } catch (e) {
+            this.onError(e)
+        }
     }
 
     onDestroy() {}
@@ -415,16 +392,28 @@ export abstract class WebComponent<
         try {
             this.onAdoption()
         } catch (e) {
-            this.onError(e as Error)
+            this.onError(e)
         }
     }
 
     onAdoption() {}
 
-    onError(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        error: Error
-    ) {
+    onError(error: Error | unknown) {
         console.error(error)
+    }
+
+    #renderContent() {
+        this.contentRoot.innerHTML = ''
+        const content = this.render()
+
+        if (content instanceof HtmlTemplate) {
+            this.#temp = content.render(this.contentRoot)
+        } else if (typeof content === 'function' || content instanceof Helper) {
+            this.#temp = html`${content}`
+        } else if (content instanceof Node) {
+            this.contentRoot.appendChild(content)
+        } else if (typeof content === 'string') {
+            this.contentRoot.innerHTML = content
+        }
     }
 }

@@ -31,7 +31,7 @@ class CompTwo extends WebComponent<{sample: string, sampleVal: string}> {
 		mountMock();
 	}
 	
-	onUpdate(name: never, newValue: null, oldValue: null) {
+	onUpdate(name: string, newValue: unknown, oldValue: unknown) {
 		updateMock(name, newValue, oldValue);
 	}
 	
@@ -49,6 +49,7 @@ class CompTwo extends WebComponent<{sample: string, sampleVal: string}> {
 }
 
 customElements.define('comp-two', CompTwo)
+
 
 class CompThree extends WebComponent<{label: string}, {count: number}> {
 	static observedAttributes = ['label'];
@@ -100,15 +101,8 @@ customElements.define('comp-four', CompFour)
 
 describe('WebComponent', () => {
 	beforeEach(() => {
-		// @ts-ignore
-		jest.spyOn(window, 'requestAnimationFrame').mockImplementation(cb => cb());
 		jest.clearAllMocks();
 		document.body.innerHTML = '';
-	});
-	
-	afterEach(() => {
-		// @ts-ignore
-		window.requestAnimationFrame.mockRestore();
 	});
 	
 	it('should create', () => {
@@ -198,6 +192,51 @@ describe('WebComponent', () => {
 			expect(mountMock).toHaveBeenCalled()
 			expect(errorMock).toHaveBeenCalled()
 		});
+		
+		it('should unmount, update, and resume', () => {
+			destroyMock.mockClear()
+			class MoveItem extends WebComponent {
+				static observedAttributes = ['y'];
+				y = 5
+				
+				onUpdate(name: string, newValue: unknown, oldValue: unknown) {
+					updateMock(name, newValue, oldValue);
+				}
+				
+				onDestroy() {
+					destroyMock();
+				}
+				
+				render() {
+					return html`item ${this.props.y}`
+				}
+			}
+			
+			customElements.define('move-item', MoveItem)
+
+			document.body.innerHTML = '<move-item></move-item>';
+			let item = document.body.children[0] as MoveItem;
+			expect(item.contentRoot.innerHTML).toBe("item 5")
+			
+			document.body.innerHTML = '';
+			
+			expect(destroyMock).toHaveBeenCalled()
+			
+			item.setAttribute('y', '10')
+			
+			expect(updateMock).not.toHaveBeenCalled()
+			
+			// DOM should not update when unmounted
+			expect(item.contentRoot.innerHTML).toBe('')
+			
+			document.body.appendChild(item)
+			
+			expect(document.body.innerHTML).toBe('<move-item y="10"></move-item>')
+			
+			expect(item.props.y()).toBe(10)
+			
+			expect(item.contentRoot.innerHTML).toBe("item 10")
+		})
 	})
 	
 	describe('should handle props', () => {
@@ -324,8 +363,8 @@ describe('WebComponent', () => {
 		it("render style", () => {
 			expect(document?.adoptedStyleSheets).toHaveLength(1)
 			expect(document?.adoptedStyleSheets[0].cssRules).toHaveLength(2)
-			expect(document?.adoptedStyleSheets[0].cssRules[0].cssText).toBe('comp-four {display: inline-block;}')
-			expect(document?.adoptedStyleSheets[0].cssRules[1].cssText).toBe('button {color: blue;}')
+			expect(document?.adoptedStyleSheets[0].cssRules[0].cssText).toBe('button {color: blue;}')
+			expect(document?.adoptedStyleSheets[0].cssRules[1].cssText).toBe('comp-four {display: inline-block;}')
 		});
 		
 		it("update style", () => {
@@ -361,4 +400,23 @@ describe('WebComponent', () => {
 		expect(three.contentRoot.innerHTML).toBe('<p>10</p>\n' +
 			'\t\t\t<button type="button">+</button>')
 	});
+	
+	it('should detect root', () => {
+		class SomeComponent extends WebComponent {
+			render() {
+				return html`
+					<comp-one></comp-one>
+				`;
+			}
+		}
+		
+		customElements.define('some-component', SomeComponent);
+		
+		const some = new SomeComponent();
+		document.body.append(some);
+		
+		expect(some.root).toEqual(document)
+		expect((some.contentRoot.children[0] as CompOne).root).toEqual(some.contentRoot)
+	})
+	
 });
