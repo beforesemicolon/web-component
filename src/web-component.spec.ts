@@ -288,14 +288,18 @@ describe('WebComponent', () => {
 			
 			expect(document.body.innerHTML).toBe('<comp-three></comp-three>')
 			expect(three.contentRoot.innerHTML).toBe('<p>0</p>\n' +
-				'\t\t\t<button type="button">+</button>')
+				'\t\t\t<button type="button">\n' +
+				'\t\t\t\t+\n' +
+				'\t\t\t</button>')
 		});
 		
 		it("when prop updates", () => {
 			three.label = 'count up';
 			
 			expect(three.contentRoot.innerHTML).toBe('<p>0</p>\n' +
-				'\t\t\t<button type="button">count up</button>')
+				'\t\t\t<button type="button">\n' +
+				'\t\t\t\tcount up\n' +
+				'\t\t\t</button>')
 		});
 		
 		it("if string rendered", () => {
@@ -391,14 +395,18 @@ describe('WebComponent', () => {
 		
 		expect(document.body.innerHTML).toBe('<comp-three></comp-three>')
 		expect(three.contentRoot.innerHTML).toBe('<p>0</p>\n' +
-			'\t\t\t<button type="button">+</button>')
+			'\t\t\t<button type="button">\n' +
+			'\t\t\t\t+\n' +
+			'\t\t\t</button>')
 		
 		three.setState({
 			count: 10
 		})
 		
 		expect(three.contentRoot.innerHTML).toBe('<p>10</p>\n' +
-			'\t\t\t<button type="button">+</button>')
+			'\t\t\t<button type="button">\n' +
+			'\t\t\t\t+\n' +
+			'\t\t\t</button>')
 	});
 	
 	it('should detect root', () => {
