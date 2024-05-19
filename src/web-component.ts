@@ -75,6 +75,7 @@ export abstract class WebComponent<
     #internals = this.attachInternals?.()
     #closestRoot: ShadowRoot | Document = document
     #initiated = false
+    #mountCleanup: (() => void) | null = null
     config: WebComponentConfig = defaultConfig
     stylesheet: CSSStyleSheet | string | null = null
     initialState: S = {} as S
@@ -337,13 +338,13 @@ export abstract class WebComponent<
             }
 
             this.#mounted = true
-            this.onMount()
+            this.#mountCleanup = this.onMount() ?? null
         } catch (e) {
             this.onError(e)
         }
     }
 
-    onMount() {}
+    onMount(): void | (() => void) {}
 
     private attributeChangedCallback(
         name: keyof P,
@@ -380,6 +381,7 @@ export abstract class WebComponent<
                 this.#temp.unmount()
             }
             this.#mounted = false
+            this.#mountCleanup?.()
             this.onDestroy()
         } catch (e) {
             this.onError(e)
