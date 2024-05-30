@@ -72,6 +72,8 @@ export abstract class WebComponent<
     #mounted = false
     #temp: HtmlTemplate | null = null
     #propNames: Array<keyof P> = []
+    // attachInternals not yet available in Node so need to conditionally call it
+    // so tests don't break
     #internals = this.attachInternals?.()
     #closestRoot: ShadowRoot | Document = document
     #initiated = false
@@ -172,7 +174,7 @@ export abstract class WebComponent<
             ) as S
 
             ;(Object.keys(newState) as Array<keyof S>).forEach((name) => {
-                if (this.#stateSetters.hasOwnProperty(name)) {
+                if (typeof this.#stateSetters[name] === 'function') {
                     this.#stateSetters[name](newState[name] as S[keyof S])
                 }
             })

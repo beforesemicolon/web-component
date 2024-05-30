@@ -215,7 +215,7 @@ describe('WebComponent', () => {
 			customElements.define('move-item', MoveItem)
 
 			document.body.innerHTML = '<move-item></move-item>';
-			let item = document.body.children[0] as MoveItem;
+			const item = document.body.children[0] as MoveItem;
 			expect(item.contentRoot.innerHTML).toBe("item 5")
 			
 			document.body.innerHTML = '';
@@ -303,7 +303,7 @@ describe('WebComponent', () => {
 		});
 		
 		it("if string rendered", () => {
-			class StringComp extends WebComponent<{ }, {}> {
+			class StringComp extends WebComponent {
 				render() {
 					return 'Hello World'
 				}
@@ -319,7 +319,7 @@ describe('WebComponent', () => {
 		});
 		
 		it("if DOM elements rendered", () => {
-			class ElComp extends WebComponent<{ }, {}> {
+			class ElComp extends WebComponent {
 				render() {
 					return element('p', {
 						textContent: 'Hello World'
