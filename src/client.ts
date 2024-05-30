@@ -1,4 +1,5 @@
 import { WebComponent } from './web-component'
+import { FormFieldWebComponent } from './form-field-web-component'
 import {
     html,
     state,
@@ -23,6 +24,7 @@ declare global {
         BFS: {
             MARKUP: typeof import('@beforesemicolon/markup')
             WebComponent: typeof WebComponent
+            FormFieldWebComponent: typeof WebComponent
         }
     }
 }
@@ -52,5 +54,6 @@ if (window) {
             val,
         } as typeof import('@beforesemicolon/markup'),
         WebComponent,
+        FormFieldWebComponent,
     }
 }
