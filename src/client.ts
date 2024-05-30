@@ -1,5 +1,5 @@
 import { WebComponent } from './web-component'
-import { FormFieldWebComponent } from './form-field-web-component'
+import { FormAssociatedWebComponent } from './form-associated-web-component'
 import {
     html,
     state,
@@ -54,6 +54,6 @@ if (window) {
             val,
         } as typeof import('@beforesemicolon/markup'),
         WebComponent,
-        FormFieldWebComponent,
+        FormFieldWebComponent: FormAssociatedWebComponent,
     }
 }

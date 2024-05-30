@@ -1,8 +1,8 @@
-import {FormFieldWebComponent} from "./form-field-web-component";
+import {FormAssociatedWebComponent} from "./form-associated-web-component";
 
-describe('FormFieldWebComponent', () => {
+describe('FormAssociatedWebComponent', () => {
 	it('should work', () => {
-		class MyField extends FormFieldWebComponent<{value: string}> {
+		class MyField extends FormAssociatedWebComponent<{value: string}> {
 			static observedAttributes = ['value']
 			value = ''
 		}

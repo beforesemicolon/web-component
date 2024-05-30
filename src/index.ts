@@ -1,5 +1,5 @@
 export * from './web-component'
-export * from './form-field-web-component'
+export * from './form-associated-web-component'
 export * from './css'
 export * from './types'
 export {
