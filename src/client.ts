@@ -1,20 +1,5 @@
 import { WebComponent } from './web-component'
-import {
-    html,
-    state,
-    and,
-    effect,
-    is,
-    isNot,
-    oneOf,
-    or,
-    pick,
-    when,
-    element,
-    repeat,
-    suspense,
-    val,
-} from '@beforesemicolon/markup'
+import * as MARKUP from '@beforesemicolon/markup'
 
 declare global {
     interface Window {
@@ -28,25 +13,7 @@ declare global {
 if (window) {
     window.BFS = {
         ...(window.BFS || {}),
-        MARKUP: {
-            ...(window.BFS?.MARKUP || {}),
-            html,
-            state,
-            effect,
-            // helpers
-            and,
-            is,
-            isNot,
-            oneOf,
-            or,
-            pick,
-            repeat,
-            when,
-            // utils
-            element,
-            suspense,
-            val,
-        } as typeof import('@beforesemicolon/markup'),
+        MARKUP,
         WebComponent,
     }
 }
