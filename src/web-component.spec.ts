@@ -101,9 +101,14 @@ customElements.define('comp-four', CompFour)
 
 describe('WebComponent', () => {
 	beforeEach(() => {
+		jest.useFakeTimers()
 		jest.clearAllMocks();
 		document.body.innerHTML = '';
 	});
+	
+	afterEach(() => {
+		jest.useRealTimers()
+	})
 	
 	it('should create', () => {
 		const one = new CompOne();
@@ -295,6 +300,7 @@ describe('WebComponent', () => {
 		
 		it("when prop updates", () => {
 			three.label = 'count up';
+			jest.advanceTimersToNextTimer()
 			
 			expect(three.contentRoot.innerHTML).toBe('<p>0</p>\n' +
 				'\t\t\t<button type="button">\n' +
@@ -402,11 +408,13 @@ describe('WebComponent', () => {
 		three.setState({
 			count: 10
 		})
+		jest.advanceTimersToNextTimer()
 		
 		expect(three.contentRoot.innerHTML).toBe('<p>10</p>\n' +
 			'\t\t\t<button type="button">\n' +
 			'\t\t\t\t+\n' +
 			'\t\t\t</button>')
+		
 	});
 	
 	it('should detect root', () => {

@@ -1,6 +1,6 @@
 {
     "name": "@beforesemicolon/web-component",
-    "version": "1.10.0-next",
+    "version": "1.11.0-next",
     "description": "Enhanced Markup with ability to create native Web Components",
     "engines": {
         "node": ">=18.16.0"
@@ -66,6 +66,6 @@
         "typescript": "^5.3.3"
     },
     "dependencies": {
-        "@beforesemicolon/markup": "^1.0.10-next"
+        "@beforesemicolon/markup": "^1.0.18-next"
     }
 }
