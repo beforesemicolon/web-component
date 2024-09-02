@@ -7,6 +7,7 @@ declare global {
         BFS: {
             MARKUP: typeof import('@beforesemicolon/markup')
             WebComponent: typeof WebComponent
+            css: typeof css
         }
     }
 }
