@@ -1,5 +1,6 @@
 import { WebComponent } from './web-component'
 import * as MARKUP from '@beforesemicolon/markup'
+import { css } from './css'
 
 declare global {
     interface Window {
@@ -15,5 +16,6 @@ if (window) {
         ...(window.BFS || {}),
         MARKUP,
         WebComponent,
+        css,
     }
 }
