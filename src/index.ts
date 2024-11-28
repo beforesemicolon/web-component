@@ -1,4 +1,4 @@
-export * from './web-component'
-export * from './css'
-export * from './types'
+export * from './web-component.ts'
+export * from './css.ts'
+export * from './types.ts'
 export * from '@beforesemicolon/markup'

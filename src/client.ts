@@ -1,6 +1,6 @@
-import { WebComponent } from './web-component'
+import { WebComponent } from './web-component.ts'
 import * as MARKUP from '@beforesemicolon/markup'
-import { css } from './css'
+import { css } from './css.ts'
 
 declare global {
     interface Window {

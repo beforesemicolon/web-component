@@ -5,11 +5,11 @@ import {
     State,
     PropsSetters,
     Props,
-} from './types'
-import { turnKebabToCamelCasing } from './utils/turn-kebab-to-camel-casing'
-import { jsonStringify } from './utils/json-stringify'
-import { booleanAttributes } from './utils/boolean-attributes'
-import { jsonParse } from './utils/json-parse'
+} from './types.ts'
+import { turnKebabToCamelCasing } from './utils/turn-kebab-to-camel-casing.ts'
+import { jsonStringify } from './utils/json-stringify.ts'
+import { booleanAttributes } from './utils/boolean-attributes.ts'
+import { jsonParse } from './utils/json-parse.ts'
 
 export type HTMLComponentElement<P extends ObjectInterface<P>> = P &
     WebComponent<P>

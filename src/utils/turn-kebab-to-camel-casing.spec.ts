@@ -1,4 +1,4 @@
-import { turnKebabToCamelCasing } from './turn-kebab-to-camel-casing'
+import { turnKebabToCamelCasing } from './turn-kebab-to-camel-casing.ts'
 
 describe('turnKebabToCamelCasing', () => {
     it('should turn camel case to kebab', () => {

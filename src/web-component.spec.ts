@@ -1,4 +1,4 @@
-import { css } from "./css";
+import { css } from "./css.ts";
 
 global.CSSStyleSheet = class extends CSSStyleSheet {
 	replaceSync(text: string) {
@@ -9,7 +9,7 @@ global.CSSStyleSheet = class extends CSSStyleSheet {
 	}
 }
 
-import {WebComponent} from './web-component';
+import {WebComponent} from './web-component.ts';
 import { element, html } from "@beforesemicolon/markup";
 
 class CompOne extends WebComponent {
