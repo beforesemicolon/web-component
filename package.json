@@ -66,6 +66,6 @@
         "typescript": "^5.3.3"
     },
     "dependencies": {
-        "@beforesemicolon/markup": "^1.4.1-next"
+        "@beforesemicolon/markup": "^1.0.0"
     }
 }
