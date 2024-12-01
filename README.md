@@ -1,17 +1,16 @@
 # Web Component
 
-[![Static Badge](https://img.shields.io/badge/documentation-web_component-blue)](https://markup.beforesemicolon.com/documentation/web-components)
+[![Static Badge](https://img.shields.io/badge/documentation-blue)](https://markup.beforesemicolon.com/documentation/capabilities/web-component)
 [![Test](https://github.com/beforesemicolon/web-component/actions/workflows/test.yml/badge.svg)](https://github.com/beforesemicolon/web-component/actions/workflows/test.yml)
 [![npm](https://img.shields.io/npm/v/%40beforesemicolon%2Fweb-component)](https://www.npmjs.com/package/@beforesemicolon/web-component)
 ![npm](https://img.shields.io/npm/l/%40beforesemicolon%2Fweb-component)
 
-Enhanced [Markup](https://markup.beforesemicolon.com/) with Web Component capability.
+Reactive Web Component API enhanced with [Markup](https://markup.beforesemicolon.com/).
 
 ## Motivation
 
 -   Native Web Components APIs are too robust. This means you need to write so much code for the simplest components.
--   Even if you manage to handle all the APIs fine, you still need to deal with DOM manipulation and handle your own
-    reactivity.
+-   Even if you manage to handle all the APIs fine, you still need to deal with DOM manipulation and handle your own reactivity.
 -   [Markup](https://markup.beforesemicolon.com/) offers the simplest and more powerful templating system that can be used
     on the client without setup.
 
@@ -20,7 +19,7 @@ With all these reasons, it only made sense to introduce a simple API to handle e
 ```ts
 // import everything from Markup as if you are using it directly
 import { WebComponent, html } from '@beforesemicolon/web-component'
-import stylesheet from './counter-app.css' assert { type: 'css' }
+import stylesheet from './counter-app.css' with { type: 'css' }
 
 interface Props {
     label: string
@@ -39,7 +38,7 @@ class CounterApp extends WebComponent<Props, State> {
     }
     stylesheet = stylesheet
 
-    countUp(e: Event) {
+    countUp = (e: Event) => {
         e.stopPropagation()
         e.preventDefault()
 
@@ -50,7 +49,7 @@ class CounterApp extends WebComponent<Props, State> {
     render() {
         return html`
             <p>${this.state.count}</p>
-            <button type="button" onclick="${this.countUp.bind(this)}">
+            <button type="button" onclick="${this.countUp}">
                 ${this.props.label}
             </button>
         `
@@ -84,6 +83,6 @@ In the browser
 <!-- link you app script after -->
 <script>
     const { WebComponent } = BFS
-    const { html, state } = BFS.MARKUP
+    const { html, state, effect } = BFS.MARKUP
 </script>
 ```
