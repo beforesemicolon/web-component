@@ -1,6 +1,6 @@
 {
     "name": "@beforesemicolon/web-component",
-    "version": "1.9.2",
+    "version": "1.13.0-next",
     "description": "Enhanced Markup with ability to create native Web Components",
     "engines": {
         "node": ">=18.16.0"
@@ -17,10 +17,9 @@
         "test": "jest",
         "test:coverage": "jest --coverage",
         "local": "nodemon --watch src -e ts --exec npm run build:browser",
-        "build:cjs-min": "esbuild `find src \\( -name '*.ts' ! -name '*.spec.ts' ! -name 'client.ts' \\)` --minify --outdir=dist/cjs --platform=node --format=cjs --keep-names --target=esnext",
-        "build:esm-min": "esbuild `find src \\( -name '*.ts' ! -name '*.spec.ts' ! -name 'client.ts' \\)` --minify --outdir=dist/esm --platform=node --format=esm --keep-names --target=esnext",
-        "build:browser": "esbuild src/client.ts --bundle --minify --keep-names --sourcemap --target=esnext --outfile=dist/client.js",
-        "build": "rm -rf dist && npm-run-all lint test && tsc --emitDeclarationOnly && npm-run-all build:cjs-min build:esm-min build:browser",
+        "build:browser": "node node_modules/@beforesemicolon/builder/dist/esm/build-browser.js",
+        "build:modules": "node node_modules/@beforesemicolon/builder/dist/esm/build-modules.js",
+        "build": "rm -rf dist && npm-run-all lint test && tsc --emitDeclarationOnly && npm-run-all build:modules build:browser",
         "lint": "eslint ./src && prettier --check .",
         "format": "eslint ./src --fix && prettier --write ."
     },
@@ -36,6 +35,7 @@
         "type": "git"
     },
     "devDependencies": {
+        "@beforesemicolon/builder": "^1.4.0",
         "@types/jest": "^29.5.11",
         "@types/jsdom": "^21.1.6",
         "@types/jsdom-global": "^3.0.7",
@@ -66,6 +66,6 @@
         "typescript": "^5.3.3"
     },
     "dependencies": {
-        "@beforesemicolon/markup": "^0.18.0"
+        "@beforesemicolon/markup": "^1.0.0"
     }
 }

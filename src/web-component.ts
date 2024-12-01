@@ -1,21 +1,15 @@
-import {
-    state,
-    HtmlTemplate,
-    jsonParse,
-    booleanAttributes,
-    val,
-    turnKebabToCamelCasing,
-    html,
-    Helper,
-    jsonStringify,
-} from '@beforesemicolon/markup'
+import { state, HtmlTemplate, val, html } from '@beforesemicolon/markup'
 import {
     ObjectInterface,
     StateSetters,
     State,
     PropsSetters,
     Props,
-} from './types'
+} from './types.ts'
+import { turnKebabToCamelCasing } from './utils/turn-kebab-to-camel-casing.ts'
+import { jsonStringify } from './utils/json-stringify.ts'
+import { booleanAttributes } from './utils/boolean-attributes.ts'
+import { jsonParse } from './utils/json-parse.ts'
 
 export type HTMLComponentElement<P extends ObjectInterface<P>> = P &
     WebComponent<P>
@@ -143,7 +137,7 @@ export abstract class WebComponent<
     render(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         data?: unknown
-    ): HtmlTemplate | string | Node | Helper<() => unknown> | void {}
+    ): HtmlTemplate | string | Node | void {}
 
     setState(
         newStateOrCallback: Partial<S> | ((currentState: S) => Partial<S>) = {}
@@ -410,7 +404,7 @@ export abstract class WebComponent<
 
         if (content instanceof HtmlTemplate) {
             this.#temp = content.render(this.contentRoot)
-        } else if (typeof content === 'function' || content instanceof Helper) {
+        } else if (typeof content === 'function') {
             this.#temp = html`${content}`
         } else if (content instanceof Node) {
             this.contentRoot.appendChild(content)

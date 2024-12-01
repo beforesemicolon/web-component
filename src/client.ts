@@ -1,28 +1,13 @@
-import { WebComponent } from './web-component'
-import {
-    html,
-    state,
-    and,
-    effect,
-    Helper,
-    helper,
-    is,
-    isNot,
-    oneOf,
-    or,
-    pick,
-    when,
-    element,
-    repeat,
-    suspense,
-    val,
-} from '@beforesemicolon/markup'
+import { WebComponent } from './web-component.ts'
+import * as MARKUP from '@beforesemicolon/markup'
+import { css } from './css.ts'
 
 declare global {
     interface Window {
         BFS: {
             MARKUP: typeof import('@beforesemicolon/markup')
             WebComponent: typeof WebComponent
+            css: typeof css
         }
     }
 }
@@ -30,27 +15,8 @@ declare global {
 if (window) {
     window.BFS = {
         ...(window.BFS || {}),
-        MARKUP: {
-            ...(window.BFS?.MARKUP || {}),
-            html,
-            state,
-            // helpers
-            and,
-            effect,
-            Helper,
-            helper,
-            is,
-            isNot,
-            oneOf,
-            or,
-            pick,
-            repeat,
-            when,
-            // utils
-            element,
-            suspense,
-            val,
-        } as typeof import('@beforesemicolon/markup'),
+        MARKUP,
         WebComponent,
+        css,
     }
 }
