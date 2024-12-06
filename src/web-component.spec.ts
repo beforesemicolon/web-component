@@ -10,7 +10,7 @@ global.CSSStyleSheet = class extends CSSStyleSheet {
 }
 
 import {WebComponent} from './web-component.ts';
-import { element, html } from "@beforesemicolon/markup";
+import { element, html, state } from "@beforesemicolon/markup";
 
 class CompOne extends WebComponent {
 }
@@ -152,7 +152,7 @@ describe('WebComponent', () => {
 
 			two.sample = 'works again';
 
-			expect(document.body.innerHTML).toBe('<comp-two sample="works"></comp-two>')
+			expect(document.body.innerHTML).toBe('<comp-two sample="works again"></comp-two>')
 			expect(updateMock).toHaveBeenCalled()
 			expect(two.props.sample()).toBe('works again');
 			expect(two.sample).toBe('works again');
@@ -175,7 +175,7 @@ describe('WebComponent', () => {
 			
 			document.body.append(iframe);
 			document.body.append(two);
-			expect(document.body.innerHTML).toBe('<iframe></iframe><comp-two sample="works"></comp-two>')
+			expect(document.body.innerHTML).toBe('<iframe></iframe><comp-two sample="works again"></comp-two>')
 			expect(mountMock).toHaveBeenCalled()
 			
 			mountMock.mockClear();
@@ -434,5 +434,62 @@ describe('WebComponent', () => {
 		expect(some.root).toEqual(document)
 		expect((some.contentRoot.children[0] as CompOne).root).toEqual(some.contentRoot)
 	})
+	
+	it("should handle internal state", () => {
+		class CountButton extends WebComponent<{count: number}> {
+			static observedAttributes = ['count'];
+			count = 0;
+			
+			updateCount = () => {
+				this.count += 1;
+				this.dispatch('change', {value: this.count})
+			}
+			
+			render() {
+				return html`
+		      <button type="button" onclick="${this.updateCount}">
+		        Count: ${this.props.count}
+		      </button>
+		    `
+			}
+		}
+		
+		customElements.define('count-button', CountButton)
+		
+		const changeHandler = jest.fn();
+		
+		html`
+			<count-button onchange="${changeHandler}"></count-button>
+			<count-button count="10" onchange="${changeHandler}"></count-button>
+		`.render(document.body);
+		
+		const [btn1, btn2] = [...document.body.children] as CountButton[];
+		
+		expect(btn1.contentRoot.innerHTML).toBe('<button type="button">\n' +
+			'\t\t        Count: 0\n' +
+			'\t\t      </button>')
+		expect(btn1.count).toBe(0)
+		expect(btn2.contentRoot.innerHTML).toBe('<button type="button">\n' +
+			'\t\t        Count: 10\n' +
+			'\t\t      </button>')
+		expect(btn2.count).toBe(10)
+		
+		expect(changeHandler).toHaveBeenCalledTimes(0);
+		
+		btn1.contentRoot.querySelector('button')?.click();
+		btn2.contentRoot.querySelector('button')?.click();
+		jest.advanceTimersToNextTimer()
+		
+		expect(changeHandler).toHaveBeenCalledTimes(2);
+		
+		expect(btn1.contentRoot.innerHTML).toBe('<button type="button">\n' +
+			'\t\t        Count: 1\n' +
+			'\t\t      </button>')
+		expect(btn1.count).toBe(1)
+		expect(btn2.contentRoot.innerHTML).toBe('<button type="button">\n' +
+			'\t\t        Count: 11\n' +
+			'\t\t      </button>')
+		expect(btn2.count).toBe(11)
+	});
 	
 });

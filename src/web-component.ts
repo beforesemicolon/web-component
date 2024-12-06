@@ -1,4 +1,4 @@
-import { state, HtmlTemplate, val, html } from '@beforesemicolon/markup'
+import { state, HtmlTemplate, val } from '@beforesemicolon/markup'
 import {
     ObjectInterface,
     StateSetters,
@@ -10,6 +10,8 @@ import { turnKebabToCamelCasing } from './utils/turn-kebab-to-camel-casing.ts'
 import { jsonStringify } from './utils/json-stringify.ts'
 import { booleanAttributes } from './utils/boolean-attributes.ts'
 import { jsonParse } from './utils/json-parse.ts'
+import { isPrimitive } from './utils/is-primitive.ts'
+import { turnCamelToKebabCasing } from './utils/turn-camel-to-kebab-casing.ts'
 
 export type HTMLComponentElement<P extends ObjectInterface<P>> = P &
     WebComponent<P>
@@ -59,10 +61,10 @@ export abstract class WebComponent<
     static observedAttributes: Array<string> = []
     static formAssociated = false
     #el: ShadowRoot | HTMLElement = this
-    #props: Props<P> = {} as Props<P>
-    #state: State<S> = {} as State<S>
-    #propsSetters: PropsSetters<P> = {} as PropsSetters<P>
-    #stateSetters: StateSetters<S> = {} as StateSetters<S>
+    #props = {} as Props<P>
+    #state = {} as State<S>
+    #propsSetters = {} as PropsSetters<P>
+    #stateSetters = {} as StateSetters<S>
     #mounted = false
     #temp: HtmlTemplate | null = null
     #propNames: Array<keyof P> = []
@@ -106,11 +108,11 @@ export abstract class WebComponent<
         super()
 
         // @ts-expect-error observedAttributes is part of constructor for web components
-        this.#propNames = (this.constructor.observedAttributes ?? []).map(
-            turnKebabToCamelCasing
-        )
+        ;(this.constructor.observedAttributes ?? []).forEach((name) => {
+            const propName = turnKebabToCamelCasing(name) as keyof P
 
-        this.#propNames.forEach((propName) => {
+            this.#propNames.push(propName)
+
             if (reservedPropNames.test(propName as string)) {
                 throw new Error(
                     `The "prop" name "${String(
@@ -119,12 +121,8 @@ export abstract class WebComponent<
                 )
             }
 
-            const isBool = Boolean(
-                // @ts-expect-error keyof P which is actually a string cant be used to key booleanAttributes
-                booleanAttributes[propName]
-            )
             const [getter, setter] = state<P[keyof P]>(
-                (isBool
+                (booleanAttributes[name]
                     ? this.hasAttribute(propName as string)
                     : undefined) as P[keyof P]
             )
@@ -277,11 +275,24 @@ export abstract class WebComponent<
                     })
                 }
 
-                this.#propNames.forEach((propName: keyof P) => {
-                    const desc = Object.getOwnPropertyDescriptor(this, propName)
+                this.#propNames.forEach((propName) => {
+                    const name = turnCamelToKebabCasing(propName as string)
+                    const desc = // describe the property directly on the object
+                        Object.getOwnPropertyDescriptor(this, propName) ??
+                        // describe properties defined as setter/getter by checking the prototype
+                        Object.getOwnPropertyDescriptors(
+                            Object.getPrototypeOf(this)
+                        )[propName]
+
+                    const value = this.hasAttribute(name)
+                        ? jsonParse(this.getAttribute(name))
+                        : null
 
                     this.#propsSetters[propName](
-                        desc?.value ?? desc?.get?.() ?? ''
+                        value ??
+                            desc?.value ??
+                            desc?.get?.() ??
+                            this.#props[propName]()
                     )
 
                     // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -294,17 +305,23 @@ export abstract class WebComponent<
                             },
                             set(newVal) {
                                 const oldVal = self.#props[propName]()
+
                                 if (newVal !== oldVal) {
-                                    self.#propsSetters[propName](newVal)
-                                    if (self.mounted) {
-                                        try {
-                                            self.onUpdate(
-                                                propName,
-                                                newVal,
-                                                oldVal
-                                            )
-                                        } catch (e) {
-                                            self.onError(e)
+                                    if (isPrimitive(newVal)) {
+                                        self.setAttribute(name, newVal)
+                                    } else {
+                                        self.#propsSetters[propName](newVal)
+
+                                        if (self.mounted) {
+                                            try {
+                                                self.onUpdate(
+                                                    propName,
+                                                    newVal,
+                                                    oldVal
+                                                )
+                                            } catch (e) {
+                                                self.onError(e)
+                                            }
                                         }
                                     }
                                 }
@@ -343,17 +360,22 @@ export abstract class WebComponent<
     private attributeChangedCallback(
         name: keyof P,
         oldVal: P[keyof P] | null,
-        newVal: P[keyof P]
+        newVal: P[keyof P] | null
     ) {
         try {
-            newVal = jsonParse(newVal)
-            name = turnKebabToCamelCasing(name as string) as keyof P
+            const propName = turnKebabToCamelCasing(name as string) as keyof P
+            const newPropVal = jsonParse(newVal)
+            const oldPropValue = this.#props[propName]()
 
-            const desc = Object.getOwnPropertyDescriptor(this, name)
+            if (newPropVal !== oldPropValue) {
+                // prevent typescript inifinity loop when parsing this code
+                ;(this.#propsSetters[propName] as (v: unknown) => void)(
+                    newPropVal
+                )
 
-            if (desc?.writable || desc?.set || desc?.configurable) {
-                // @ts-expect-error property is set directly in the element when mounted
-                this[name] = newVal
+                if (this.mounted) {
+                    this.onUpdate(propName, newPropVal, oldPropValue)
+                }
             }
         } catch (e) {
             this.onError(e)
@@ -404,8 +426,6 @@ export abstract class WebComponent<
 
         if (content instanceof HtmlTemplate) {
             this.#temp = content.render(this.contentRoot)
-        } else if (typeof content === 'function') {
-            this.#temp = html`${content}`
         } else if (content instanceof Node) {
             this.contentRoot.appendChild(content)
         } else if (typeof content === 'string') {
