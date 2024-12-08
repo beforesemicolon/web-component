@@ -492,4 +492,52 @@ describe('WebComponent', () => {
 		expect(btn2.count).toBe(11)
 	});
 	
+	it("should update template and attribute by updating property value", () => {
+		class SampleField extends WebComponent {
+			static observedAttributes = ['value', 'disabled'];
+			static formAssociated = true
+			
+			value = '';
+			disabled = false;
+			
+			onMount() {
+				this.value = 'works'
+			}
+			
+			render() {
+				return html`
+					<input type="text" ${this.props}"></input>
+				`
+			}
+		}
+		
+		customElements.define('sample-field', SampleField);
+		
+		const field1 = new SampleField();
+		const field2 = new SampleField();
+		const fieldset = element('fieldset', {childNodes: [field1, field2], attributes: {disabled: true}})
+		const form = element('form', {childNodes: [fieldset]})
+		
+		document.body.append(form);
+		
+		expect(document.body.innerHTML).toBe('<form>' +
+			'<fieldset disabled="true">' +
+			'<sample-field value="works"></sample-field>' +
+			'<sample-field value="works"></sample-field>' +
+			'</fieldset>' +
+			'</form>')
+		
+		jest.advanceTimersToNextTimer(10)
+		
+		expect(field1.outerHTML).toBe('<sample-field value="works"></sample-field>')
+		expect(field1.value).toBe('works')
+		expect(field1.disabled).toBe(false)
+		expect(field1.contentRoot.innerHTML).toBe('<input type="text" value="works">')
+
+		expect(field2.outerHTML).toBe('<sample-field value="works"></sample-field>')
+		expect(field2.value).toBe('works')
+		expect(field2.disabled).toBe(false)
+		expect(field2.contentRoot.innerHTML).toBe('<input type="text" value="works">')
+	})
+	
 });

@@ -368,7 +368,7 @@ export abstract class WebComponent<
             const oldPropValue = this.#props[propName]()
 
             if (newPropVal !== oldPropValue) {
-                // prevent typescript inifinity loop when parsing this code
+                // prevent typescript infinity loop when parsing this code
                 ;(this.#propsSetters[propName] as (v: unknown) => void)(
                     newPropVal
                 )
