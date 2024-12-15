@@ -41,14 +41,21 @@ const stringToSheet = (css: string) => {
 
 interface WebComponentConfig {
     shadow?: boolean
+    // https://developer.mozilla.org/en-US/docs/Web/API/Element/attachShadow#options
     mode?: 'closed' | 'open'
     delegatesFocus?: boolean
+    clonable?: boolean
+    serializable?: boolean
+    slotAssignment?: 'named' | 'manual'
 }
 
 const defaultConfig: WebComponentConfig = {
     shadow: true,
     mode: 'open',
     delegatesFocus: false,
+    clonable: false,
+    serializable: false,
+    slotAssignment: 'named',
 }
 
 const reservedPropNames =
@@ -269,10 +276,7 @@ export abstract class WebComponent<
                 this.#renderContent()
             } else {
                 if (config.shadow && !(this.#el instanceof ShadowRoot)) {
-                    this.#el = this.attachShadow({
-                        mode: config.mode ?? 'open',
-                        delegatesFocus: config.delegatesFocus,
-                    })
+                    this.#el = this.attachShadow(config as ShadowRootInit)
                 }
 
                 this.#propNames.forEach((propName) => {
