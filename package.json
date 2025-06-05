@@ -1,6 +1,6 @@
 {
     "name": "@beforesemicolon/web-component",
-    "version": "1.16.0",
+    "version": "1.16.1",
     "description": "Enhanced Markup with ability to create native Web Components",
     "engines": {
         "node": ">=18.16.0"
@@ -35,7 +35,7 @@
         "type": "git"
     },
     "devDependencies": {
-        "@beforesemicolon/builder": "^1.4.0",
+        "@beforesemicolon/builder": "latest",
         "@types/jest": "^29.5.11",
         "@types/jsdom": "^21.1.7",
         "@types/jsdom-global": "^3.0.7",
@@ -61,6 +61,6 @@
         "typescript": "^5.3.3"
     },
     "dependencies": {
-        "@beforesemicolon/markup": "^1.13.3"
+        "@beforesemicolon/markup": "^1.*"
     }
 }
