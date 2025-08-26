@@ -21,5 +21,10 @@
         "allowJs": true
     },
     "include": ["./src/**/*"],
-    "exclude": ["src/**/*.spec.ts"]
+    "exclude": [
+        "src/**/*.spec.ts",
+        "node_modules",
+        "build-client.ts",
+        "build.ts"
+    ]
 }

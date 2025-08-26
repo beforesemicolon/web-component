@@ -1,6 +1,6 @@
 {
     "name": "@beforesemicolon/web-component",
-    "version": "1.16.4",
+    "version": "1.17.0",
     "description": "Enhanced Markup with ability to create native Web Components",
     "engines": {
         "node": ">=18.16.0"
@@ -17,9 +17,7 @@
         "test": "jest",
         "test:coverage": "jest --coverage",
         "local": "nodemon --watch src -e ts --exec npm run build:browser",
-        "build:browser": "node node_modules/@beforesemicolon/builder/dist/esm/build-browser.js",
-        "build:modules": "node node_modules/@beforesemicolon/builder/dist/esm/build-modules.js",
-        "build": "rm -rf dist && npm-run-all lint test && tsc --emitDeclarationOnly && npm-run-all build:modules build:browser",
+        "build": "rm -rf dist && npm-run-all lint test && tsc --emitDeclarationOnly && tsx ./build.ts && tsx ./build-client.ts",
         "lint": "eslint ./src && prettier --check .",
         "format": "eslint ./src --fix && prettier --write ."
     },
@@ -35,7 +33,7 @@
         "type": "git"
     },
     "devDependencies": {
-        "@beforesemicolon/builder": "latest",
+        "@beforesemicolon/builder": "^1.6.3",
         "@types/jest": "^29.5.11",
         "@types/jsdom": "^21.1.7",
         "@types/jsdom-global": "^3.0.7",
@@ -58,6 +56,7 @@
         "npm-run-all": "^4.1.5",
         "prettier": "3.1.1",
         "ts-jest": "^29.1.1",
+        "tsx": "^4.7.0",
         "typescript": "^5.3.3"
     },
     "dependencies": {
