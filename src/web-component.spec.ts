@@ -50,7 +50,6 @@ class CompTwo extends WebComponent<{sample: string, sampleVal: string}> {
 
 customElements.define('comp-two', CompTwo)
 
-
 class CompThree extends WebComponent<{label: string}, {count: number}> {
 	static observedAttributes = ['label'];
 	label = '+';
@@ -98,6 +97,24 @@ class CompFour extends WebComponent {
 }
 
 customElements.define('comp-four', CompFour)
+
+class CompFive extends WebComponent {
+	static observedAttributes = ['inline'];
+	
+	inline = false;
+	
+	config = {
+		shadow: false
+	}
+	
+	stylesheet = css`
+		:host {
+			display: ${() => this.props.inline() ? 'inline' : 'block'};
+		}
+	`
+}
+
+customElements.define('comp-five', CompFive)
 
 describe('WebComponent', () => {
 	beforeEach(() => {
@@ -360,9 +377,15 @@ describe('WebComponent', () => {
 	
 	describe('should handle style', () => {
 		const four = new CompFour();
+		const five = new CompFive();
 		
 		beforeEach(() => {
 			document.body.append(four)
+		})
+		
+		afterEach(() => {
+			four.remove();
+			five.remove();
 		})
 		
 		it('with no shadow', () => {
@@ -389,6 +412,18 @@ describe('WebComponent', () => {
 			four.updateStylesheet(null);
 			
 			expect(document?.adoptedStyleSheets).toHaveLength(0)
+		});
+		
+		it("dynamic style", () => {
+			document.body.append(five)
+			
+			expect(document?.adoptedStyleSheets).toHaveLength(1)
+			expect(document?.adoptedStyleSheets[0].cssRules[0].cssText).toBe('comp-five {display: block;}')
+			
+			five.setAttribute('inline', 'true')
+			jest.advanceTimersToNextTimer()
+			
+			expect(document?.adoptedStyleSheets[0].cssRules[0].cssText).toBe('comp-five {display: inline;}')
 		});
 	})
 	

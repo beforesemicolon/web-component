@@ -12,6 +12,7 @@ import { booleanAttributes } from './utils/boolean-attributes.ts'
 import { jsonParse } from './utils/json-parse.ts'
 import { isPrimitive } from './utils/is-primitive.ts'
 import { turnCamelToKebabCasing } from './utils/turn-camel-to-kebab-casing.ts'
+import { CSSStyle } from './css.ts'
 
 export type HTMLComponentElement<P extends ObjectInterface<P>> = P &
     WebComponent<P>
@@ -80,7 +81,7 @@ export abstract class WebComponent<
     #initiated = false
     #mountCleanup: (() => void) | null = null
     config: WebComponentConfig = defaultConfig
-    stylesheet: CSSStyleSheet | string | null = null
+    stylesheet: CSSStyle | CSSStyleSheet | string | null = null
     initialState: S = {} as S
 
     get props(): Props<P> {
@@ -347,7 +348,14 @@ export abstract class WebComponent<
                 this.#renderContent()
 
                 if (this.stylesheet) {
-                    this.updateStylesheet(this.stylesheet)
+                    if (this.stylesheet instanceof CSSStyle) {
+                        this.stylesheet.onUpdate((newCSS) =>
+                            this.updateStylesheet(newCSS)
+                        )
+                        this.updateStylesheet(this.stylesheet.toString())
+                    } else {
+                        this.updateStylesheet(this.stylesheet)
+                    }
                 }
                 this.#initiated = true
             }
