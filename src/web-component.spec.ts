@@ -116,16 +116,13 @@ class CompFive extends WebComponent {
 
 customElements.define('comp-five', CompFive)
 
+const flushMicrotasks = () => new Promise<void>((resolve) => queueMicrotask(resolve));
+
 describe('WebComponent', () => {
 	beforeEach(() => {
-		jest.useFakeTimers()
 		jest.clearAllMocks();
 		document.body.innerHTML = '';
 	});
-	
-	afterEach(() => {
-		jest.useRealTimers()
-	})
 	
 	it('should create', () => {
 		const one = new CompOne();
@@ -315,9 +312,9 @@ describe('WebComponent', () => {
 				'\t\t\t</button>')
 		});
 		
-		it("when prop updates", () => {
+		it("when prop updates", async () => {
 			three.label = 'count up';
-			jest.advanceTimersToNextTimer()
+			await flushMicrotasks();
 			
 			expect(three.contentRoot.innerHTML).toBe('<p>0</p>\n' +
 				'\t\t\t<button type="button">\n' +
@@ -414,20 +411,20 @@ describe('WebComponent', () => {
 			expect(document?.adoptedStyleSheets).toHaveLength(0)
 		});
 		
-		it("dynamic style", () => {
+		it("dynamic style", async () => {
 			document.body.append(five)
 			
 			expect(document?.adoptedStyleSheets).toHaveLength(1)
 			expect(document?.adoptedStyleSheets[0].cssRules[0].cssText).toBe('comp-five {display: block;}')
 			
 			five.setAttribute('inline', 'true')
-			jest.advanceTimersToNextTimer()
+			await flushMicrotasks()
 			
 			expect(document?.adoptedStyleSheets[0].cssRules[0].cssText).toBe('comp-five {display: inline;}')
 		});
 	})
 	
-	it("should handle state", () => {
+	it("should handle state", async () => {
 		const three = new CompThree();
 		
 		document.body.append(three)
@@ -443,7 +440,7 @@ describe('WebComponent', () => {
 		three.setState({
 			count: 10
 		})
-		jest.advanceTimersToNextTimer()
+		await flushMicrotasks()
 		
 		expect(three.contentRoot.innerHTML).toBe('<p>10</p>\n' +
 			'\t\t\t<button type="button">\n' +
@@ -470,7 +467,7 @@ describe('WebComponent', () => {
 		expect((some.contentRoot.children[0] as CompOne).root).toEqual(some.contentRoot)
 	})
 	
-	it("should handle internal state", () => {
+	it("should handle internal state", async () => {
 		class CountButton extends WebComponent<{count: number}> {
 			static observedAttributes = ['count'];
 			count = 0;
@@ -513,7 +510,7 @@ describe('WebComponent', () => {
 		
 		btn1.contentRoot.querySelector('button')?.click();
 		btn2.contentRoot.querySelector('button')?.click();
-		jest.advanceTimersToNextTimer()
+		await flushMicrotasks()
 		
 		expect(changeHandler).toHaveBeenCalledTimes(2);
 		
@@ -527,7 +524,7 @@ describe('WebComponent', () => {
 		expect(btn2.count).toBe(11)
 	});
 	
-	it("should update template and attribute by updating property value", () => {
+	it("should update template and attribute by updating property value", async () => {
 		class SampleField extends WebComponent {
 			static observedAttributes = ['value', 'disabled'];
 			static formAssociated = true
@@ -562,7 +559,7 @@ describe('WebComponent', () => {
 			'</fieldset>' +
 			'</form>')
 		
-		jest.advanceTimersToNextTimer(10)
+		await flushMicrotasks()
 		
 		expect(field1.outerHTML).toBe('<sample-field value="works"></sample-field>')
 		expect(field1.value).toBe('works')
