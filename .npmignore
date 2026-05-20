@@ -16,3 +16,7 @@ coverage
 jest.config.cjs
 build.ts
 build-client.ts
+renovate.json
+.renovaterc.json
+.renovaterc
+renovate.json5
