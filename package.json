@@ -19,7 +19,8 @@
         "local": "run-p local:watch local:serve",
         "local:watch": "node build-docs.js && nodemon --exec 'node build-docs.js'",
         "local:serve": "npx http-server ./website",
-        "build": "rm -rf dist && npm-run-all lint test && tsc --emitDeclarationOnly && node build.js",
+        "build": "npm-run-all build:package build:docs",
+        "build:package": "rm -rf dist && npm-run-all lint test && tsc --emitDeclarationOnly && node build.js",
         "build:docs": "node build-docs.js",
         "lint": "eslint ./src && prettier --check .",
         "format": "eslint ./src --fix && prettier --write ."
