@@ -1,4 +1,11 @@
 export default {
+    meta: {
+        siteName: 'WebComponent',
+        title: 'WebComponent by Before Semicolon',
+        description:
+            'Build reactive Web Components enhanced with state, props, scoped styles, lifecycles, and form integration — powered by Markup.',
+        image: '/assets/web-component-banner.jpg',
+    },
     theme: {
         light: {
             '--background': 'oklch(0.98 0.012 250)',

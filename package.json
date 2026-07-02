@@ -37,7 +37,7 @@
         "type": "git"
     },
     "devDependencies": {
-        "@beforesemicolon/builder": "^1.8.20",
+        "@beforesemicolon/builder": "^1.8.22",
         "@types/jest": "^29.5.11",
         "@types/jsdom": "^21.1.7",
         "@types/jsdom-global": "^3.0.7",
