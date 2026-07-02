@@ -1,3 +1,14 @@
+const renderGoogleAnalyticsScript = () => `
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MMBMGFEBY6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-MMBMGFEBY6');
+</script>`
+
 export default {
     meta: {
         siteName: 'WebComponent',
@@ -5,6 +16,79 @@ export default {
         description:
             'Build reactive Web Components enhanced with state, props, scoped styles, lifecycles, and form integration — powered by Markup.',
         image: '/assets/web-component-banner.jpg',
+    },
+    site: {
+        name: 'WebComponent',
+        packageName: '@beforesemicolon/web-component',
+        repositoryUrl: 'https://github.com/beforesemicolon/web-component',
+        repositoryLabel: 'WebComponent GitHub repository',
+        docsEditUrl:
+            'https://github.com/beforesemicolon/web-component/tree/main/docs',
+        footerDescription:
+            'Reactive Web Components enhanced with state, props, scoped styles, lifecycles, and form integration.',
+        footerGroups: [
+            {
+                title: 'Learning Resources',
+                links: [{ label: 'Documentation', href: '/documentation' }],
+            },
+            {
+                title: 'About Before Semicolon',
+                links: [
+                    {
+                        label: 'Open Source',
+                        href: 'https://github.com/beforesemicolon',
+                    },
+                    {
+                        label: 'Website',
+                        href: 'https://beforesemicolon.com/',
+                    },
+                    {
+                        label: 'Blog',
+                        href: 'https://medium.com/before-semicolon',
+                    },
+                    {
+                        label: 'YouTube Channel',
+                        href: 'https://www.youtube.com/channel/UCrU33aw1k9BqTIq2yKXrmBw',
+                    },
+                ],
+            },
+        ],
+        socialLinks: [
+            {
+                name: 'Medium blog',
+                href: 'https://medium.com/before-semicolon',
+                icon: '/assets/medium2.svg',
+            },
+            {
+                name: 'Facebook',
+                href: 'https://www.facebook.com/beforesemicolon/',
+                icon: '/assets/facebook.svg',
+            },
+            {
+                name: 'Instagram',
+                href: 'https://www.instagram.com/before_semicolon_/',
+                icon: '/assets/instagram.svg',
+            },
+            {
+                name: 'Reddit',
+                href: 'https://www.reddit.com/r/beforesemicolon/',
+                icon: '/assets/reddit.svg',
+            },
+            {
+                name: 'Twitter',
+                href: 'https://twitter.com/BeforeSemicolon',
+                icon: '/assets/twitter.svg',
+            },
+            {
+                name: 'YouTube',
+                href: 'https://www.youtube.com/channel/UCrU33aw1k9BqTIq2yKXrmBw',
+                icon: '/assets/youtube.svg',
+            },
+        ],
+        copyright: `Copyright &copy; ${new Date().getFullYear()} Before Semicolon. All rights reserved.`,
+    },
+    headScripts: {
+        analytics: renderGoogleAnalyticsScript,
     },
     theme: {
         light: {
