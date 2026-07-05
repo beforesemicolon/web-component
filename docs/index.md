@@ -6,7 +6,7 @@ description: Build reactive Web Components enhanced with state, props, scoped st
 layout: landing
 ---
 
-::: layout landing-hero version="@beforesemicolon/web-component" title="Web Components." title2="Now Reactive." primaryLabel="Get Started" secondaryLabel="npm i @beforesemicolon/web-component"
+::: layout landing-hero version="v1.19.2" title="Web Components." title2="Now Reactive." primaryLabel="Get Started" secondaryLabel="npm i @beforesemicolon/web-component"
 
 === copy
 
