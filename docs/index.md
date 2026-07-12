@@ -59,7 +59,7 @@ customElements.define('hello-world', HelloWorld)
 
 ## Part of the Markup family.
 
-Web Component is built on Markup, and Router is built on top of Web Component &mdash; same engine, modular packages.
+Web Component is built on Markup, and Router and Intl are built on top of Web Component &mdash; same engine, modular packages.
 
 === product title=Markup package=@beforesemicolon/markup color=primary icon=reactive href=https://markup.beforesemicolon.com
 
@@ -68,6 +68,10 @@ The 9Kb reactive templating system that powers Web Component. Use it directly fo
 === product title=Router package=@beforesemicolon/router color=accent icon=router href=https://router.beforesemicolon.com
 
 Declarative routing as web component tags &mdash; built on top of Web Component. Nested routes, params, 404s.
+
+=== product title=Intl package=@beforesemicolon/intl color=primary icon=reactive href=https://intl.beforesemicolon.com
+
+Localization for component-first interfaces &mdash; built on top of Web Component. Locale scopes, messages, formatters.
 
 :::
 
