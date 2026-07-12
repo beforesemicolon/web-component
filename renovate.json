@@ -7,7 +7,7 @@
     "dependencyDashboard": false,
     "prCreation": "not-pending",
     "prConcurrentLimit": 5,
-    "baseBranches": ["main", "master"],
+    "baseBranches": ["main"],
     "packageRules": [
         {
             "matchUpdateTypes": ["patch", "minor", "pin", "digest"],
