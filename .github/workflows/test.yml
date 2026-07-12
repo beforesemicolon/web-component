@@ -23,17 +23,5 @@ jobs:
                   node-version: ${{ matrix.node-version }}
                   cache: 'npm'
             - run: npm ci
-            - name: Run lint and capture diagnostics
-              id: lint
-              continue-on-error: true
-              run: npm run lint > lint-${{ matrix.node-version }}.log 2>&1
-            - name: Upload lint diagnostics
-              if: steps.lint.outcome == 'failure'
-              uses: actions/upload-artifact@v4
-              with:
-                  name: lint-${{ matrix.node-version }}
-                  path: lint-${{ matrix.node-version }}.log
-            - name: Fail on lint errors
-              if: steps.lint.outcome == 'failure'
-              run: exit 1
+            - run: npm run lint
             - run: npm test
