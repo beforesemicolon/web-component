@@ -24,9 +24,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Apply formatting
-        run: |
-          npm run format
-          git restore --source=HEAD -- .github/workflows/fix-prettier-3.9.yml
+        run: npm run format
       - run: npm run lint
       - run: npm run build
       - name: Commit formatting changes
