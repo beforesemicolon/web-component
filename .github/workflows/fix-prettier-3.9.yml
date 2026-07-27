@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - agent/fix-prettier-3.9
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
