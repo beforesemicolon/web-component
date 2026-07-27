@@ -55,8 +55,8 @@ customElements.define('status-badge', StatusBadge)
 
 To make dynamic styling cleaner, you can use `@beforesemicolon/markup`'s reactive helpers like `when()` and `is()` directly inside your style strings. They return reactive functions that resolve values dynamically.
 
--   `is(getter, expectedValue)`: Checks if a getter returns a matching value.
--   `when(condition, thenValue, otherwiseValue)`: Evaluates a condition (can be a getter or a function) and returns the corresponding value.
+- `is(getter, expectedValue)`: Checks if a getter returns a matching value.
+- `when(condition, thenValue, otherwiseValue)`: Evaluates a condition (can be a getter or a function) and returns the corresponding value.
 
 Here is the same example using these helpers:
 
@@ -103,8 +103,8 @@ class StatusBadge extends WebComponent {
 
 The `css` function parses the strings and values into a `CSSStyle` instance. The class has the following public API:
 
--   **`toString()`**: Evaluates and returns the stylesheet as a plain CSS string.
--   **`onUpdate(callback)`**: Registers a callback function that is invoked with the updated CSS string whenever any interpolated reactive values change.
+- **`toString()`**: Evaluates and returns the stylesheet as a plain CSS string.
+- **`onUpdate(callback)`**: Registers a callback function that is invoked with the updated CSS string whenever any interpolated reactive values change.
 
 ```javascript
 import { css } from '@beforesemicolon/web-component'

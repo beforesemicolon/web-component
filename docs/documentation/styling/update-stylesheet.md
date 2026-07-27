@@ -18,10 +18,10 @@ updateStylesheet(sheet: CSSStyleSheet | string | null): void
 
 #### Parameters
 
--   **`sheet`**:
-    -   `CSSStyleSheet`: Adopts the new stylesheet object directly.
-    -   `string`: Parses the CSS string into a stylesheet, rewrites `:host` selectors if Shadow DOM is disabled, and adopts it.
-    -   `null`: Detaches and removes the current stylesheet from the element's content root (or document).
+- **`sheet`**:
+    - `CSSStyleSheet`: Adopts the new stylesheet object directly.
+    - `string`: Parses the CSS string into a stylesheet, rewrites `:host` selectors if Shadow DOM is disabled, and adopts it.
+    - `null`: Detaches and removes the current stylesheet from the element's content root (or document).
 
 ### Dynamic Theme Swapping Example
 
@@ -67,8 +67,8 @@ class ThemeBox extends WebComponent {
         return html`
             <div>
                 <p>
-                    Current Theme: ${() =>
-                        this.state.isDark() ? 'Dark' : 'Light'}
+                    Current Theme:
+                    ${() => (this.state.isDark() ? 'Dark' : 'Light')}
                 </p>
                 <button onclick="${this.toggleTheme}">Toggle Theme</button>
             </div>

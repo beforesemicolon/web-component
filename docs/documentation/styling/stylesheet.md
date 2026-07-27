@@ -92,8 +92,8 @@ If you disable Shadow DOM by setting `config.shadow = false`, the component cann
 
 Because global styles can leak, WebComponent automatically parses and rewrites specific selectors:
 
--   `:host` is rewritten to the custom element's tag name (e.g. `my-element`).
--   `:host-context(selector)` is rewritten to match the target context (e.g. `selector my-element`).
+- `:host` is rewritten to the custom element's tag name (e.g. `my-element`).
+- `:host-context(selector)` is rewritten to match the target context (e.g. `selector my-element`).
 
 ```css
 /* Original CSS */

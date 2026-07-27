@@ -9,10 +9,10 @@ Reactive Web Component API enhanced with [Markup](https://markup.beforesemicolon
 
 ## Motivation
 
--   Native Web Components APIs are too robust. This means you need to write so much code for the simplest components.
--   Even if you manage to handle all the APIs fine, you still need to deal with DOM manipulation and handle your own reactivity.
--   [Markup](https://markup.beforesemicolon.com/) offers the simplest and more powerful templating system that can be used
-    on the client without setup.
+- Native Web Components APIs are too robust. This means you need to write so much code for the simplest components.
+- Even if you manage to handle all the APIs fine, you still need to deal with DOM manipulation and handle your own reactivity.
+- [Markup](https://markup.beforesemicolon.com/) offers the simplest and more powerful templating system that can be used
+  on the client without setup.
 
 With all these reasons, it only made sense to introduce a simple API to handle everything for you.
 

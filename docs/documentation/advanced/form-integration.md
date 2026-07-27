@@ -96,11 +96,11 @@ get internals(): ElementInternals
 
 Use it to communicate with the parent form:
 
--   `setFormValue(value)`: controls what `FormData` receives for the element's `name`.
--   `setValidity(flags, message, anchor)`: controls native validity state.
--   `reportValidity()`: asks the browser to show validation UI.
--   `form`: returns the associated form.
--   `labels`: returns labels associated with the custom element.
+- `setFormValue(value)`: controls what `FormData` receives for the element's `name`.
+- `setValidity(flags, message, anchor)`: controls native validity state.
+- `reportValidity()`: asks the browser to show validation UI.
+- `form`: returns the associated form.
+- `labels`: returns labels associated with the custom element.
 
 ### Register the Submitted Value
 
@@ -315,11 +315,11 @@ Use it like a normal form field:
 
 ### Practical Rules
 
--   Add `static formAssociated = true` only to components that should behave as native form controls.
--   Always call `this.internals.setFormValue()` when the submitted value changes.
--   Keep the submitted value and the visible internal control value synchronized.
--   Use `this.internals.setValidity()` when the custom element should participate in native constraint validation.
--   Use `formDisabledCallback()` to respond to ancestor `<fieldset disabled>` changes.
--   Use `formResetCallback()` to restore defaults when the parent form resets.
--   Use `formStateRestoreCallback()` for browser restore and autocomplete flows.
--   Keep component events like `change` useful for app code, but do not rely on events for native form submission.
+- Add `static formAssociated = true` only to components that should behave as native form controls.
+- Always call `this.internals.setFormValue()` when the submitted value changes.
+- Keep the submitted value and the visible internal control value synchronized.
+- Use `this.internals.setValidity()` when the custom element should participate in native constraint validation.
+- Use `formDisabledCallback()` to respond to ancestor `<fieldset disabled>` changes.
+- Use `formResetCallback()` to restore defaults when the parent form resets.
+- Use `formStateRestoreCallback()` for browser restore and autocomplete flows.
+- Keep component events like `change` useful for app code, but do not rely on events for native form submission.

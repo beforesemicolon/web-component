@@ -20,7 +20,7 @@ Instead of dealing with native custom element callback names, `@beforesemicolon/
 
 Called when the element is first connected to the DOM. This is the ideal place to run setups such as setting up timers, fetching remote data, or adding event listeners.
 
--   **Cleanup function**: The `onMount()` method can optionally return a cleanup function. If provided, this function is automatically executed when the component is disconnected from the DOM, right before `onDestroy()` is called.
+- **Cleanup function**: The `onMount()` method can optionally return a cleanup function. If provided, this function is automatically executed when the component is disconnected from the DOM, right before `onDestroy()` is called.
 
 ```javascript
 onMount() {

@@ -71,6 +71,6 @@ Once the custom element is registered, you can place the `<my-button>` tag anywh
 
 Now that you have built your first web component, explore the core features that make `@beforesemicolon/web-component` powerful:
 
--   **[Reactive Props](./props-and-state/props.md)**: Pass data into your components and handle attribute updates.
--   **[Reactive State](./props-and-state/state.md)**: Manage internal state and automatically trigger surgical DOM updates.
--   **[Lifecycle Hooks](./events-and-lifecycle/lifecycle.md)**: Run setup and cleanup code with `onMount` and `onDestroy`.
+- **[Reactive Props](./props-and-state/props.md)**: Pass data into your components and handle attribute updates.
+- **[Reactive State](./props-and-state/state.md)**: Manage internal state and automatically trigger surgical DOM updates.
+- **[Lifecycle Hooks](./events-and-lifecycle/lifecycle.md)**: Run setup and cleanup code with `onMount` and `onDestroy`.

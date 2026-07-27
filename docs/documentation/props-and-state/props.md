@@ -28,9 +28,9 @@ HTML attributes are case-insensitive and conventionally written in kebab-case (e
 
 For example:
 
--   `card-title` becomes `cardTitle`
--   `is-open` becomes `isOpen`
--   `disabled` remains `disabled`
+- `card-title` becomes `cardTitle`
+- `is-open` becomes `isOpen`
+- `disabled` remains `disabled`
 
 ### Default Values
 
@@ -100,10 +100,10 @@ There are two different paths:
 
 In this HTML-only example, WebComponent receives strings from the browser and parses JSON-compatible values before updating `this.props`:
 
--   `card-title` remains the string `"My Project"`.
--   `count` becomes the number `3`.
--   `enabled` becomes the boolean `true`.
--   `tags` becomes the array `["ui", "release"]`.
+- `card-title` remains the string `"My Project"`.
+- `count` becomes the number `3`.
+- `enabled` becomes the boolean `true`.
+- `tags` becomes the array `["ui", "release"]`.
 
 When a parent template passes a non-primitive value, keep it as a reference instead of stringifying it:
 

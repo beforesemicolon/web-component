@@ -32,18 +32,18 @@ Once loaded, the library attaches a single global variable `BFS` to the browser'
 
 The `window.BFS` namespace is structured as follows:
 
--   **`window.BFS.WebComponent`**: The core component base class.
--   **`window.BFS.css`**: The tagged template function for creating reactive scoped CSS.
--   **`window.BFS.MARKUP`**: An object containing all the re-exported APIs from the underlying `@beforesemicolon/markup` package.
+- **`window.BFS.WebComponent`**: The core component base class.
+- **`window.BFS.css`**: The tagged template function for creating reactive scoped CSS.
+- **`window.BFS.MARKUP`**: An object containing all the re-exported APIs from the underlying `@beforesemicolon/markup` package.
 
 #### Re-exported Markup APIs under `BFS.MARKUP`
 
 Through `BFS.MARKUP`, you can access all template rendering and reactivity tools:
 
--   **`html`**: Tagged template function for rendering DOM elements.
--   **`state`**: Creates reactive state getters and setters.
--   **`effect`**: Tracks side-effects depending on states.
--   **Helper utilities**: `when`, `repeat`, `suspense`, `visible`, etc.
+- **`html`**: Tagged template function for rendering DOM elements.
+- **`state`**: Creates reactive state getters and setters.
+- **`effect`**: Tracks side-effects depending on states.
+- **Helper utilities**: `when`, `repeat`, `suspense`, `visible`, etc.
 
 ---
 
