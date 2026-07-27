@@ -44,40 +44,40 @@ Below is the complete list of reserved property names that cannot be overridden 
 
 #### Base Configuration & Styling
 
--   `config`: Used to define Shadow DOM configuration.
--   `stylesheet`: Used to define scoped stylesheets (e.g., via `css` tagged templates).
--   `updateStylesheet(sheet)`: Method to dynamically update/replace the stylesheet.
+- `config`: Used to define Shadow DOM configuration.
+- `stylesheet`: Used to define scoped stylesheets (e.g., via `css` tagged templates).
+- `updateStylesheet(sheet)`: Method to dynamically update/replace the stylesheet.
 
 #### Reactivity & Internal Refs
 
--   `props`: Object containing reactive prop getters.
--   `initialState`: Object containing initial values for internal state.
--   `state`: Object containing reactive state getters.
--   `setState(newState | callback)`: Method used to reactively update the internal state.
--   `refs`: Object containing references to elements marked with the `ref` attribute in the template.
+- `props`: Object containing reactive prop getters.
+- `initialState`: Object containing initial values for internal state.
+- `state`: Object containing reactive state getters.
+- `setState(newState | callback)`: Method used to reactively update the internal state.
+- `refs`: Object containing references to elements marked with the `ref` attribute in the template.
 
 #### DOM & Shadow Roots
 
--   `mounted`: Boolean getter indicating if the component is currently connected to the DOM.
--   `contentRoot`: Getter returning the render target (`ShadowRoot` or the element itself if shadow DOM is disabled).
--   `root`: Getter returning the ancestor shadow root or document of the element.
--   `internals`: Getter returning the `ElementInternals` instance (via `attachInternals()`), useful for form association and accessibility.
--   `render()`: Method that returns the HTML template or Node to be rendered.
--   `dispatch(name, detail)`: Method to fire custom DOM events easily.
+- `mounted`: Boolean getter indicating if the component is currently connected to the DOM.
+- `contentRoot`: Getter returning the render target (`ShadowRoot` or the element itself if shadow DOM is disabled).
+- `root`: Getter returning the ancestor shadow root or document of the element.
+- `internals`: Getter returning the `ElementInternals` instance (via `attachInternals()`), useful for form association and accessibility.
+- `render()`: Method that returns the HTML template or Node to be rendered.
+- `dispatch(name, detail)`: Method to fire custom DOM events easily.
 
 #### Lifecycle Methods
 
--   `connectedCallback()`: Native element connection handler. Use `onMount()` instead for custom behavior.
--   `attributeChangedCallback(name, oldValue, newValue)`: Native attribute change handler. Use `onUpdate()` instead for custom behavior.
--   `disconnectedCallback()`: Native element disconnection handler. Use `onDestroy()` instead for custom behavior.
--   `adoptedCallback()`: Native adoption handler. Use `onAdoption()` instead for custom behavior.
--   `onError(error)`: Callback executed when errors occur within lifecycles or rendering.
+- `connectedCallback()`: Native element connection handler. Use `onMount()` instead for custom behavior.
+- `attributeChangedCallback(name, oldValue, newValue)`: Native attribute change handler. Use `onUpdate()` instead for custom behavior.
+- `disconnectedCallback()`: Native element disconnection handler. Use `onDestroy()` instead for custom behavior.
+- `adoptedCallback()`: Native adoption handler. Use `onAdoption()` instead for custom behavior.
+- `onError(error)`: Callback executed when errors occur within lifecycles or rendering.
 
 #### Native HTMLElement Properties
 
--   `style`: Standard CSS declaration block.
--   `className`: Standard class name string.
--   `classList`: Standard class token list.
+- `style`: Standard CSS declaration block.
+- `className`: Standard class name string.
+- `classList`: Standard class token list.
 
 > [!WARNING]
 > Attempting to define any of these reserved names as custom props or mapping them via `observedAttributes` will cause conflicts with the core runtime behavior and might break the component's reactivity or lifecycle.

@@ -22,8 +22,8 @@ get contentRoot(): ShadowRoot | HTMLElement
 
 The value of `contentRoot` depends on your component's Shadow DOM configuration:
 
--   **Shadow DOM Enabled (`config.shadow = true` - Default)**: `contentRoot` returns the element's own `ShadowRoot`. All rendering, template mounting, and scoped styling happen inside this shadow boundary.
--   **Shadow DOM Disabled (`config.shadow = false`)**: `contentRoot` returns the custom element instance itself (`HTMLElement`). Templates are rendered directly into the light DOM as children of the custom element.
+- **Shadow DOM Enabled (`config.shadow = true` - Default)**: `contentRoot` returns the element's own `ShadowRoot`. All rendering, template mounting, and scoped styling happen inside this shadow boundary.
+- **Shadow DOM Disabled (`config.shadow = false`)**: `contentRoot` returns the custom element instance itself (`HTMLElement`). Templates are rendered directly into the light DOM as children of the custom element.
 
 #### Practical Usage
 
@@ -49,8 +49,8 @@ get root(): ShadowRoot | Document
 
 When the component is connected to the DOM, it climbs the node hierarchy searching for an ancestor `ShadowRoot`:
 
--   If the component is nested inside the shadow DOM of **another** parent web component, `this.root` returns that parent's `ShadowRoot`.
--   If the component is placed directly in the main page layout, `this.root` returns the main page `document`.
+- If the component is nested inside the shadow DOM of **another** parent web component, `this.root` returns that parent's `ShadowRoot`.
+- If the component is placed directly in the main page layout, `this.root` returns the main page `document`.
 
 #### Practical Usage
 

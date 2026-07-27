@@ -58,9 +58,9 @@ For rapid prototyping or zero-build environments, you can include the script fro
 
 When using the client CDN build, `@beforesemicolon/web-component` exposes a global variable `BFS`. Under this namespace, you can access the core elements:
 
--   **`BFS.WebComponent`**: The base class for building custom elements.
--   **`BFS.css`**: The tagged template styling helper.
--   **`BFS.MARKUP`**: The underlying Markup library namespace containing `html`, `state`, `effect`, and other template utilities.
+- **`BFS.WebComponent`**: The base class for building custom elements.
+- **`BFS.css`**: The tagged template styling helper.
+- **`BFS.MARKUP`**: The underlying Markup library namespace containing `html`, `state`, `effect`, and other template utilities.
 
 Here is an example of accessing these APIs from browser-native scripts:
 

@@ -49,11 +49,11 @@ class ErrorProneComponent extends WebComponent {
 
 The component automatically wraps internal processes in `try/catch` blocks. If any of the following operations fail, the error is caught and passed to the `onError` hook:
 
--   **State Mutations**: Errors during `this.setState()`, such as trying to update state on an unmounted component.
--   **Dynamic Stylesheet Updates**: Errors inside `this.updateStylesheet()` or when compiling reactive styles using the `css` template tag.
--   **Custom Event Dispatching**: Errors occurring while creating or dispatching custom events through `this.dispatch()`.
--   **Lifecycle Connections**: Errors thrown during the component connection or adoption phases, including setups inside `onMount()` and `onAdoption()`.
--   **Lifecycle Disconnections**: Errors thrown when the component is being disconnected, including during the mount cleanup callbacks and `onDestroy()`.
+- **State Mutations**: Errors during `this.setState()`, such as trying to update state on an unmounted component.
+- **Dynamic Stylesheet Updates**: Errors inside `this.updateStylesheet()` or when compiling reactive styles using the `css` template tag.
+- **Custom Event Dispatching**: Errors occurring while creating or dispatching custom events through `this.dispatch()`.
+- **Lifecycle Connections**: Errors thrown during the component connection or adoption phases, including setups inside `onMount()` and `onAdoption()`.
+- **Lifecycle Disconnections**: Errors thrown when the component is being disconnected, including during the mount cleanup callbacks and `onDestroy()`.
 
 ---
 

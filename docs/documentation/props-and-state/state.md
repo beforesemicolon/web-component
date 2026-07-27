@@ -29,8 +29,8 @@ class CounterElement extends WebComponent {
 
 Like props, the properties of `this.state` are reactive getter functions. You can access the values inside your templates by passing the getter directly or by invoking it.
 
--   Pass the getter directly to let the template handle reactive bindings: `this.state.count`
--   Invoke it as a function when executing calculations or inside conditional blocks: `this.state.count()`
+- Pass the getter directly to let the template handle reactive bindings: `this.state.count`
+- Invoke it as a function when executing calculations or inside conditional blocks: `this.state.count()`
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'

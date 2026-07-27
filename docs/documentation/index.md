@@ -16,21 +16,21 @@ By design, the native Web Components APIs are low-level and verbose. Writing raw
 
 WebComponent wraps native custom elements with several major enhancements:
 
--   **State Management**: Reactive internal state that triggers targeted DOM updates when mutated via `setState`.
--   **Props Management**: Maps observed attributes directly to reactive properties, handling automatic camelCase conversion and deserialization.
--   **Component Styling**: First-class support for `CSSStyleSheet` objects, CSS import assertions, and reactive stylesheets via the `css` tagged template.
--   **Form Integration**: Out-of-the-box support for form-associated custom elements, exposing standard form verification and value setting APIs.
--   **Lifecycles**: Predictable wrappers around native element connection callbacks, supporting cleanup function returns.
--   **Template Refs**: Easily reference and query rendered DOM elements without using verbose `querySelector` or `shadowRoot` calls.
--   **Error Handling**: A centralized `onError` hook to catch and process runtime rendering or lifecycle errors.
--   **Event Dispatching**: A clean `dispatch` helper to fire standard `CustomEvent` instances with typed detail payloads.
+- **State Management**: Reactive internal state that triggers targeted DOM updates when mutated via `setState`.
+- **Props Management**: Maps observed attributes directly to reactive properties, handling automatic camelCase conversion and deserialization.
+- **Component Styling**: First-class support for `CSSStyleSheet` objects, CSS import assertions, and reactive stylesheets via the `css` tagged template.
+- **Form Integration**: Out-of-the-box support for form-associated custom elements, exposing standard form verification and value setting APIs.
+- **Lifecycles**: Predictable wrappers around native element connection callbacks, supporting cleanup function returns.
+- **Template Refs**: Easily reference and query rendered DOM elements without using verbose `querySelector` or `shadowRoot` calls.
+- **Error Handling**: A centralized `onError` hook to catch and process runtime rendering or lifecycle errors.
+- **Event Dispatching**: A clean `dispatch` helper to fire standard `CustomEvent` instances with typed detail payloads.
 
 ### Start Here
 
--   [Get Started](./get-started.md)
--   [Guide & Best Practices](./guide.md)
--   [AI Guide](./ai.md)
--   [Creating Components](./fundamentals/creating-components.md)
+- [Get Started](./get-started.md)
+- [Guide & Best Practices](./guide.md)
+- [AI Guide](./ai.md)
+- [Creating Components](./fundamentals/creating-components.md)
 
 ### Full Example
 
