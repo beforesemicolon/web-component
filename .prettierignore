@@ -2,4 +2,3 @@ src/**/*.spec.ts
 dist/
 website/
 .netlify/
-.github/workflows/fix-prettier-3.9.yml
