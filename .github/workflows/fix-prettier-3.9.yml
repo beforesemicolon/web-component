@@ -1,0 +1,37 @@
+name: Repair Prettier 3.9 formatting
+
+on:
+  push:
+    branches:
+      - agent/fix-prettier-3.9
+
+permissions:
+  contents: write
+
+jobs:
+  format-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: agent/fix-prettier-3.9
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Apply formatting
+        run: npm run format
+      - name: Commit formatting changes
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No formatting changes required"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "style: apply Prettier 3.9 formatting"
+          git push
+      - run: npm run build
