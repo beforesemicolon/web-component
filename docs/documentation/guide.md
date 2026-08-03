@@ -1,26 +1,26 @@
 ---
-name: Guide & Best Practices
+name: '{{t.pages.documentation.guide.meta.guide_best_practices}}'
 order: 3.1
-title: WebComponent Guide and Best Practices - Before Semicolon
-description: Practical conventions for building reactive custom elements with @beforesemicolon/web-component.
+title: '{{t.pages.documentation.guide.meta.webcomponent_guide_and_best_practices_before_semicolon}}'
+description: '{{t.pages.documentation.guide.meta.practical_conventions_for_building_reactive_custom_elements_with_beforesemicolon_web_component}}'
 layout: document
 ---
 
-## Guide & Best Practices
+## {{t.pages.documentation.guide.content.guide_best_practices}}
 
-Use `@beforesemicolon/web-component` when you want native custom elements with a small reactive layer for templates, props, state, scoped styles, lifecycle hooks, and form integration.
+{{t.pages.documentation.guide.content.use_beforesemicolon_web_component_when_you_want_native_custom_elements_with_a_small_reactive_lay}}
 
-## Core Rules
+## {{t.pages.documentation.guide.content.core_rules}}
 
-1.  **Keep `render()` declarative**: Return `html`, a `Node`, a string, or nothing. Do not start timers, fetch data, subscribe to global events, or mutate state inside `render()`.
-2.  **Use observed attributes for public inputs**: Put external inputs in `static observedAttributes`, provide defaults as class fields, and read them from `this.props`.
-3.  **Use state for owned UI data**: Put private component data in `initialState` and update it with `this.setState()`.
-4.  **Pass reactive getters directly when possible**: Use `${this.state.count}` or `${this.props.label}` in templates. Call getters inside calculations, conditions, or event handlers.
-5.  **Use lifecycle hooks for side effects**: Start work in `onMount()`, return cleanup from `onMount()` or use `onDestroy()`, and respond to prop changes in `onUpdate()`.
-6.  **Prefer `ref` before `querySelector`**: Use `ref` for template-owned elements and reach for `contentRoot` only when dynamic querying is genuinely clearer.
-7.  **Dispatch public events**: Use `this.dispatch(name, detail)` for component outputs. Consumers listen with normal DOM APIs or Markup `on...` handlers.
+1.  {{t.pages.documentation.guide.content.keep_render_declarative_return_html_a_node_a_string_or_nothing_do_not_start_timers_fetch_data_su}}
+2.  {{t.pages.documentation.guide.content.use_observed_attributes_for_public_inputs_put_external_inputs_in_static_observedattributes_provi}}
+3.  {{t.pages.documentation.guide.content.use_state_for_owned_ui_data_put_private_component_data_in_initialstate_and_update_it_with_this_s}}
+4.  {{t.pages.documentation.guide.content.pass_reactive_getters_directly_when_possible_use_this_state_count_or_this_props_label_in_templat}}
+5.  {{t.pages.documentation.guide.content.use_lifecycle_hooks_for_side_effects_start_work_in_onmount_return_cleanup_from_onmount_or_use_on}}
+6.  {{t.pages.documentation.guide.content.prefer_ref_before_queryselector_use_ref_for_template_owned_elements_and_reach_for_contentroot_on}}
+7.  {{t.pages.documentation.guide.content.dispatch_public_events_use_this_dispatch_name_detail_for_component_outputs_consumers_listen_with}}
 
-## Component Shape
+## {{t.pages.documentation.guide.content.component_shape}}
 
 ```javascript
 import { WebComponent, html, css } from '@beforesemicolon/web-component'
@@ -67,9 +67,9 @@ class ProductCounter extends WebComponent {
 customElements.define('product-counter', ProductCounter)
 ```
 
-## Attribute Formatting
+## {{t.pages.documentation.guide.content.attribute_formatting}}
 
-Break long custom element usage across lines. It keeps examples readable and avoids horizontal scroll.
+{{t.pages.documentation.guide.content.break_long_custom_element_usage_across_lines_it_keeps_examples_readable_and_avoids_horizontal_sc}}
 
 ```html
 <product-counter
@@ -79,9 +79,9 @@ Break long custom element usage across lines. It keeps examples readable and avo
 ></product-counter>
 ```
 
-## Props vs State
+## {{t.pages.documentation.guide.content.props_vs_state}}
 
-Use props for values controlled by the outside page. Use state for values the component owns.
+{{t.pages.documentation.guide.content.use_props_for_values_controlled_by_the_outside_page_use_state_for_values_the_component_owns}}
 
 ```javascript
 class UserBadge extends WebComponent {
@@ -107,9 +107,9 @@ class UserBadge extends WebComponent {
 }
 ```
 
-## Side Effects
+## {{t.pages.documentation.guide.content.side_effects}}
 
-Use `onMount()` for browser subscriptions and return a cleanup function.
+{{t.pages.documentation.guide.content.use_onmount_for_browser_subscriptions_and_return_a_cleanup_function}}
 
 ```javascript
 class ViewportMeter extends WebComponent {
@@ -130,9 +130,9 @@ class ViewportMeter extends WebComponent {
 }
 ```
 
-## Styling
+## {{t.pages.documentation.guide.content.styling}}
 
-Use `stylesheet` for static CSS and `css` when styles depend on props or state.
+{{t.pages.documentation.guide.content.use_stylesheet_for_static_css_and_css_when_styles_depend_on_props_or_state}}
 
 ```javascript
 class ModePanel extends WebComponent {
@@ -156,9 +156,9 @@ class ModePanel extends WebComponent {
 }
 ```
 
-## Form Controls
+## {{t.pages.documentation.guide.content.form_controls}}
 
-Use `static formAssociated = true` only for controls that should participate in native form submission or validation.
+{{t.pages.documentation.guide.content.use_static_formassociated_true_only_for_controls_that_should_participate_in_native_form_submissi}}
 
 ```javascript
 class RatingInput extends WebComponent {

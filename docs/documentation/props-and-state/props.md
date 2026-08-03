@@ -1,18 +1,18 @@
 ---
-name: Props
+name: '{{t.pages.documentation.props_and_state.props.meta.props}}'
 order: 5.1
 layout: document
-title: Props - WebComponent by Before Semicolon
-description: Define and read reactive external properties mapped to observed attributes.
+title: '{{t.pages.documentation.props_and_state.props.meta.props_webcomponent_by_before_semicolon}}'
+description: '{{t.pages.documentation.props_and_state.props.meta.define_and_read_reactive_external_properties_mapped_to_observed_attributes}}'
 ---
 
-## Props
+## {{t.pages.documentation.props_and_state.props.content.props}}
 
-Props are the external inputs to your component. In WebComponent, props are bound to HTML attributes, providing a reactive and seamless way to receive data from parents or external consumers.
+{{t.pages.documentation.props_and_state.props.content.props_are_the_external_inputs_to_your_component_in_webcomponent_props_are_bound_to_html_attribut}}
 
-### Declaring Props
+### {{t.pages.documentation.props_and_state.props.content.declaring_props}}
 
-To declare reactive props, add their attribute names to the `static observedAttributes` array. WebComponent automatically watches these attributes and sets up reactive getters/setters on the element instance.
+{{t.pages.documentation.props_and_state.props.content.to_declare_reactive_props_add_their_attribute_names_to_the_static_observedattributes_array_webco}}
 
 ```javascript
 import { WebComponent } from '@beforesemicolon/web-component'
@@ -22,19 +22,19 @@ class MyCard extends WebComponent {
 }
 ```
 
-### Case Conversion
+### {{t.pages.documentation.props_and_state.props.content.case_conversion}}
 
-HTML attributes are case-insensitive and conventionally written in kebab-case (e.g., `card-title`). WebComponent automatically converts these kebab-case attributes to camelCase properties on the class instance (e.g., `cardTitle`).
+{{t.pages.documentation.props_and_state.props.content.html_attributes_are_case_insensitive_and_conventionally_written_in_kebab_case_e_g_card_title_web}}
 
-For example:
+{{t.pages.documentation.props_and_state.props.content.for_example}}
 
-- `card-title` becomes `cardTitle`
-- `is-open` becomes `isOpen`
-- `disabled` remains `disabled`
+- {{t.pages.documentation.props_and_state.props.content.card_title_becomes_cardtitle}}
+- {{t.pages.documentation.props_and_state.props.content.is_open_becomes_isopen}}
+- {{t.pages.documentation.props_and_state.props.content.disabled_remains_disabled}}
 
-### Default Values
+### {{t.pages.documentation.props_and_state.props.content.default_values}}
 
-You can specify default values for your props by defining them as class fields. If the corresponding attribute is not present on the element when it mounts, the default value will be used.
+{{t.pages.documentation.props_and_state.props.content.you_can_specify_default_values_for_your_props_by_defining_them_as_class_fields_if_the_correspond}}
 
 ```javascript
 import { WebComponent } from '@beforesemicolon/web-component'
@@ -48,11 +48,11 @@ class MyCard extends WebComponent {
 }
 ```
 
-### Reading Props in Templates
+### {{t.pages.documentation.props_and_state.props.content.reading_props_in_templates}}
 
-Inside the component class, you can access the reactive getter functions via `this.props`.
+{{t.pages.documentation.props_and_state.props.content.inside_the_component_class_you_can_access_the_reactive_getter_functions_via_this_props}}
 
-Since these props are reactive signal getters, they should be invoked as functions to read their current value (e.g., `this.props.cardTitle()`). When used in Markup templates, passing the getter function directly allows the template to automatically subscribe to updates:
+{{t.pages.documentation.props_and_state.props.content.since_these_props_are_reactive_signal_getters_they_should_be_invoked_as_functions_to_read_their}}
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -76,18 +76,18 @@ class MyCard extends WebComponent {
 }
 ```
 
-> [!NOTE]
-> Passing `this.props.cardTitle` directly as an expression in the template (without calling it) works because Markup is designed to resolve getters reactively. If you are doing calculations or conditional rendering inside a function callback, make sure to call it as a function: `this.props.isOpen()`.
+> {{t.common.content.note}}
+> {{t.pages.documentation.props_and_state.props.content.passing_this_props_cardtitle_directly_as_an_expression_in_the_template_without_calling_it_works}}
 
-### Attribute Parsing & Serialization
+### {{t.pages.documentation.props_and_state.props.content.attribute_parsing_serialization}}
 
-WebComponent does not serialize and deserialize prop values as a component data protocol.
+{{t.pages.documentation.props_and_state.props.content.webcomponent_does_not_serialize_and_deserialize_prop_values_as_a_component_data_protocol}}
 
-There are two different paths:
+{{t.pages.documentation.props_and_state.props.content.there_are_two_different_paths}}
 
-1. **String attributes**: Literal HTML attributes and `setAttribute()` values are browser strings. WebComponent passes those strings through its internal JSON parser, so primitive-looking values can become primitives and JSON-looking values can become arrays or objects.
-2. **Property/reference values**: Values assigned through the component property, including values passed from Markup expressions, are kept as JavaScript values. Objects, arrays, functions, and other non-primitives are passed by reference and are not written back to HTML attributes.
-3. **Primitive property values**: When you assign a primitive value directly to the component property, WebComponent mirrors it back to the matching kebab-case attribute.
+1. {{t.pages.documentation.props_and_state.props.content.string_attributes_literal_html_attributes_and_setattribute_values_are_browser_strings_webcompone}}
+2. {{t.pages.documentation.props_and_state.props.content.property_reference_values_values_assigned_through_the_component_property_including_values_passed}}
+3. {{t.pages.documentation.props_and_state.props.content.primitive_property_values_when_you_assign_a_primitive_value_directly_to_the_component_property_w}}
 
 ```html
 <my-card
@@ -98,14 +98,14 @@ There are two different paths:
 ></my-card>
 ```
 
-In this HTML-only example, WebComponent receives strings from the browser and parses JSON-compatible values before updating `this.props`:
+{{t.pages.documentation.props_and_state.props.content.in_this_html_only_example_webcomponent_receives_strings_from_the_browser_and_parses_json_compati}}
 
-- `card-title` remains the string `"My Project"`.
-- `count` becomes the number `3`.
-- `enabled` becomes the boolean `true`.
-- `tags` becomes the array `["ui", "release"]`.
+- {{t.pages.documentation.props_and_state.props.content.card_title_remains_the_string_my_project}}
+- {{t.pages.documentation.props_and_state.props.content.count_becomes_the_number_3}}
+- {{t.pages.documentation.props_and_state.props.content.enabled_becomes_the_boolean_true}}
+- {{t.pages.documentation.props_and_state.props.content.tags_becomes_the_array_ui_release}}
 
-When a parent template passes a non-primitive value, keep it as a reference instead of stringifying it:
+{{t.pages.documentation.props_and_state.props.content.when_a_parent_template_passes_a_non_primitive_value_keep_it_as_a_reference_instead_of_stringifyi}}
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -122,11 +122,11 @@ class ProjectShell extends WebComponent {
 }
 ```
 
-The `project` prop is the original object reference. It is not converted to JSON, placed in the DOM as an attribute string, and parsed again later.
+{{t.pages.documentation.props_and_state.props.content.the_project_prop_is_the_original_object_reference_it_is_not_converted_to_json_placed_in_the_dom}}
 
-### Imperative Updates
+### {{t.pages.documentation.props_and_state.props.content.imperative_updates}}
 
-You can also read and write props imperatively directly on the element instance. Primitive values sync back to HTML attributes. Non-primitive values update the reactive prop directly and stay as references.
+{{t.pages.documentation.props_and_state.props.content.you_can_also_read_and_write_props_imperatively_directly_on_the_element_instance_primitive_values}}
 
 ```javascript
 const card = document.querySelector('my-card')
@@ -150,7 +150,7 @@ console.log(card.props.project() === project) // true
 console.log(card.hasAttribute('project')) // false
 ```
 
-### Practical Component Example
+### {{t.pages.documentation.props_and_state.props.content.practical_component_example}}
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'

@@ -18,7 +18,7 @@
         "test:coverage": "jest --coverage",
         "local": "run-p local:watch local:serve",
         "local:watch": "node build-docs.js && nodemon --exec 'node build-docs.js'",
-        "local:serve": "npx http-server ./website",
+        "local:serve": "npx http-server ./website/en",
         "build": "npm-run-all build:package build:docs",
         "build:package": "rm -rf dist && npm-run-all lint test && tsc --emitDeclarationOnly && node build.js",
         "build:docs": "node build-docs.js",
@@ -38,6 +38,7 @@
     },
     "devDependencies": {
         "@beforesemicolon/builder": "^1.8.25",
+        "@beforesemicolon/site-builder": "^1.4.0",
         "@types/jest": "^29.5.11",
         "@types/jsdom": "^21.1.7",
         "@types/jsdom-global": "^3.0.7",

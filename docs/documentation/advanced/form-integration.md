@@ -1,20 +1,20 @@
 ---
-name: Form Integration
+name: '{{t.pages.documentation.advanced.form_integration.meta.form_integration}}'
 order: 8.1
-title: Form Integration - WebComponent by Before Semicolon
-description: Build form-associated custom elements with ElementInternals, submitted values, validation, disabled state, reset, and state restoration.
+title: '{{t.pages.documentation.advanced.form_integration.meta.form_integration_webcomponent_by_before_semicolon}}'
+description: '{{t.pages.documentation.advanced.form_integration.meta.build_form_associated_custom_elements_with_elementinternals_submitted_values_validation_disabled}}'
 layout: document
 ---
 
-## Form Integration
+## {{t.pages.documentation.advanced.form_integration.content.form_integration}}
 
-Custom elements can render inside a `<form>`, but that does not automatically make them form controls. A normal custom element is ignored by `FormData`, native constraint validation, fieldset disabled state, and form reset behavior unless it opts into the browser's **Form-Associated Custom Elements** API.
+{{t.pages.documentation.advanced.form_integration.content.custom_elements_can_render_inside_a_but_that_does_not_automatically_make_them_form_controls_a_no}}
 
-`@beforesemicolon/web-component` supports that native API directly. It exposes the element's `ElementInternals` instance as `this.internals`, while you use standard browser callbacks such as `formAssociatedCallback()`, `formDisabledCallback()`, `formResetCallback()`, and `formStateRestoreCallback()`.
+{{t.pages.documentation.advanced.form_integration.content.beforesemicolon_web_component_supports_that_native_api_directly_it_exposes_the_element_s_element}}
 
-### The Default Problem
+### {{t.pages.documentation.advanced.form_integration.content.the_default_problem}}
 
-Start with a component that wraps a native input:
+{{t.pages.documentation.advanced.form_integration.content.start_with_a_component_that_wraps_a_native_input}}
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -46,7 +46,7 @@ class TextField extends WebComponent {
 customElements.define('text-field', TextField)
 ```
 
-You can place it in a form:
+{{t.pages.documentation.advanced.form_integration.content.you_can_place_it_in_a_form}}
 
 ```html
 <form id="profile-form">
@@ -55,7 +55,7 @@ You can place it in a form:
 </form>
 ```
 
-But submitting the form will not include `firstName`:
+{{t.pages.documentation.advanced.form_integration.content.but_submitting_the_form_will_not_include_firstname}}
 
 ```javascript
 const form = document.querySelector('#profile-form')
@@ -69,11 +69,11 @@ form.addEventListener('submit', (event) => {
 })
 ```
 
-The browser sees the custom element as an element, not as a successful form control with a submitted value.
+{{t.pages.documentation.advanced.form_integration.content.the_browser_sees_the_custom_element_as_an_element_not_as_a_successful_form_control_with_a_submit}}
 
-### Enable Form Association
+### {{t.pages.documentation.advanced.form_integration.content.enable_form_association}}
 
-Add `static formAssociated = true` so the browser treats the custom element as form-associated:
+{{t.pages.documentation.advanced.form_integration.content.add_static_formassociated_true_so_the_browser_treats_the_custom_element_as_form_associated}}
 
 ```javascript
 class TextField extends WebComponent {
@@ -82,29 +82,29 @@ class TextField extends WebComponent {
 }
 ```
 
-This is native custom element behavior, not a WebComponent-specific abstraction. It allows the element to be associated with a parent form and receive native form callbacks.
+{{t.pages.documentation.advanced.form_integration.content.this_is_native_custom_element_behavior_not_a_webcomponent_specific_abstraction_it_allows_the_ele}}
 
-Form association alone does not submit a value. It only lets the custom element participate in the form system. You still need `this.internals.setFormValue()`.
+{{t.pages.documentation.advanced.form_integration.content.form_association_alone_does_not_submit_a_value_it_only_lets_the_custom_element_participate_in_th}}
 
-### ElementInternals
+### {{t.pages.documentation.advanced.form_integration.content.elementinternals}}
 
-`this.internals` exposes the native `ElementInternals` object created with `attachInternals()`.
+{{t.pages.documentation.advanced.form_integration.content.this_internals_exposes_the_native_elementinternals_object_created_with_attachinternals}}
 
 ```typescript
 get internals(): ElementInternals
 ```
 
-Use it to communicate with the parent form:
+{{t.pages.documentation.advanced.form_integration.content.use_it_to_communicate_with_the_parent_form}}
 
-- `setFormValue(value)`: controls what `FormData` receives for the element's `name`.
-- `setValidity(flags, message, anchor)`: controls native validity state.
-- `reportValidity()`: asks the browser to show validation UI.
-- `form`: returns the associated form.
-- `labels`: returns labels associated with the custom element.
+- {{t.pages.documentation.advanced.form_integration.content.setformvalue_value_controls_what_formdata_receives_for_the_element_s_name}}
+- {{t.pages.documentation.advanced.form_integration.content.setvalidity_flags_message_anchor_controls_native_validity_state}}
+- {{t.pages.documentation.advanced.form_integration.content.reportvalidity_asks_the_browser_to_show_validation_ui}}
+- {{t.pages.documentation.advanced.form_integration.content.form_returns_the_associated_form}}
+- {{t.pages.documentation.advanced.form_integration.content.labels_returns_labels_associated_with_the_custom_element}}
 
-### Register the Submitted Value
+### {{t.pages.documentation.advanced.form_integration.content.register_the_submitted_value}}
 
-Call `setFormValue()` whenever the component value changes. The submitted field name comes from the custom element's own `name` attribute.
+{{t.pages.documentation.advanced.form_integration.content.call_setformvalue_whenever_the_component_value_changes_the_submitted_field_name_comes_from_the_c}}
 
 ```javascript
 handleInput = (event) => {
@@ -116,14 +116,14 @@ handleInput = (event) => {
 }
 ```
 
-Now the same form produces useful data:
+{{t.pages.documentation.advanced.form_integration.content.now_the_same_form_produces_useful_data}}
 
 ```javascript
 console.log(Object.fromEntries(new FormData(form)))
 // { firstName: "Ada" }
 ```
 
-You can also register an initial value when the browser associates the element with a form:
+{{t.pages.documentation.advanced.form_integration.content.you_can_also_register_an_initial_value_when_the_browser_associates_the_element_with_a_form}}
 
 ```javascript
 formAssociatedCallback() {
@@ -131,9 +131,9 @@ formAssociatedCallback() {
 }
 ```
 
-### Validation
+### {{t.pages.documentation.advanced.form_integration.content.validation}}
 
-A form-associated custom element can use native validation instead of inventing a parallel error system. A common pattern is to delegate validity to the internal native control, then report that validity through `ElementInternals`.
+{{t.pages.documentation.advanced.form_integration.content.a_form_associated_custom_element_can_use_native_validation_instead_of_inventing_a_parallel_error}}
 
 ```javascript
 validate(report = false) {
@@ -156,15 +156,15 @@ validate(report = false) {
 }
 ```
 
-`setValidity()` accepts the same validity flags exposed by native form controls. Passing an empty or valid `ValidityState` clears the error. Passing an anchor element lets the browser position native validation UI near the relevant internal control.
+{{t.pages.documentation.advanced.form_integration.content.setvalidity_accepts_the_same_validity_flags_exposed_by_native_form_controls_passing_an_empty_or}}
 
-### Native Form Callbacks
+### {{t.pages.documentation.advanced.form_integration.content.native_form_callbacks}}
 
-Form-associated custom elements use native callback names. WebComponent does not wrap these because they are part of the browser platform.
+{{t.pages.documentation.advanced.form_integration.content.form_associated_custom_elements_use_native_callback_names_webcomponent_does_not_wrap_these_becau}}
 
-#### `formAssociatedCallback(form)`
+#### {{t.pages.documentation.advanced.form_integration.content.formassociatedcallback_form}}
 
-Called when the browser associates or disassociates the element with a form. Use this to register the initial submitted value and validity.
+{{t.pages.documentation.advanced.form_integration.content.called_when_the_browser_associates_or_disassociates_the_element_with_a_form_use_this_to_register}}
 
 ```javascript
 formAssociatedCallback() {
@@ -172,9 +172,9 @@ formAssociatedCallback() {
 }
 ```
 
-#### `formDisabledCallback(disabled)`
+#### {{t.pages.documentation.advanced.form_integration.content.formdisabledcallback_disabled}}
 
-Called when the element becomes disabled because its own `disabled` attribute changed or because an ancestor `<fieldset>` changed disabled state.
+{{t.pages.documentation.advanced.form_integration.content.called_when_the_element_becomes_disabled_because_its_own_disabled_attribute_changed_or_because_a}}
 
 ```javascript
 formDisabledCallback(disabled) {
@@ -182,11 +182,11 @@ formDisabledCallback(disabled) {
 }
 ```
 
-If your template passes `this.props.disabled` into an internal input, assigning `this.disabled` updates the prop and keeps the rendered control in sync.
+{{t.pages.documentation.advanced.form_integration.content.if_your_template_passes_this_props_disabled_into_an_internal_input_assigning_this_disabled_updat}}
 
-#### `formResetCallback()`
+#### {{t.pages.documentation.advanced.form_integration.content.formresetcallback}}
 
-Called when the parent form resets. Use it to restore the component's default value, clear validation state, and update the native form value.
+{{t.pages.documentation.advanced.form_integration.content.called_when_the_parent_form_resets_use_it_to_restore_the_component_s_default_value_clear_validat}}
 
 ```javascript
 formResetCallback() {
@@ -194,9 +194,9 @@ formResetCallback() {
 }
 ```
 
-#### `formStateRestoreCallback(state, mode)`
+#### {{t.pages.documentation.advanced.form_integration.content.formstaterestorecallback_state_mode}}
 
-Called when the browser restores form state, for example after navigation or autocomplete. Use it to restore the component's visible value and submitted value.
+{{t.pages.documentation.advanced.form_integration.content.called_when_the_browser_restores_form_state_for_example_after_navigation_or_autocomplete_use_it}}
 
 ```javascript
 formStateRestoreCallback(state, mode) {
@@ -206,9 +206,9 @@ formStateRestoreCallback(state, mode) {
 }
 ```
 
-### Complete Text Field
+### {{t.pages.documentation.advanced.form_integration.content.complete_text_field}}
 
-This example keeps the custom element API small while integrating with native form submission, validation, reset, fieldset disabled state, and restore behavior.
+{{t.pages.documentation.advanced.form_integration.content.this_example_keeps_the_custom_element_api_small_while_integrating_with_native_form_submission_va}}
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -296,7 +296,7 @@ class TextField extends WebComponent {
 customElements.define('text-field', TextField)
 ```
 
-Use it like a normal form field:
+{{t.pages.documentation.advanced.form_integration.content.use_it_like_a_normal_form_field}}
 
 ```html
 <form id="profile-form">
@@ -313,13 +313,13 @@ Use it like a normal form field:
 </form>
 ```
 
-### Practical Rules
+### {{t.pages.documentation.advanced.form_integration.content.practical_rules}}
 
-- Add `static formAssociated = true` only to components that should behave as native form controls.
-- Always call `this.internals.setFormValue()` when the submitted value changes.
-- Keep the submitted value and the visible internal control value synchronized.
-- Use `this.internals.setValidity()` when the custom element should participate in native constraint validation.
-- Use `formDisabledCallback()` to respond to ancestor `<fieldset disabled>` changes.
-- Use `formResetCallback()` to restore defaults when the parent form resets.
-- Use `formStateRestoreCallback()` for browser restore and autocomplete flows.
-- Keep component events like `change` useful for app code, but do not rely on events for native form submission.
+- {{t.pages.documentation.advanced.form_integration.content.add_static_formassociated_true_only_to_components_that_should_behave_as_native_form_controls}}
+- {{t.pages.documentation.advanced.form_integration.content.always_call_this_internals_setformvalue_when_the_submitted_value_changes}}
+- {{t.pages.documentation.advanced.form_integration.content.keep_the_submitted_value_and_the_visible_internal_control_value_synchronized}}
+- {{t.pages.documentation.advanced.form_integration.content.use_this_internals_setvalidity_when_the_custom_element_should_participate_in_native_constraint_v}}
+- {{t.pages.documentation.advanced.form_integration.content.use_formdisabledcallback_to_respond_to_ancestor_changes}}
+- {{t.pages.documentation.advanced.form_integration.content.use_formresetcallback_to_restore_defaults_when_the_parent_form_resets}}
+- {{t.pages.documentation.advanced.form_integration.content.use_formstaterestorecallback_for_browser_restore_and_autocomplete_flows}}
+- {{t.pages.documentation.advanced.form_integration.content.keep_component_events_like_change_useful_for_app_code_but_do_not_rely_on_events_for_native_form}}

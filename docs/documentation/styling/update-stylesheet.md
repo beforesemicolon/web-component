@@ -1,31 +1,31 @@
 ---
-name: updateStylesheet
+name: '{{t.pages.documentation.styling.update_stylesheet.meta.updatestylesheet}}'
 order: 6.3
 layout: document
-title: updateStylesheet - WebComponent by Before Semicolon
-description: Swap stylesheets dynamically at runtime using updateStylesheet.
+title: '{{t.pages.documentation.styling.update_stylesheet.meta.updatestylesheet_webcomponent_by_before_semicolon}}'
+description: '{{t.pages.documentation.styling.update_stylesheet.meta.swap_stylesheets_dynamically_at_runtime_using_updatestylesheet}}'
 ---
 
-## updateStylesheet
+## {{t.pages.documentation.styling.update_stylesheet.content.updatestylesheet}}
 
-While the `css` tagged template is perfect for fine-grained style changes, there are times when you need to replace or detach stylesheets entirely (e.g., swapping global themes, switching between light and dark mode stylesheets, or handling third-party stylesheets). You can perform these dynamic updates using `this.updateStylesheet()`.
+{{t.pages.documentation.styling.update_stylesheet.content.while_the_css_tagged_template_is_perfect_for_fine_grained_style_changes_there_are_times_when_you}}
 
-### Method Signature
+### {{t.pages.documentation.styling.update_stylesheet.content.method_signature}}
 
 ```typescript
 updateStylesheet(sheet: CSSStyleSheet | string | null): void
 ```
 
-#### Parameters
+#### {{t.pages.documentation.styling.update_stylesheet.content.parameters}}
 
-- **`sheet`**:
-    - `CSSStyleSheet`: Adopts the new stylesheet object directly.
-    - `string`: Parses the CSS string into a stylesheet, rewrites `:host` selectors if Shadow DOM is disabled, and adopts it.
-    - `null`: Detaches and removes the current stylesheet from the element's content root (or document).
+- {{t.pages.documentation.styling.update_stylesheet.content.sheet}}
+    - {{t.pages.documentation.styling.update_stylesheet.content.cssstylesheet_adopts_the_new_stylesheet_object_directly}}
+    - {{t.pages.documentation.styling.update_stylesheet.content.string_parses_the_css_string_into_a_stylesheet_rewrites_host_selectors_if_shadow_dom_is_disabled}}
+    - {{t.pages.documentation.styling.update_stylesheet.content.null_detaches_and_removes_the_current_stylesheet_from_the_element_s_content_root_or_document}}
 
-### Dynamic Theme Swapping Example
+### {{t.pages.documentation.styling.update_stylesheet.content.dynamic_theme_swapping_example}}
 
-In this example, we define two themes and swap the stylesheet dynamically when a user clicks a button:
+{{t.pages.documentation.styling.update_stylesheet.content.in_this_example_we_define_two_themes_and_swap_the_stylesheet_dynamically_when_a_user_clicks_a_bu}}
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -79,22 +79,22 @@ class ThemeBox extends WebComponent {
 customElements.define('theme-box', ThemeBox)
 ```
 
-### Detaching Stylesheets
+### {{t.pages.documentation.styling.update_stylesheet.content.detaching_stylesheets}}
 
-To remove all styling applied via the component's stylesheet property, call `this.updateStylesheet(null)`:
+{{t.pages.documentation.styling.update_stylesheet.content.to_remove_all_styling_applied_via_the_component_s_stylesheet_property_call_this_updatestylesheet}}
 
 ```javascript
 // Remove the current adopted stylesheet
 this.updateStylesheet(null)
 ```
 
-### How WebComponent Handles Swapping
+### {{t.pages.documentation.styling.update_stylesheet.content.how_webcomponent_handles_swapping}}
 
-When you call `updateStylesheet(sheet)`, WebComponent will:
+{{t.pages.documentation.styling.update_stylesheet.content.when_you_call_updatestylesheet_sheet_webcomponent_will}}
 
-1. Locate the currently active stylesheet and filter it out of the container's `adoptedStyleSheets` array.
-2. Convert the new stylesheet parameter into a native `CSSStyleSheet` if it is a string.
-3. Apply Light DOM selector rewriting (e.g., converting `:host` to the element's tag name) if `config.shadow` is `false`.
-4. Append the new stylesheet to `adoptedStyleSheets` on either:
-    - The element's `ShadowRoot` (if Shadow DOM is enabled).
-    - The `document` or parent Shadow Root (if Shadow DOM is disabled).
+1. {{t.pages.documentation.styling.update_stylesheet.content.locate_the_currently_active_stylesheet_and_filter_it_out_of_the_container_s_adoptedstylesheets_a}}
+2. {{t.pages.documentation.styling.update_stylesheet.content.convert_the_new_stylesheet_parameter_into_a_native_cssstylesheet_if_it_is_a_string}}
+3. {{t.pages.documentation.styling.update_stylesheet.content.apply_light_dom_selector_rewriting_e_g_converting_host_to_the_element_s_tag_name_if_config_shado}}
+4. {{t.pages.documentation.styling.update_stylesheet.content.append_the_new_stylesheet_to_adoptedstylesheets_on_either}}
+    - {{t.pages.documentation.styling.update_stylesheet.content.the_element_s_shadowroot_if_shadow_dom_is_enabled}}
+    - {{t.pages.documentation.styling.update_stylesheet.content.the_document_or_parent_shadow_root_if_shadow_dom_is_disabled}}

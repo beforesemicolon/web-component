@@ -1,26 +1,26 @@
 ---
-name: Lifecycle
+name: '{{t.pages.documentation.events_and_lifecycle.lifecycle.meta.lifecycle}}'
 order: 7.2
-title: Lifecycle - WebComponent by Before Semicolon
-description: Learn how to hook into key execution stages of your WebComponent using onMount, onDestroy, onUpdate, onAdoption, onError, and Markup effects.
+title: '{{t.pages.documentation.events_and_lifecycle.lifecycle.meta.lifecycle_webcomponent_by_before_semicolon}}'
+description: '{{t.pages.documentation.events_and_lifecycle.lifecycle.meta.learn_how_to_hook_into_key_execution_stages_of_your_webcomponent_using_onmount_ondestroy_onupdat}}'
 layout: document
 ---
 
-## Lifecycle
+## {{t.pages.documentation.events_and_lifecycle.lifecycle.content.lifecycle}}
 
-Every `@beforesemicolon/web-component` instance transitions through a series of lifecycle phases, starting from its construction to its destruction and removal from the DOM.
+{{t.pages.documentation.events_and_lifecycle.lifecycle.content.every_beforesemicolon_web_component_instance_transitions_through_a_series_of_lifecycle_phases_st}}
 
-Instead of dealing with native custom element callback names, `@beforesemicolon/web-component` provides clean, high-level hooks to handle setup, side effects, updates, cleanup, adoption, and runtime errors.
+{{t.pages.documentation.events_and_lifecycle.lifecycle.content.instead_of_dealing_with_native_custom_element_callback_names_beforesemicolon_web_component_provi}}
 
 ---
 
-### Lifecycle Hook Methods
+### {{t.pages.documentation.events_and_lifecycle.lifecycle.content.lifecycle_hook_methods}}
 
-#### `onMount()`
+#### {{t.pages.documentation.events_and_lifecycle.lifecycle.content.onmount}}
 
-Called when the element is first connected to the DOM. This is the ideal place to run setups such as setting up timers, fetching remote data, or adding event listeners.
+{{t.pages.documentation.events_and_lifecycle.lifecycle.content.called_when_the_element_is_first_connected_to_the_dom_this_is_the_ideal_place_to_run_setups_such}}
 
-- **Cleanup function**: The `onMount()` method can optionally return a cleanup function. If provided, this function is automatically executed when the component is disconnected from the DOM, right before `onDestroy()` is called.
+- {{t.pages.documentation.events_and_lifecycle.lifecycle.content.cleanup_function_the_onmount_method_can_optionally_return_a_cleanup_function_if_provided_this_fu}}
 
 ```javascript
 onMount() {
@@ -36,9 +36,9 @@ onMount() {
 }
 ```
 
-#### `onDestroy()`
+#### {{t.pages.documentation.events_and_lifecycle.lifecycle.content.ondestroy}}
 
-Called when the element is disconnected and removed from the DOM. Use this hook for final cleanups if they were not already handled in the cleanup callback returned by `onMount()`.
+{{t.pages.documentation.events_and_lifecycle.lifecycle.content.called_when_the_element_is_disconnected_and_removed_from_the_dom_use_this_hook_for_final_cleanup}}
 
 ```javascript
 onDestroy() {
@@ -46,9 +46,9 @@ onDestroy() {
 }
 ```
 
-#### `onUpdate(name, newValue, oldValue)`
+#### {{t.pages.documentation.events_and_lifecycle.lifecycle.content.onupdate_name_newvalue_oldvalue}}
 
-Called when an observed attribute (declared in `static observedAttributes`) changes value. This hook runs only after the component is fully mounted.
+{{t.pages.documentation.events_and_lifecycle.lifecycle.content.called_when_an_observed_attribute_declared_in_static_observedattributes_changes_value_this_hook}}
 
 ```typescript
 onUpdate(name: string, newValue: unknown, oldValue: unknown): void
@@ -64,9 +64,9 @@ onUpdate(name, newValue, oldValue) {
 }
 ```
 
-#### `onAdoption()`
+#### {{t.pages.documentation.events_and_lifecycle.lifecycle.content.onadoption}}
 
-Called when the browser's native `adoptedCallback()` fires, which happens when the custom element is moved to a new document. This is uncommon in most apps, but useful for iframe, portal, document migration, and testing scenarios.
+{{t.pages.documentation.events_and_lifecycle.lifecycle.content.called_when_the_browser_s_native_adoptedcallback_fires_which_happens_when_the_custom_element_is}}
 
 ```javascript
 onAdoption() {
@@ -74,9 +74,9 @@ onAdoption() {
 }
 ```
 
-#### `onError(error)`
+#### {{t.pages.documentation.events_and_lifecycle.lifecycle.content.onerror_error}}
 
-Called when WebComponent catches an error from rendering, state updates, stylesheet updates, lifecycle execution, adoption, or cleanup. The default implementation logs the error with `console.error`.
+{{t.pages.documentation.events_and_lifecycle.lifecycle.content.called_when_webcomponent_catches_an_error_from_rendering_state_updates_stylesheet_updates_lifecy}}
 
 ```typescript
 onError(error: Error | unknown): void
@@ -88,15 +88,15 @@ onError(error) {
 }
 ```
 
-Use `onError()` for component-local error reporting or fallback state. Avoid throwing inside `onError()` unless you intentionally want the error to escape the component boundary.
+{{t.pages.documentation.events_and_lifecycle.lifecycle.content.use_onerror_for_component_local_error_reporting_or_fallback_state_avoid_throwing_inside_onerror}}
 
 ---
 
-### Side Effects with `effect()`
+### {{t.pages.documentation.events_and_lifecycle.lifecycle.content.side_effects_with_effect}}
 
-Because WebComponent is powered by Markup, you can use Markup's `effect()` helper for reactive side effects. An effect runs immediately, tracks any reactive getters it reads synchronously, and runs again when those values change.
+{{t.pages.documentation.events_and_lifecycle.lifecycle.content.because_webcomponent_is_powered_by_markup_you_can_use_markup_s_effect_helper_for_reactive_side_e}}
 
-Use `effect()` when the side effect should follow reactive props or state. Keep it out of `render()` so rendering stays declarative.
+{{t.pages.documentation.events_and_lifecycle.lifecycle.content.use_effect_when_the_side_effect_should_follow_reactive_props_or_state_keep_it_out_of_render_so_r}}
 
 ```javascript
 import { WebComponent, effect, html } from '@beforesemicolon/web-component'
@@ -118,17 +118,17 @@ class SaveStatus extends WebComponent {
 }
 ```
 
-The function returned by `effect()` unsubscribes the effect. Returning it from `onMount()` ties the effect to the component lifetime, so WebComponent calls it when the element disconnects.
+{{t.pages.documentation.events_and_lifecycle.lifecycle.content.the_function_returned_by_effect_unsubscribes_the_effect_returning_it_from_onmount_ties_the_effec}}
 
-### Checking Mount Status
+### {{t.pages.documentation.events_and_lifecycle.lifecycle.content.checking_mount_status}}
 
-You can check whether the component is currently connected to the DOM using the `this.mounted` boolean getter.
+{{t.pages.documentation.events_and_lifecycle.lifecycle.content.you_can_check_whether_the_component_is_currently_connected_to_the_dom_using_the_this_mounted_boo}}
 
 ```typescript
 get mounted(): boolean
 ```
 
-This is particularly useful when performing asynchronous tasks (like fetching data) to prevent updating the state on an unmounted component, which would otherwise throw an error.
+{{t.pages.documentation.events_and_lifecycle.lifecycle.content.this_is_particularly_useful_when_performing_asynchronous_tasks_like_fetching_data_to_prevent_upd}}
 
 ```javascript
 async fetchData() {
@@ -141,27 +141,27 @@ async fetchData() {
 
 ---
 
-### Lifecycle Order of Execution
+### {{t.pages.documentation.events_and_lifecycle.lifecycle.content.lifecycle_order_of_execution}}
 
-Understanding the exact sequence in which callbacks are invoked helps in structuring components properly. The lifecycles run in the following sequence:
+{{t.pages.documentation.events_and_lifecycle.lifecycle.content.understanding_the_exact_sequence_in_which_callbacks_are_invoked_helps_in_structuring_components}}
 
-1. **`constructor`**  
-   The browser instantiates the element. `@beforesemicolon/web-component` maps `static observedAttributes` to internal reactive props getters and setters, throwing errors if any prop conflicts with reserved keywords.
-2. **`render`**  
-   Called during the connection phase. The component renders its template and appends it to its content root.
-3. **`stylesheet configuration`**  
-   Initializes and applies stylesheets (e.g., from the `stylesheet` property or the `css` tagged template).
-4. **`onMount`**  
-   Triggered immediately after rendering is complete and stylesheets are attached. The return value (if it is a function) is cached as the mount cleanup callback.
-5. **`effect` callbacks**  
-   Markup effects created during `onMount()` run immediately and re-run later when their tracked reactive getters change. If the effect unsubscribe is returned from `onMount()`, it becomes the component's mount cleanup callback.
-6. **`onUpdate`**  
-   Runs every time an observed attribute changes (only while the component is mounted).
-7. **`adoptedCallback` / `onAdoption`**  
-   Runs when the browser adopts the element into a different document.
-8. **`Mount Cleanup`**  
-   Runs the cleanup function returned by `onMount()` (if any) when the element disconnects.
-9. **`onDestroy`**  
-   Runs immediately after the mount cleanup function finishes.
-10. **`onError`**  
-    Runs whenever WebComponent catches an error from one of its guarded rendering, update, stylesheet, lifecycle, adoption, or cleanup paths.
+1. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.constructor}}
+   {{t.pages.documentation.events_and_lifecycle.lifecycle.content.the_browser_instantiates_the_element_beforesemicolon_web_component_maps_static_observedattribute}}
+2. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.render}}
+   {{t.pages.documentation.events_and_lifecycle.lifecycle.content.called_during_the_connection_phase_the_component_renders_its_template_and_appends_it_to_its_cont}}
+3. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.stylesheet_configuration}}
+   {{t.pages.documentation.events_and_lifecycle.lifecycle.content.initializes_and_applies_stylesheets_e_g_from_the_stylesheet_property_or_the_css_tagged_template}}
+4. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.onmount_2}}
+   {{t.pages.documentation.events_and_lifecycle.lifecycle.content.triggered_immediately_after_rendering_is_complete_and_stylesheets_are_attached_the_return_value}}
+5. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.effect_callbacks}}
+   {{t.pages.documentation.events_and_lifecycle.lifecycle.content.markup_effects_created_during_onmount_run_immediately_and_re_run_later_when_their_tracked_reacti}}
+6. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.onupdate}}
+   {{t.pages.documentation.events_and_lifecycle.lifecycle.content.runs_every_time_an_observed_attribute_changes_only_while_the_component_is_mounted}}
+7. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.adoptedcallback_onadoption}}
+   {{t.pages.documentation.events_and_lifecycle.lifecycle.content.runs_when_the_browser_adopts_the_element_into_a_different_document}}
+8. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.mount_cleanup}}
+   {{t.pages.documentation.events_and_lifecycle.lifecycle.content.runs_the_cleanup_function_returned_by_onmount_if_any_when_the_element_disconnects}}
+9. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.ondestroy_2}}
+   {{t.pages.documentation.events_and_lifecycle.lifecycle.content.runs_immediately_after_the_mount_cleanup_function_finishes}}
+10. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.onerror}}
+    {{t.pages.documentation.events_and_lifecycle.lifecycle.content.runs_whenever_webcomponent_catches_an_error_from_one_of_its_guarded_rendering_update_stylesheet_lifec}}

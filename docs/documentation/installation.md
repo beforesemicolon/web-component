@@ -1,68 +1,68 @@
 ---
-name: Installation
+name: '{{t.pages.documentation.installation.meta.installation}}'
 order: 3
-title: Installation - WebComponent by Before Semicolon
-description: Install WebComponent via npm, yarn, pnpm or include it via CDN.
+title: '{{t.pages.documentation.installation.meta.installation_webcomponent_by_before_semicolon}}'
+description: '{{t.pages.documentation.installation.meta.install_webcomponent_via_npm_yarn_pnpm_or_include_it_via_cdn}}'
 layout: document
 ---
 
-## Installation
+## {{t.pages.documentation.installation.content.installation}}
 
-`@beforesemicolon/web-component` is a plug-and-play library. It does not require complex build steps, compiler configuration, or bundlers. You can use it by installing it via a package manager or directly including it from a CDN in a standard browser script tag.
+{{t.pages.documentation.installation.content.beforesemicolon_web_component_is_a_plug_and_play_library_it_does_not_require_complex_build_steps}}
 
-### Via Package Managers
+### {{t.pages.documentation.installation.content.via_package_managers}}
 
-Install the package using your package manager of choice:
+{{t.pages.documentation.installation.content.install_the_package_using_your_package_manager_of_choice}}
 
-#### npm
+#### {{t.pages.documentation.installation.content.npm}}
 
 ```bash
 npm install @beforesemicolon/web-component
 ```
 
-#### yarn
+#### {{t.pages.documentation.installation.content.yarn}}
 
 ```bash
 yarn add @beforesemicolon/web-component
 ```
 
-#### pnpm
+#### {{t.pages.documentation.installation.content.pnpm}}
 
 ```bash
 pnpm add @beforesemicolon/web-component
 ```
 
-Once installed, you can import `WebComponent`, styling utilities, and Markup templating functions directly into your JavaScript or TypeScript files:
+{{t.pages.documentation.installation.content.once_installed_you_can_import_webcomponent_styling_utilities_and_markup_templating_functions_dir}}
 
 ```javascript
 import { WebComponent, html, css } from '@beforesemicolon/web-component'
 ```
 
-### Via CDN
+### {{t.pages.documentation.installation.content.via_cdn}}
 
-For rapid prototyping or zero-build environments, you can include the script from a CDN (such as **unpkg** or **jsDelivr**) in your document's `<head>`.
+{{t.pages.documentation.installation.content.for_rapid_prototyping_or_zero_build_environments_you_can_include_the_script_from_a_cdn_such_as_u}}
 
-#### Latest Version
+#### {{t.pages.documentation.installation.content.latest_version}}
 
 ```html
 <script src="https://unpkg.com/@beforesemicolon/web-component/dist/client.js"></script>
 ```
 
-#### Specific Version
+#### {{t.pages.documentation.installation.content.specific_version}}
 
 ```html
 <script src="https://unpkg.com/@beforesemicolon/web-component@1.19.2/dist/client.js"></script>
 ```
 
-### CDN Global Namespaces
+### {{t.pages.documentation.installation.content.cdn_global_namespaces}}
 
-When using the client CDN build, `@beforesemicolon/web-component` exposes a global variable `BFS`. Under this namespace, you can access the core elements:
+{{t.pages.documentation.installation.content.when_using_the_client_cdn_build_beforesemicolon_web_component_exposes_a_global_variable_bfs_unde}}
 
-- **`BFS.WebComponent`**: The base class for building custom elements.
-- **`BFS.css`**: The tagged template styling helper.
-- **`BFS.MARKUP`**: The underlying Markup library namespace containing `html`, `state`, `effect`, and other template utilities.
+- {{t.pages.documentation.installation.content.bfs_webcomponent_the_base_class_for_building_custom_elements}}
+- {{t.pages.documentation.installation.content.bfs_css_the_tagged_template_styling_helper}}
+- {{t.pages.documentation.installation.content.bfs_markup_the_underlying_markup_library_namespace_containing_html_state_effect_and_other_templa}}
 
-Here is an example of accessing these APIs from browser-native scripts:
+{{t.pages.documentation.installation.content.here_is_an_example_of_accessing_these_apis_from_browser_native_scripts}}
 
 ```javascript
 const { WebComponent, css } = BFS

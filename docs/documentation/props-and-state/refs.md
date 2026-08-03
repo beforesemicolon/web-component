@@ -1,18 +1,18 @@
 ---
-name: Refs
+name: '{{t.pages.documentation.props_and_state.refs.meta.refs}}'
 order: 5.3
 layout: document
-title: Refs - WebComponent by Before Semicolon
-description: Safely reference and interact with rendered DOM elements inside your templates.
+title: '{{t.pages.documentation.props_and_state.refs.meta.refs_webcomponent_by_before_semicolon}}'
+description: '{{t.pages.documentation.props_and_state.refs.meta.safely_reference_and_interact_with_rendered_dom_elements_inside_your_templates}}'
 ---
 
-## Refs
+## {{t.pages.documentation.props_and_state.refs.content.refs}}
 
-While declarative programming is preferred, there are times when you need to access DOM elements directly to perform imperative operations (e.g., focusing an input, playing a video, initializing third-party libraries, or measuring element dimensions). WebComponent integrates Markup's `ref` system to let you reference elements easily.
+{{t.pages.documentation.props_and_state.refs.content.while_declarative_programming_is_preferred_there_are_times_when_you_need_to_access_dom_elements}}
 
-### Binding Refs in Templates
+### {{t.pages.documentation.props_and_state.refs.content.binding_refs_in_templates}}
 
-To bind a DOM element, add a `ref` attribute with a unique name to any element in your template.
+{{t.pages.documentation.props_and_state.refs.content.to_bind_a_dom_element_add_a_ref_attribute_with_a_unique_name_to_any_element_in_your_template}}
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -33,11 +33,11 @@ class FocusInput extends WebComponent {
 }
 ```
 
-### Accessing Refs via `this.refs`
+### {{t.pages.documentation.props_and_state.refs.content.accessing_refs_via_this_refs}}
 
-You can access all bound elements using the `this.refs` getter.
+{{t.pages.documentation.props_and_state.refs.content.you_can_access_all_bound_elements_using_the_this_refs_getter}}
 
-Since multiple elements can share the same ref name, each key in `this.refs` returns an **array** of elements matching that ref name. If there is only one element with that ref, it will still be returned inside an array (e.g., as the first element: `this.refs.textInput[0]`).
+{{t.pages.documentation.props_and_state.refs.content.since_multiple_elements_can_share_the_same_ref_name_each_key_in_this_refs_returns_an_array_of_el}}
 
 ```javascript
 focusInput = () => {
@@ -48,11 +48,11 @@ focusInput = () => {
 }
 ```
 
-### Refs and Lifecycle
+### {{t.pages.documentation.props_and_state.refs.content.refs_and_lifecycle}}
 
-References are only populated after the component is rendered and mounted. They are not available inside the `constructor`.
+{{t.pages.documentation.props_and_state.refs.content.references_are_only_populated_after_the_component_is_rendered_and_mounted_they_are_not_available}}
 
-If you need to perform imperative operations immediately when the element appears, use the `onMount` lifecycle hook.
+{{t.pages.documentation.props_and_state.refs.content.if_you_need_to_perform_imperative_operations_immediately_when_the_element_appears_use_the_onmoun}}
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -72,9 +72,9 @@ class AutoFocusInput extends WebComponent {
 }
 ```
 
-### Multiple Elements / Dynamic Refs
+### {{t.pages.documentation.props_and_state.refs.content.multiple_elements_dynamic_refs}}
 
-You can use the same ref name on multiple elements to group them. WebComponent will return all rendered elements sharing that ref name in the order they appear.
+{{t.pages.documentation.props_and_state.refs.content.you_can_use_the_same_ref_name_on_multiple_elements_to_group_them_webcomponent_will_return_all_re}}
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -100,4 +100,4 @@ class ListSelector extends WebComponent {
 }
 ```
 
-Refs are dynamic. If elements are conditionally rendered (e.g., using helper functions like `when`), they will be added to or removed from the `this.refs` arrays accordingly. Always check if the ref array and its elements exist before accessing them.
+{{t.pages.documentation.props_and_state.refs.content.refs_are_dynamic_if_elements_are_conditionally_rendered_e_g_using_helper_functions_like_when_the}}

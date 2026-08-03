@@ -1,26 +1,26 @@
 ---
-name: Rendering
+name: '{{t.pages.documentation.fundamentals.rendering.meta.rendering}}'
 order: 4.2
-title: Rendering - WebComponent by Before Semicolon
-description: Learn about the render() method and how content slots work.
+title: '{{t.pages.documentation.fundamentals.rendering.meta.rendering_webcomponent_by_before_semicolon}}'
+description: '{{t.pages.documentation.fundamentals.rendering.meta.learn_about_the_render_method_and_how_content_slots_work}}'
 layout: document
 ---
 
-## Rendering
+## {{t.pages.documentation.fundamentals.rendering.content.rendering}}
 
-The primary way to define a component's visual interface is by implementing the `render()` method. This method is called once during the component's initialization. The returned content is rendered into the component's `contentRoot` (which is either the shadow root or the element itself if shadow DOM is disabled).
+{{t.pages.documentation.fundamentals.rendering.content.the_primary_way_to_define_a_component_s_visual_interface_is_by_implementing_the_render_method_th}}
 
-### The render() Method
+### {{t.pages.documentation.fundamentals.rendering.content.the_render_method}}
 
-The `render()` method has the following signature:
+{{t.pages.documentation.fundamentals.rendering.content.the_render_method_has_the_following_signature}}
 
 ```typescript
 render(): HtmlTemplate | string | Node | void
 ```
 
-#### Supported Return Types
+#### {{t.pages.documentation.fundamentals.rendering.content.supported_return_types}}
 
-1. **`HtmlTemplate`**: The recommended return type. Built using the `html` tagged template from `@beforesemicolon/web-component`. It compiles into highly efficient DOM updates that only refresh the specific dynamic values in your template.
+1. {{t.pages.documentation.fundamentals.rendering.content.htmltemplate_the_recommended_return_type_built_using_the_html_tagged_template_from_beforesemicol}}
 
     ```javascript
     import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -37,7 +37,7 @@ render(): HtmlTemplate | string | Node | void
     }
     ```
 
-2. **`string`**: A raw HTML string can be returned. Note that returning raw strings does not benefit from the surgical reactive updates provided by `HtmlTemplate`.
+2. {{t.pages.documentation.fundamentals.rendering.content.string_a_raw_html_string_can_be_returned_note_that_returning_raw_strings_does_not_benefit_from_t}}
 
     ```javascript
     class StringElement extends WebComponent {
@@ -47,7 +47,7 @@ render(): HtmlTemplate | string | Node | void
     }
     ```
 
-3. **Native `Node`**: You can return standard DOM nodes created programmatically.
+3. {{t.pages.documentation.fundamentals.rendering.content.native_node_you_can_return_standard_dom_nodes_created_programmatically}}
 
     ```javascript
     class DOMNodeElement extends WebComponent {
@@ -59,7 +59,7 @@ render(): HtmlTemplate | string | Node | void
     }
     ```
 
-4. **`null` or `void`**: Headless or logic-only components that do not render any markup can return `null` or omit the return value.
+4. {{t.pages.documentation.fundamentals.rendering.content.null_or_void_headless_or_logic_only_components_that_do_not_render_any_markup_can_return_null_or}}
 
     ```javascript
     class HeadlessTracker extends WebComponent {
@@ -76,15 +76,15 @@ render(): HtmlTemplate | string | Node | void
 
 ---
 
-### Slot Projections
+### {{t.pages.documentation.fundamentals.rendering.content.slot_projections}}
 
-Web Components support content projection via the `<slot>` element, allowing users to pass markup down into your component. By default, `@beforesemicolon/web-component` supports both default slots and named slots.
+{{t.pages.documentation.fundamentals.rendering.content.web_components_support_content_projection_via_the_element_allowing_users_to_pass_markup_down_int}}
 
-#### Default Slots
+#### {{t.pages.documentation.fundamentals.rendering.content.default_slots}}
 
-An unnamed `<slot>` acts as the default catch-all container for any children passed inside your custom element.
+{{t.pages.documentation.fundamentals.rendering.content.an_unnamed_acts_as_the_default_catch_all_container_for_any_children_passed_inside_your_custom_el}}
 
-**Component Definition:**
+{{t.pages.documentation.fundamentals.rendering.content.component_definition}}
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -101,7 +101,7 @@ class SimpleBox extends WebComponent {
 customElements.define('simple-box', SimpleBox)
 ```
 
-**Usage in HTML:**
+{{t.pages.documentation.fundamentals.rendering.content.usage_in_html}}
 
 ```html
 <simple-box>
@@ -109,11 +109,11 @@ customElements.define('simple-box', SimpleBox)
 </simple-box>
 ```
 
-#### Named Slots
+#### {{t.pages.documentation.fundamentals.rendering.content.named_slots}}
 
-To project content into specific locations, use named slots. You specify the name using the `name` attribute on the `<slot>`, and match it using the `slot` attribute on the element to project.
+{{t.pages.documentation.fundamentals.rendering.content.to_project_content_into_specific_locations_use_named_slots_you_specify_the_name_using_the_name_a}}
 
-**Component Definition:**
+{{t.pages.documentation.fundamentals.rendering.content.component_definition}}
 
 ```javascript
 class LayoutPanel extends WebComponent {
@@ -137,7 +137,7 @@ class LayoutPanel extends WebComponent {
 customElements.define('layout-panel', LayoutPanel)
 ```
 
-**Usage in HTML:**
+{{t.pages.documentation.fundamentals.rendering.content.usage_in_html}}
 
 ```html
 <layout-panel>

@@ -1,18 +1,18 @@
 ---
-name: Error Handling
+name: '{{t.pages.documentation.events_and_lifecycle.error_handling.meta.error_handling}}'
 order: 7.3
-title: Error Handling - WebComponent by Before Semicolon
-description: Intercept and process runtime errors from render, state updates, styles, or lifecycles using the onError hook.
+title: '{{t.pages.documentation.events_and_lifecycle.error_handling.meta.error_handling_webcomponent_by_before_semicolon}}'
+description: '{{t.pages.documentation.events_and_lifecycle.error_handling.meta.intercept_and_process_runtime_errors_from_render_state_updates_styles_or_lifecycles_using_the_on}}'
 layout: document
 ---
 
-## Error Handling
+## {{t.pages.documentation.events_and_lifecycle.error_handling.content.error_handling}}
 
-Handling runtime errors gracefully is crucial for building robust web applications. `@beforesemicolon/web-component` features a centralized `onError()` hook that allows you to intercept and handle errors occurring within the component boundary.
+{{t.pages.documentation.events_and_lifecycle.error_handling.content.handling_runtime_errors_gracefully_is_crucial_for_building_robust_web_applications_beforesemicol}}
 
-### The `onError` Hook
+### {{t.pages.documentation.events_and_lifecycle.error_handling.content.the_onerror_hook}}
 
-By default, the `onError` hook logs the error to the console using `console.error`.
+{{t.pages.documentation.events_and_lifecycle.error_handling.content.by_default_the_onerror_hook_logs_the_error_to_the_console_using_console_error}}
 
 ```typescript
 onError(error: Error | unknown): void {
@@ -20,7 +20,7 @@ onError(error: Error | unknown): void {
 }
 ```
 
-You can override this method to customize how your component handles errors, such as showing a toast notification, logging to an external service, or dispatching an error event.
+{{t.pages.documentation.events_and_lifecycle.error_handling.content.you_can_override_this_method_to_customize_how_your_component_handles_errors_such_as_showing_a_to}}
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -45,23 +45,23 @@ class ErrorProneComponent extends WebComponent {
 
 ---
 
-### What Triggers `onError`?
+### {{t.pages.documentation.events_and_lifecycle.error_handling.content.what_triggers_onerror}}
 
-The component automatically wraps internal processes in `try/catch` blocks. If any of the following operations fail, the error is caught and passed to the `onError` hook:
+{{t.pages.documentation.events_and_lifecycle.error_handling.content.the_component_automatically_wraps_internal_processes_in_try_catch_blocks_if_any_of_the_following}}
 
-- **State Mutations**: Errors during `this.setState()`, such as trying to update state on an unmounted component.
-- **Dynamic Stylesheet Updates**: Errors inside `this.updateStylesheet()` or when compiling reactive styles using the `css` template tag.
-- **Custom Event Dispatching**: Errors occurring while creating or dispatching custom events through `this.dispatch()`.
-- **Lifecycle Connections**: Errors thrown during the component connection or adoption phases, including setups inside `onMount()` and `onAdoption()`.
-- **Lifecycle Disconnections**: Errors thrown when the component is being disconnected, including during the mount cleanup callbacks and `onDestroy()`.
+- {{t.pages.documentation.events_and_lifecycle.error_handling.content.state_mutations_errors_during_this_setstate_such_as_trying_to_update_state_on_an_unmounted_compo}}
+- {{t.pages.documentation.events_and_lifecycle.error_handling.content.dynamic_stylesheet_updates_errors_inside_this_updatestylesheet_or_when_compiling_reactive_styles}}
+- {{t.pages.documentation.events_and_lifecycle.error_handling.content.custom_event_dispatching_errors_occurring_while_creating_or_dispatching_custom_events_through_th}}
+- {{t.pages.documentation.events_and_lifecycle.error_handling.content.lifecycle_connections_errors_thrown_during_the_component_connection_or_adoption_phases_including}}
+- {{t.pages.documentation.events_and_lifecycle.error_handling.content.lifecycle_disconnections_errors_thrown_when_the_component_is_being_disconnected_including_during}}
 
 ---
 
-### Centralized Error Tracking Pattern
+### {{t.pages.documentation.events_and_lifecycle.error_handling.content.centralized_error_tracking_pattern}}
 
-In larger applications, repeating error handling logic in every component is inefficient. The recommended pattern is to build a base `Component` class that extends `WebComponent` to centralize logging and error telemetry across all components.
+{{t.pages.documentation.events_and_lifecycle.error_handling.content.in_larger_applications_repeating_error_handling_logic_in_every_component_is_inefficient_the_reco}}
 
-Here is an example of a base class setup:
+{{t.pages.documentation.events_and_lifecycle.error_handling.content.here_is_an_example_of_a_base_class_setup}}
 
 ```typescript
 // src/components/base-component.ts
@@ -90,7 +90,7 @@ export abstract class BaseComponent<
 }
 ```
 
-Now, instead of extending `WebComponent` directly, your feature components extend `BaseComponent`:
+{{t.pages.documentation.events_and_lifecycle.error_handling.content.now_instead_of_extending_webcomponent_directly_your_feature_components_extend_basecomponent}}
 
 ```typescript
 // src/components/user-profile.ts
@@ -106,11 +106,11 @@ class UserProfile extends BaseComponent {
 customElements.define('user-profile', UserProfile)
 ```
 
-### Reporting Your Own Component Errors
+### {{t.pages.documentation.events_and_lifecycle.error_handling.content.reporting_your_own_component_errors}}
 
-`onError()` is not only for errors WebComponent catches internally. If your component has its own async work, event handlers, or imperative code, catch those errors locally and call `this.onError(error)`.
+{{t.pages.documentation.events_and_lifecycle.error_handling.content.onerror_is_not_only_for_errors_webcomponent_catches_internally_if_your_component_has_its_own_asy}}
 
-This is especially useful when all components extend a shared base component. The base class becomes the single reporting boundary, while individual components decide which local failures should be reported.
+{{t.pages.documentation.events_and_lifecycle.error_handling.content.this_is_especially_useful_when_all_components_extend_a_shared_base_component_the_base_class_beco}}
 
 ```typescript
 import { html } from '@beforesemicolon/web-component'
@@ -146,7 +146,7 @@ class UserProfile extends BaseComponent {
 }
 ```
 
-You can use the same approach inside event handlers:
+{{t.pages.documentation.events_and_lifecycle.error_handling.content.you_can_use_the_same_approach_inside_event_handlers}}
 
 ```typescript
 handleSave = async () => {
@@ -159,4 +159,4 @@ handleSave = async () => {
 }
 ```
 
-This keeps the component's local control flow explicit while still routing every report through the same base `onError()` implementation.
+{{t.pages.documentation.events_and_lifecycle.error_handling.content.this_keeps_the_component_s_local_control_flow_explicit_while_still_routing_every_report_through}}

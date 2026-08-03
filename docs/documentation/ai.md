@@ -1,60 +1,60 @@
 ---
-name: AI Guide
+name: '{{t.pages.documentation.ai.meta.ai_guide}}'
 order: 3.2
-title: AI Guide - WebComponent by Before Semicolon
-description: AI-first guide to @beforesemicolon/web-component APIs, source boundaries, and common implementation mistakes.
+title: '{{t.pages.documentation.ai.meta.ai_guide_webcomponent_by_before_semicolon}}'
+description: '{{t.pages.documentation.ai.meta.ai_first_guide_to_beforesemicolon_web_component_apis_source_boundaries_and_common_implementation}}'
 layout: document
 ---
 
-## AI Guide
+## {{t.pages.documentation.ai.content.ai_guide}}
 
-Use this page first if you are an AI agent scanning the WebComponent docs.
+{{t.pages.documentation.ai.content.use_this_page_first_if_you_are_an_ai_agent_scanning_the_webcomponent_docs}}
 
-## Read First
+## {{t.pages.documentation.ai.content.read_first}}
 
-- [What is WebComponent?](./index.md)
-- [Get Started](./get-started.md)
-- [Guide & Best Practices](./guide.md)
-- [Creating Components](./fundamentals/creating-components.md)
-- [Props](./props-and-state/props.md)
-- [State](./props-and-state/state.md)
-- [Stylesheet](./styling/stylesheet.md)
-- [Events](./events-and-lifecycle/events.md)
+- {{t.pages.documentation.ai.content.what_is_webcomponent_index_md}}
+- {{t.common.content.get_started_get_started_md}}
+- {{t.common.content.guide_best_practices_guide_md}}
+- {{t.common.content.creating_components_fundamentals_creating_components_md}}
+- {{t.pages.documentation.ai.content.props_props_and_state_props_md}}
+- {{t.pages.documentation.ai.content.state_props_and_state_state_md}}
+- {{t.pages.documentation.ai.content.stylesheet_styling_stylesheet_md}}
+- {{t.pages.documentation.ai.content.events_events_and_lifecycle_events_md}}
 
-## Package Boundary
+## {{t.pages.documentation.ai.content.package_boundary}}
 
-- `@beforesemicolon/web-component` exports `WebComponent`, `HTMLComponentElement`, `css`, and the WebComponent-specific types.
-- It also re-exports `@beforesemicolon/markup`, so examples can import `html`, `repeat`, `when`, `state`, and other Markup APIs from `@beforesemicolon/web-component`.
-- The browser bundle exposes `window.BFS.WebComponent`, `window.BFS.css`, and `window.BFS.MARKUP`.
+- {{t.pages.documentation.ai.content.beforesemicolon_web_component_exports_webcomponent_htmlcomponentelement_css_and_the_webcomponent}}
+- {{t.pages.documentation.ai.content.it_also_re_exports_beforesemicolon_markup_so_examples_can_import_html_repeat_when_state_and_othe}}
+- {{t.pages.documentation.ai.content.the_browser_bundle_exposes_window_bfs_webcomponent_window_bfs_css_and_window_bfs_markup}}
 
-## Runtime Facts
+## {{t.pages.documentation.ai.content.runtime_facts}}
 
-- `static observedAttributes` defines public attributes and creates camelCase reactive props under `this.props`.
-- Default prop values are class fields with the camelCase prop name.
-- `initialState` defines local state getters under `this.state`.
-- `this.setState()` only works after the component is mounted.
-- `this.dispatch(name, detail)` creates a `CustomEvent` with `detail`. Add native custom event options manually only if the runtime API changes to support them.
-- `render()` may return a Markup `HtmlTemplate`, a string, a DOM `Node`, or nothing.
-- `stylesheet` accepts a CSS string, a `CSSStyleSheet`, or a reactive `css` result.
-- `config.shadow` defaults to `true`.
-- When `config.shadow = false`, `:host` selectors are rewritten to the custom element tag.
+- {{t.pages.documentation.ai.content.static_observedattributes_defines_public_attributes_and_creates_camelcase_reactive_props_under_t}}
+- {{t.pages.documentation.ai.content.default_prop_values_are_class_fields_with_the_camelcase_prop_name}}
+- {{t.pages.documentation.ai.content.initialstate_defines_local_state_getters_under_this_state}}
+- {{t.pages.documentation.ai.content.this_setstate_only_works_after_the_component_is_mounted}}
+- {{t.pages.documentation.ai.content.this_dispatch_name_detail_creates_a_customevent_with_detail_add_native_custom_event_options_manu}}
+- {{t.pages.documentation.ai.content.render_may_return_a_markup_htmltemplate_a_string_a_dom_node_or_nothing}}
+- {{t.pages.documentation.ai.content.stylesheet_accepts_a_css_string_a_cssstylesheet_or_a_reactive_css_result}}
+- {{t.pages.documentation.ai.content.config_shadow_defaults_to_true}}
+- {{t.pages.documentation.ai.content.when_config_shadow_false_host_selectors_are_rewritten_to_the_custom_element_tag}}
 
-## Common Tasks
+## {{t.pages.documentation.ai.content.common_tasks}}
 
-- Public input: add the kebab-case name to `static observedAttributes` and read `this.props.camelName`.
-- Internal UI state: add a key to `initialState` and update it with `this.setState()`.
-- DOM element access: add `ref="name"` and use `this.refs.name?.[0]` after render.
-- Component output: call `this.dispatch('event-name', { value })`.
-- Mount side effects: use `onMount()` and return cleanup.
-- Prop reactions: use `onUpdate(name, newValue, oldValue)`.
-- Scoped CSS: assign `stylesheet`.
-- Reactive CSS: assign `stylesheet = css\`...\``.
-- Native forms: set `static formAssociated = true` and use `this.internals`.
+- {{t.pages.documentation.ai.content.public_input_add_the_kebab_case_name_to_static_observedattributes_and_read_this_props_camelname}}
+- {{t.pages.documentation.ai.content.internal_ui_state_add_a_key_to_initialstate_and_update_it_with_this_setstate}}
+- {{t.pages.documentation.ai.content.dom_element_access_add_ref_name_and_use_this_refs_name_0_after_render}}
+- {{t.pages.documentation.ai.content.component_output_call_this_dispatch_event_name_value}}
+- {{t.pages.documentation.ai.content.mount_side_effects_use_onmount_and_return_cleanup}}
+- {{t.pages.documentation.ai.content.prop_reactions_use_onupdate_name_newvalue_oldvalue}}
+- {{t.pages.documentation.ai.content.scoped_css_assign_stylesheet}}
+- {{t.pages.documentation.ai.content.reactive_css_assign_stylesheet_css}}
+- {{t.pages.documentation.ai.content.native_forms_set_static_formassociated_true_and_use_this_internals}}
 
-## Avoid
+## {{t.pages.documentation.ai.content.avoid}}
 
-- Do not call `this.setState()` in the constructor or during class field initialization.
-- Do not mutate arrays or objects inside state in place; return a new value from `setState`.
-- Do not document native lifecycle callbacks as extension points; use `onMount`, `onUpdate`, `onDestroy`, and `onAdoption`.
-- Do not assume `dispatch()` bubbles or crosses shadow boundaries unless the source code supports options for that.
-- Do not use long one-line custom element examples when several attributes are present.
+- {{t.pages.documentation.ai.content.do_not_call_this_setstate_in_the_constructor_or_during_class_field_initialization}}
+- {{t.pages.documentation.ai.content.do_not_mutate_arrays_or_objects_inside_state_in_place_return_a_new_value_from_setstate}}
+- {{t.pages.documentation.ai.content.do_not_document_native_lifecycle_callbacks_as_extension_points_use_onmount_onupdate_ondestroy_an}}
+- {{t.pages.documentation.ai.content.do_not_assume_dispatch_bubbles_or_crosses_shadow_boundaries_unless_the_source_code_supports_opti}}
+- {{t.pages.documentation.ai.content.do_not_use_long_one_line_custom_element_examples_when_several_attributes_are_present}}

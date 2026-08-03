@@ -1,18 +1,18 @@
 ---
-name: TypeScript
+name: '{{t.pages.documentation.fundamentals.typescript.meta.typescript}}'
 order: 4.4
-title: TypeScript - WebComponent by Before Semicolon
-description: Complete type safety and generics integration in WebComponent.
+title: '{{t.pages.documentation.fundamentals.typescript.meta.typescript_webcomponent_by_before_semicolon}}'
+description: '{{t.pages.documentation.fundamentals.typescript.meta.complete_type_safety_and_generics_integration_in_webcomponent}}'
 layout: document
 ---
 
-## TypeScript
+## {{t.pages.documentation.fundamentals.typescript.content.typescript}}
 
-`@beforesemicolon/web-component` is designed with first-class TypeScript support, offering complete type safety for properties, internal state, reference bindings, and custom element interfaces.
+{{t.pages.documentation.fundamentals.typescript.content.beforesemicolon_web_component_is_designed_with_first_class_typescript_support_offering_complete}}
 
-### Subclassing with Generics
+### {{t.pages.documentation.fundamentals.typescript.content.subclassing_with_generics}}
 
-The `WebComponent` base class accepts two optional generic parameters: `Props` and `State`.
+{{t.pages.documentation.fundamentals.typescript.content.the_webcomponent_base_class_accepts_two_optional_generic_parameters_props_and_state}}
 
 ```typescript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -60,11 +60,11 @@ class CustomButton extends WebComponent<ButtonProps, ButtonState> {
 
 ---
 
-### Custom Element References
+### {{t.pages.documentation.fundamentals.typescript.content.custom_element_references}}
 
-When working with DOM APIs or template references, you often need a reference type that contains both the custom properties of your element and the standard `WebComponent` / `HTMLElement` APIs.
+{{t.pages.documentation.fundamentals.typescript.content.when_working_with_dom_apis_or_template_references_you_often_need_a_reference_type_that_contains}}
 
-The `HTMLComponentElement<Props>` utility type provides this capability. It combines the `WebComponent` class with your custom property signatures (without requiring getters) so you can directly read or write values.
+{{t.pages.documentation.fundamentals.typescript.content.the_htmlcomponentelement_utility_type_provides_this_capability_it_combines_the_webcomponent_clas}}
 
 ```typescript
 import { HTMLComponentElement } from '@beforesemicolon/web-component'
@@ -87,13 +87,13 @@ if (myButton) {
 
 ---
 
-### Exported Utility Types
+### {{t.pages.documentation.fundamentals.typescript.content.exported_utility_types}}
 
-The following TypeScript utility types are exported from the library to help build typed component-based architectures:
+{{t.pages.documentation.fundamentals.typescript.content.the_following_typescript_utility_types_are_exported_from_the_library_to_help_build_typed_compone}}
 
-#### `ObjectInterface<P>`
+#### {{t.pages.documentation.fundamentals.typescript.content.objectinterface}}
 
-Constraints checking helper representing an object containing key-value pairs where keys must be `string`, `number`, or `symbol`.
+{{t.pages.documentation.fundamentals.typescript.content.constraints_checking_helper_representing_an_object_containing_key_value_pairs_where_keys_must_be}}
 
 ```typescript
 type ObjectInterface<P> = {
@@ -101,9 +101,9 @@ type ObjectInterface<P> = {
 }
 ```
 
-#### `Props<P>`
+#### {{t.pages.documentation.fundamentals.typescript.content.props}}
 
-Maps each key in a properties interface `P` to a reactive `StateGetter` from `@beforesemicolon/markup`. This matches the type of `this.props`.
+{{t.pages.documentation.fundamentals.typescript.content.maps_each_key_in_a_properties_interface_p_to_a_reactive_stategetter_from_beforesemicolon_markup}}
 
 ```typescript
 type Props<P> = {
@@ -111,9 +111,9 @@ type Props<P> = {
 }
 ```
 
-#### `PropsSetters<P>`
+#### {{t.pages.documentation.fundamentals.typescript.content.propssetters}}
 
-Maps each key in a properties interface `P` to a reactive `StateSetter` from `@beforesemicolon/markup`.
+{{t.pages.documentation.fundamentals.typescript.content.maps_each_key_in_a_properties_interface_p_to_a_reactive_statesetter_from_beforesemicolon_markup}}
 
 ```typescript
 type PropsSetters<P> = {
@@ -121,9 +121,9 @@ type PropsSetters<P> = {
 }
 ```
 
-#### `State<S>`
+#### {{t.pages.documentation.fundamentals.typescript.content.state}}
 
-Maps each key in a state interface `S` to a reactive `StateGetter` from `@beforesemicolon/markup`. This matches the type of `this.state`.
+{{t.pages.documentation.fundamentals.typescript.content.maps_each_key_in_a_state_interface_s_to_a_reactive_stategetter_from_beforesemicolon_markup_this}}
 
 ```typescript
 type State<S> = {
@@ -131,9 +131,9 @@ type State<S> = {
 }
 ```
 
-#### `StateSetters<S>`
+#### {{t.pages.documentation.fundamentals.typescript.content.statesetters}}
 
-Maps each key in a state interface `S` to a reactive `StateSetter` from `@beforesemicolon/markup`.
+{{t.pages.documentation.fundamentals.typescript.content.maps_each_key_in_a_state_interface_s_to_a_reactive_statesetter_from_beforesemicolon_markup}}
 
 ```typescript
 type StateSetters<S> = {

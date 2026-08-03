@@ -1,16 +1,16 @@
 ---
-name: Creating Components
+name: '{{t.pages.documentation.fundamentals.creating_components.meta.creating_components}}'
 order: 4.1
-title: Creating Components - WebComponent by Before Semicolon
-description: Learn how to subclass WebComponent and register your custom elements.
+title: '{{t.pages.documentation.fundamentals.creating_components.meta.creating_components_webcomponent_by_before_semicolon}}'
+description: '{{t.pages.documentation.fundamentals.creating_components.meta.learn_how_to_subclass_webcomponent_and_register_your_custom_elements}}'
 layout: document
 ---
 
-## Creating Components
+## {{t.pages.documentation.fundamentals.creating_components.content.creating_components}}
 
-To create a new custom element with `@beforesemicolon/web-component`, you subclass the `WebComponent` base class and register it with the browser using `customElements.define()`.
+{{t.pages.documentation.fundamentals.creating_components.content.to_create_a_new_custom_element_with_beforesemicolon_web_component_you_subclass_the_webcomponent}}
 
-Here is a basic example of a component:
+{{t.pages.documentation.fundamentals.creating_components.content.here_is_a_basic_example_of_a_component}}
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -24,60 +24,60 @@ class MyElement extends WebComponent {
 customElements.define('my-element', MyElement)
 ```
 
-### Tag Naming Requirements
+### {{t.pages.documentation.fundamentals.creating_components.content.tag_naming_requirements}}
 
-Custom element tag names must adhere to the standard HTML specification:
+{{t.pages.documentation.fundamentals.creating_components.content.custom_element_tag_names_must_adhere_to_the_standard_html_specification}}
 
-1. **Must contain at least one hyphen (`-`)**: This distinguishes custom elements from standard HTML elements. For example, `my-element`, `todo-list`, and `fancy-btn` are valid, whereas `myelement` or `button` are invalid.
-2. **Must start with a lowercase ASCII letter** (e.g. `a-z`).
-3. **Cannot contain uppercase letters**: Standard HTML parsers treat tag names as case-insensitive, so custom element tags are defined in all lowercase.
+1. {{t.pages.documentation.fundamentals.creating_components.content.must_contain_at_least_one_hyphen_this_distinguishes_custom_elements_from_standard_html_elements}}
+2. {{t.pages.documentation.fundamentals.creating_components.content.must_start_with_a_lowercase_ascii_letter_e_g_a_z}}
+3. {{t.pages.documentation.fundamentals.creating_components.content.cannot_contain_uppercase_letters_standard_html_parsers_treat_tag_names_as_case_insensitive_so_cu}}
 
-### Subclassing WebComponent
+### {{t.pages.documentation.fundamentals.creating_components.content.subclassing_webcomponent}}
 
-The `WebComponent` class inherits from the native `HTMLElement`. This means your component is a native custom element and has access to all standard DOM properties, methods, and lifecycle callbacks, while adding reactivity and convenience features.
+{{t.pages.documentation.fundamentals.creating_components.content.the_webcomponent_class_inherits_from_the_native_htmlelement_this_means_your_component_is_a_nativ}}
 
-### Reserved Properties
+### {{t.pages.documentation.fundamentals.creating_components.content.reserved_properties}}
 
-Because `WebComponent` and the native `HTMLElement` define essential properties and methods for lifecycle management, rendering, state, and styling, you **cannot** use these names as reactive component properties (props).
+{{t.pages.documentation.fundamentals.creating_components.content.because_webcomponent_and_the_native_htmlelement_define_essential_properties_and_methods_for_life}}
 
-Below is the complete list of reserved property names that cannot be overridden or declared in `observedAttributes` for props mapping:
+{{t.pages.documentation.fundamentals.creating_components.content.below_is_the_complete_list_of_reserved_property_names_that_cannot_be_overridden_or_declared_in_o}}
 
-#### Base Configuration & Styling
+#### {{t.pages.documentation.fundamentals.creating_components.content.base_configuration_styling}}
 
-- `config`: Used to define Shadow DOM configuration.
-- `stylesheet`: Used to define scoped stylesheets (e.g., via `css` tagged templates).
-- `updateStylesheet(sheet)`: Method to dynamically update/replace the stylesheet.
+- {{t.pages.documentation.fundamentals.creating_components.content.config_used_to_define_shadow_dom_configuration}}
+- {{t.pages.documentation.fundamentals.creating_components.content.stylesheet_used_to_define_scoped_stylesheets_e_g_via_css_tagged_templates}}
+- {{t.pages.documentation.fundamentals.creating_components.content.updatestylesheet_sheet_method_to_dynamically_update_replace_the_stylesheet}}
 
-#### Reactivity & Internal Refs
+#### {{t.pages.documentation.fundamentals.creating_components.content.reactivity_internal_refs}}
 
-- `props`: Object containing reactive prop getters.
-- `initialState`: Object containing initial values for internal state.
-- `state`: Object containing reactive state getters.
-- `setState(newState | callback)`: Method used to reactively update the internal state.
-- `refs`: Object containing references to elements marked with the `ref` attribute in the template.
+- {{t.pages.documentation.fundamentals.creating_components.content.props_object_containing_reactive_prop_getters}}
+- {{t.pages.documentation.fundamentals.creating_components.content.initialstate_object_containing_initial_values_for_internal_state}}
+- {{t.pages.documentation.fundamentals.creating_components.content.state_object_containing_reactive_state_getters}}
+- {{t.pages.documentation.fundamentals.creating_components.content.setstate_newstate_callback_method_used_to_reactively_update_the_internal_state}}
+- {{t.pages.documentation.fundamentals.creating_components.content.refs_object_containing_references_to_elements_marked_with_the_ref_attribute_in_the_template}}
 
-#### DOM & Shadow Roots
+#### {{t.pages.documentation.fundamentals.creating_components.content.dom_shadow_roots}}
 
-- `mounted`: Boolean getter indicating if the component is currently connected to the DOM.
-- `contentRoot`: Getter returning the render target (`ShadowRoot` or the element itself if shadow DOM is disabled).
-- `root`: Getter returning the ancestor shadow root or document of the element.
-- `internals`: Getter returning the `ElementInternals` instance (via `attachInternals()`), useful for form association and accessibility.
-- `render()`: Method that returns the HTML template or Node to be rendered.
-- `dispatch(name, detail)`: Method to fire custom DOM events easily.
+- {{t.pages.documentation.fundamentals.creating_components.content.mounted_boolean_getter_indicating_if_the_component_is_currently_connected_to_the_dom}}
+- {{t.pages.documentation.fundamentals.creating_components.content.contentroot_getter_returning_the_render_target_shadowroot_or_the_element_itself_if_shadow_dom_is}}
+- {{t.pages.documentation.fundamentals.creating_components.content.root_getter_returning_the_ancestor_shadow_root_or_document_of_the_element}}
+- {{t.pages.documentation.fundamentals.creating_components.content.internals_getter_returning_the_elementinternals_instance_via_attachinternals_useful_for_form_ass}}
+- {{t.pages.documentation.fundamentals.creating_components.content.render_method_that_returns_the_html_template_or_node_to_be_rendered}}
+- {{t.pages.documentation.fundamentals.creating_components.content.dispatch_name_detail_method_to_fire_custom_dom_events_easily}}
 
-#### Lifecycle Methods
+#### {{t.pages.documentation.fundamentals.creating_components.content.lifecycle_methods}}
 
-- `connectedCallback()`: Native element connection handler. Use `onMount()` instead for custom behavior.
-- `attributeChangedCallback(name, oldValue, newValue)`: Native attribute change handler. Use `onUpdate()` instead for custom behavior.
-- `disconnectedCallback()`: Native element disconnection handler. Use `onDestroy()` instead for custom behavior.
-- `adoptedCallback()`: Native adoption handler. Use `onAdoption()` instead for custom behavior.
-- `onError(error)`: Callback executed when errors occur within lifecycles or rendering.
+- {{t.pages.documentation.fundamentals.creating_components.content.connectedcallback_native_element_connection_handler_use_onmount_instead_for_custom_behavior}}
+- {{t.pages.documentation.fundamentals.creating_components.content.attributechangedcallback_name_oldvalue_newvalue_native_attribute_change_handler_use_onupdate_ins}}
+- {{t.pages.documentation.fundamentals.creating_components.content.disconnectedcallback_native_element_disconnection_handler_use_ondestroy_instead_for_custom_behav}}
+- {{t.pages.documentation.fundamentals.creating_components.content.adoptedcallback_native_adoption_handler_use_onadoption_instead_for_custom_behavior}}
+- {{t.pages.documentation.fundamentals.creating_components.content.onerror_error_callback_executed_when_errors_occur_within_lifecycles_or_rendering}}
 
-#### Native HTMLElement Properties
+#### {{t.pages.documentation.fundamentals.creating_components.content.native_htmlelement_properties}}
 
-- `style`: Standard CSS declaration block.
-- `className`: Standard class name string.
-- `classList`: Standard class token list.
+- {{t.pages.documentation.fundamentals.creating_components.content.style_standard_css_declaration_block}}
+- {{t.pages.documentation.fundamentals.creating_components.content.classname_standard_class_name_string}}
+- {{t.pages.documentation.fundamentals.creating_components.content.classlist_standard_class_token_list}}
 
-> [!WARNING]
-> Attempting to define any of these reserved names as custom props or mapping them via `observedAttributes` will cause conflicts with the core runtime behavior and might break the component's reactivity or lifecycle.
+> {{t.pages.documentation.fundamentals.creating_components.content.warning}}
+> {{t.pages.documentation.fundamentals.creating_components.content.attempting_to_define_any_of_these_reserved_names_as_custom_props_or_mapping_them_via_observedatt}}

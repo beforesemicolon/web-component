@@ -1,33 +1,33 @@
 ---
-name: Content Root & Root
+name: '{{t.pages.documentation.advanced.content_root_and_root.meta.content_root_root}}'
 order: 8.2
-title: Content Root & Root - WebComponent by Before Semicolon
-description: Learn how to resolve component rendering targets using contentRoot and locate ancestor contexts using root.
+title: '{{t.pages.documentation.advanced.content_root_and_root.meta.content_root_root_webcomponent_by_before_semicolon}}'
+description: '{{t.pages.documentation.advanced.content_root_and_root.meta.learn_how_to_resolve_component_rendering_targets_using_contentroot_and_locate_ancestor_contexts}}'
 layout: document
 ---
 
-## Content Root & Root
+## {{t.pages.documentation.advanced.content_root_and_root.content.content_root_root}}
 
-When building web components, managing DOM boundaries (specifically Shadow DOM boundaries) is key to proper element styling, event routing, and DOM traversal. `@beforesemicolon/web-component` simplifies this by exposing two context getters: `contentRoot` and `root`.
+{{t.pages.documentation.advanced.content_root_and_root.content.when_building_web_components_managing_dom_boundaries_specifically_shadow_dom_boundaries_is_key_t}}
 
 ---
 
-### Content Root
+### {{t.pages.documentation.advanced.content_root_and_root.content.content_root}}
 
-The `contentRoot` property represents the element container where the component's template is rendered.
+{{t.pages.documentation.advanced.content_root_and_root.content.the_contentroot_property_represents_the_element_container_where_the_component_s_template_is_rend}}
 
 ```typescript
 get contentRoot(): ShadowRoot | HTMLElement
 ```
 
-The value of `contentRoot` depends on your component's Shadow DOM configuration:
+{{t.pages.documentation.advanced.content_root_and_root.content.the_value_of_contentroot_depends_on_your_component_s_shadow_dom_configuration}}
 
-- **Shadow DOM Enabled (`config.shadow = true` - Default)**: `contentRoot` returns the element's own `ShadowRoot`. All rendering, template mounting, and scoped styling happen inside this shadow boundary.
-- **Shadow DOM Disabled (`config.shadow = false`)**: `contentRoot` returns the custom element instance itself (`HTMLElement`). Templates are rendered directly into the light DOM as children of the custom element.
+- {{t.pages.documentation.advanced.content_root_and_root.content.shadow_dom_enabled_config_shadow_true_default_contentroot_returns_the_element_s_own_shadowroot_a}}
+- {{t.pages.documentation.advanced.content_root_and_root.content.shadow_dom_disabled_config_shadow_false_contentroot_returns_the_custom_element_instance_itself_h}}
 
-#### Practical Usage
+#### {{t.pages.documentation.advanced.content_root_and_root.content.practical_usage}}
 
-If you need to query elements rendered by your component template manually (instead of using the [Refs API](../props-and-state/refs.md)), you should search within the `contentRoot`:
+{{t.pages.documentation.advanced.content_root_and_root.content.if_you_need_to_query_elements_rendered_by_your_component_template_manually_instead_of_using_the}}
 
 ```javascript
 onMount() {
@@ -39,22 +39,22 @@ onMount() {
 
 ---
 
-### Root
+### {{t.pages.documentation.advanced.content_root_and_root.content.root}}
 
-The `root` property returns the closest ancestor root container containing this component.
+{{t.pages.documentation.advanced.content_root_and_root.content.the_root_property_returns_the_closest_ancestor_root_container_containing_this_component}}
 
 ```typescript
 get root(): ShadowRoot | Document
 ```
 
-When the component is connected to the DOM, it climbs the node hierarchy searching for an ancestor `ShadowRoot`:
+{{t.pages.documentation.advanced.content_root_and_root.content.when_the_component_is_connected_to_the_dom_it_climbs_the_node_hierarchy_searching_for_an_ancesto}}
 
-- If the component is nested inside the shadow DOM of **another** parent web component, `this.root` returns that parent's `ShadowRoot`.
-- If the component is placed directly in the main page layout, `this.root` returns the main page `document`.
+- {{t.pages.documentation.advanced.content_root_and_root.content.if_the_component_is_nested_inside_the_shadow_dom_of_another_parent_web_component_this_root_retur}}
+- {{t.pages.documentation.advanced.content_root_and_root.content.if_the_component_is_placed_directly_in_the_main_page_layout_this_root_returns_the_main_page_docu}}
 
-#### Practical Usage
+#### {{t.pages.documentation.advanced.content_root_and_root.content.practical_usage}}
 
-`this.root` is highly useful for locating shared stylesheet registries, resolving theme configurations, or listening to events at the boundary of the current sub-tree:
+{{t.pages.documentation.advanced.content_root_and_root.content.this_root_is_highly_useful_for_locating_shared_stylesheet_registries_resolving_theme_configurati}}
 
 ```javascript
 onMount() {
@@ -70,13 +70,13 @@ onMount() {
 
 ---
 
-### Comparison: `this.root` vs Native `getRootNode()`
+### {{t.pages.documentation.advanced.content_root_and_root.content.comparison_this_root_vs_native_getrootnode}}
 
-The native DOM API provides a `node.getRootNode(options)` method. It is important to contrast how `this.root` differs:
+{{t.pages.documentation.advanced.content_root_and_root.content.the_native_dom_api_provides_a_node_getrootnode_options_method_it_is_important_to_contrast_how_th}}
 
-1. **Focus of Search**:
-    - `this.root` searches for the **parent context** in which the custom element itself lives.
-    - Native `getRootNode()` called on the custom element itself returns the same outer document or outer shadow root. However, if called on nodes _inside_ the element's own shadow DOM, native `getRootNode()` returns the component's _own_ shadow root.
-2. **Context Resolution**:
-    - `this.root` resolves early during `connectedCallback` and provides a guaranteed reference to the surrounding environment context.
-    - This makes `this.root` the preferred property to use when a nested child element needs to communicate upward or register with a parent context provider without leaking to the global `document` scope.
+1. {{t.pages.documentation.advanced.content_root_and_root.content.focus_of_search}}
+    - {{t.pages.documentation.advanced.content_root_and_root.content.this_root_searches_for_the_parent_context_in_which_the_custom_element_itself_lives}}
+    - {{t.pages.documentation.advanced.content_root_and_root.content.native_getrootnode_called_on_the_custom_element_itself_returns_the_same_outer_document_or_outer}}
+2. {{t.pages.documentation.advanced.content_root_and_root.content.context_resolution}}
+    - {{t.pages.documentation.advanced.content_root_and_root.content.this_root_resolves_early_during_connectedcallback_and_provides_a_guaranteed_reference_to_the_sur}}
+    - {{t.pages.documentation.advanced.content_root_and_root.content.this_makes_this_root_the_preferred_property_to_use_when_a_nested_child_element_needs_to_communic}}

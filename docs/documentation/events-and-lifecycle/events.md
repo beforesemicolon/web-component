@@ -1,26 +1,26 @@
 ---
-name: Events
+name: '{{t.pages.documentation.events_and_lifecycle.events.meta.events}}'
 order: 7.1
-title: Events - WebComponent by Before Semicolon
-description: Learn how to dispatch and listen to custom events in WebComponent using the dispatch method.
+title: '{{t.pages.documentation.events_and_lifecycle.events.meta.events_webcomponent_by_before_semicolon}}'
+description: '{{t.pages.documentation.events_and_lifecycle.events.meta.learn_how_to_dispatch_and_listen_to_custom_events_in_webcomponent_using_the_dispatch_method}}'
 layout: document
 ---
 
-## Events
+## {{t.pages.documentation.events_and_lifecycle.events.content.events}}
 
-Custom elements often need to communicate changes or actions back to their parents or the rest of the application. `@beforesemicolon/web-component` provides a built-in helper method, `this.dispatch()`, to dispatch custom DOM events cleanly.
+{{t.pages.documentation.events_and_lifecycle.events.content.custom_elements_often_need_to_communicate_changes_or_actions_back_to_their_parents_or_the_rest_o}}
 
-### Dispatching Custom Events
+### {{t.pages.documentation.events_and_lifecycle.events.content.dispatching_custom_events}}
 
-To dispatch a custom event from inside a component, use the `this.dispatch(name, detail)` method.
+{{t.pages.documentation.events_and_lifecycle.events.content.to_dispatch_a_custom_event_from_inside_a_component_use_the_this_dispatch_name_detail_method}}
 
 ```typescript
 dispatch(name: string, detail?: Record<string, unknown>): void
 ```
 
-This method is a convenient wrapper around the native `dispatchEvent` API. It instantiates a standard `CustomEvent` and passes the second argument as `event.detail`.
+{{t.pages.documentation.events_and_lifecycle.events.content.this_method_is_a_convenient_wrapper_around_the_native_dispatchevent_api_it_instantiates_a_standa}}
 
-Here is a practical example of a counter component that dispatches an event whenever the count changes:
+{{t.pages.documentation.events_and_lifecycle.events.content.here_is_a_practical_example_of_a_counter_component_that_dispatches_an_event_whenever_the_count_c}}
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -48,9 +48,9 @@ class CounterButton extends WebComponent {
 customElements.define('counter-button', CounterButton)
 ```
 
-### Passing Payloads
+### {{t.pages.documentation.events_and_lifecycle.events.content.passing_payloads}}
 
-The second parameter to `this.dispatch` is an optional `detail` object containing any custom data. In the receiving event listener, this payload is available via `event.detail`.
+{{t.pages.documentation.events_and_lifecycle.events.content.the_second_parameter_to_this_dispatch_is_an_optional_detail_object_containing_any_custom_data_in}}
 
 ```javascript
 // Inside your component
@@ -60,15 +60,15 @@ this.dispatch('submit', {
 })
 ```
 
-### Listening to Custom Events
+### {{t.pages.documentation.events_and_lifecycle.events.content.listening_to_custom_events}}
 
-Since components are native custom elements, you can listen to these events using standard web APIs or directly inside Markup templates.
+{{t.pages.documentation.events_and_lifecycle.events.content.since_components_are_native_custom_elements_you_can_listen_to_these_events_using_standard_web_ap}}
 
-#### In Markup Templates
+#### {{t.pages.documentation.events_and_lifecycle.events.content.in_markup_templates}}
 
-Markup templates support binding event listeners for any standard or custom event by prefixing the event name with `on`.
+{{t.pages.documentation.events_and_lifecycle.events.content.markup_templates_support_binding_event_listeners_for_any_standard_or_custom_event_by_prefixing_t}}
 
-For example, if your custom element is named `<counter-button>` and dispatches a `countchange` event, you can listen to it in a template like this:
+{{t.pages.documentation.events_and_lifecycle.events.content.for_example_if_your_custom_element_is_named_and_dispatches_a_countchange_event_you_can_listen_to}}
 
 ```javascript
 import { html } from '@beforesemicolon/web-component'
@@ -85,9 +85,9 @@ const template = html`
 `
 ```
 
-#### Using Native Event Listeners
+#### {{t.pages.documentation.events_and_lifecycle.events.content.using_native_event_listeners}}
 
-You can also interact with the component imperatively in standard JavaScript using the native `addEventListener` method:
+{{t.pages.documentation.events_and_lifecycle.events.content.you_can_also_interact_with_the_component_imperatively_in_standard_javascript_using_the_native_ad}}
 
 ```javascript
 const element = document.querySelector('counter-button')
@@ -97,15 +97,15 @@ element.addEventListener('countchange', (event) => {
 })
 ```
 
-### Event Boundary Notes
+### {{t.pages.documentation.events_and_lifecycle.events.content.event_boundary_notes}}
 
-`this.dispatch()` intentionally keeps a small API:
+{{t.pages.documentation.events_and_lifecycle.events.content.this_dispatch_intentionally_keeps_a_small_api}}
 
 ```javascript
 this.dispatch('countchange', { count: nextCount })
 ```
 
-If you need custom event options such as `bubbles`, `composed`, or `cancelable`, use the native API directly:
+{{t.pages.documentation.events_and_lifecycle.events.content.if_you_need_custom_event_options_such_as_bubbles_composed_or_cancelable_use_the_native_api_direc}}
 
 ```javascript
 this.dispatchEvent(

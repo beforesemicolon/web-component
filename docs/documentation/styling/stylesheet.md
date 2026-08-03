@@ -1,22 +1,22 @@
 ---
-name: Stylesheet
+name: '{{t.pages.documentation.styling.stylesheet.meta.stylesheet}}'
 order: 6.1
 layout: document
-title: Stylesheet - WebComponent by Before Semicolon
-description: Learn how to load, assign, and manage component styles using the stylesheet property.
+title: '{{t.pages.documentation.styling.stylesheet.meta.stylesheet_webcomponent_by_before_semicolon}}'
+description: '{{t.pages.documentation.styling.stylesheet.meta.learn_how_to_load_assign_and_manage_component_styles_using_the_stylesheet_property}}'
 ---
 
-## Stylesheet
+## {{t.pages.documentation.styling.stylesheet.content.stylesheet}}
 
-The `stylesheet` class property is the primary way to define styling for your component. WebComponent accepts a variety of stylesheet formats and processes them automatically based on your Shadow DOM configurations.
+{{t.pages.documentation.styling.stylesheet.content.the_stylesheet_class_property_is_the_primary_way_to_define_styling_for_your_component_webcompone}}
 
-### Supported Stylesheet Formats
+### {{t.pages.documentation.styling.stylesheet.content.supported_stylesheet_formats}}
 
-You can assign a CSS string, a native `CSSStyleSheet` instance, or a CSS import assertion to the `stylesheet` property.
+{{t.pages.documentation.styling.stylesheet.content.you_can_assign_a_css_string_a_native_cssstylesheet_instance_or_a_css_import_assertion_to_the_sty}}
 
-#### 1. CSS Strings
+#### {{t.pages.documentation.styling.stylesheet.content.text_1_css_strings}}
 
-The simplest way is to define your stylesheet as a plain CSS string:
+{{t.pages.documentation.styling.stylesheet.content.the_simplest_way_is_to_define_your_stylesheet_as_a_plain_css_string}}
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -42,9 +42,9 @@ class SimpleBtn extends WebComponent {
 }
 ```
 
-#### 2. CSS Import Assertions
+#### {{t.pages.documentation.styling.stylesheet.content.text_2_css_import_assertions}}
 
-If your build environment or browser supports CSS module imports, you can import a `.css` file directly and assign the stylesheet export:
+{{t.pages.documentation.styling.stylesheet.content.if_your_build_environment_or_browser_supports_css_module_imports_you_can_import_a_css_file_direc}}
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -59,9 +59,9 @@ class AssetBtn extends WebComponent {
 }
 ```
 
-#### 3. Native `CSSStyleSheet`
+#### {{t.pages.documentation.styling.stylesheet.content.text_3_native_cssstylesheet}}
 
-You can also construct stylesheets imperatively:
+{{t.pages.documentation.styling.stylesheet.content.you_can_also_construct_stylesheets_imperatively}}
 
 ```javascript
 const sheet = new CSSStyleSheet()
@@ -72,13 +72,13 @@ class BoldBtn extends WebComponent {
 }
 ```
 
-### Shadow DOM vs. Light DOM Behavior
+### {{t.pages.documentation.styling.stylesheet.content.shadow_dom_vs_light_dom_behavior}}
 
-Behind the scenes, WebComponent uses **Adopted StyleSheets** to inject your styles. Where those stylesheets are adopted depends on your component configuration.
+{{t.pages.documentation.styling.stylesheet.content.behind_the_scenes_webcomponent_uses_adopted_stylesheets_to_inject_your_styles_where_those_styles}}
 
-#### Under Shadow DOM (Default)
+#### {{t.pages.documentation.styling.stylesheet.content.under_shadow_dom_default}}
 
-If Shadow DOM is active, the style is adopted by the Shadow Root of the component. It keeps styles isolated and allows the use of the `:host` selector.
+{{t.pages.documentation.styling.stylesheet.content.if_shadow_dom_is_active_the_style_is_adopted_by_the_shadow_root_of_the_component_it_keeps_styles}}
 
 ```css
 :host {
@@ -86,14 +86,14 @@ If Shadow DOM is active, the style is adopted by the Shadow Root of the componen
 }
 ```
 
-#### Under Light DOM
+#### {{t.pages.documentation.styling.stylesheet.content.under_light_dom}}
 
-If you disable Shadow DOM by setting `config.shadow = false`, the component cannot adopt styles locally since there is no Shadow Root. WebComponent handles this by adopting the styles on the document (or the closest containing ancestor shadow root).
+{{t.pages.documentation.styling.stylesheet.content.if_you_disable_shadow_dom_by_setting_config_shadow_false_the_component_cannot_adopt_styles_local}}
 
-Because global styles can leak, WebComponent automatically parses and rewrites specific selectors:
+{{t.pages.documentation.styling.stylesheet.content.because_global_styles_can_leak_webcomponent_automatically_parses_and_rewrites_specific_selectors}}
 
-- `:host` is rewritten to the custom element's tag name (e.g. `my-element`).
-- `:host-context(selector)` is rewritten to match the target context (e.g. `selector my-element`).
+- {{t.pages.documentation.styling.stylesheet.content.host_is_rewritten_to_the_custom_element_s_tag_name_e_g_my_element}}
+- {{t.pages.documentation.styling.stylesheet.content.host_context_selector_is_rewritten_to_match_the_target_context_e_g_selector_my_element}}
 
 ```css
 /* Original CSS */
@@ -119,4 +119,4 @@ my-element.active {
 }
 ```
 
-This ensures your styling rules continue to work as expected, even if you decide to toggle the Shadow DOM configuration.
+{{t.pages.documentation.styling.stylesheet.content.this_ensures_your_styling_rules_continue_to_work_as_expected_even_if_you_decide_to_toggle_the_sh}}

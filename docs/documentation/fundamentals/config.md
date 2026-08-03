@@ -1,18 +1,18 @@
 ---
-name: Config
+name: '{{t.pages.documentation.fundamentals.config.meta.config}}'
 order: 4.3
-title: Config - WebComponent by Before Semicolon
-description: Configure Shadow DOM shadow root options on your components.
+title: '{{t.pages.documentation.fundamentals.config.meta.config_webcomponent_by_before_semicolon}}'
+description: '{{t.pages.documentation.fundamentals.config.meta.configure_shadow_dom_shadow_root_options_on_your_components}}'
 layout: document
 ---
 
-## Config
+## {{t.pages.documentation.fundamentals.config.content.config}}
 
-By default, `@beforesemicolon/web-component` creates an encapsulated Shadow DOM for each component. You can customize the Shadow DOM configuration or completely opt out of it using the `config` class property.
+{{t.pages.documentation.fundamentals.config.content.by_default_beforesemicolon_web_component_creates_an_encapsulated_shadow_dom_for_each_component_y}}
 
-### Default Configuration
+### {{t.pages.documentation.fundamentals.config.content.default_configuration}}
 
-If you do not define a custom `config` property, the component defaults to the following settings:
+{{t.pages.documentation.fundamentals.config.content.if_you_do_not_define_a_custom_config_property_the_component_defaults_to_the_following_settings}}
 
 ```javascript
 class MyComponent extends WebComponent {
@@ -27,9 +27,9 @@ class MyComponent extends WebComponent {
 }
 ```
 
-### Disabling Shadow DOM
+### {{t.pages.documentation.fundamentals.config.content.disabling_shadow_dom}}
 
-In some scenarios, you might want a component to render directly into the Light DOM (e.g. to inherit all global CSS stylesheets easily or to construct headless components). You can do this by setting `shadow: false` on the `config` object.
+{{t.pages.documentation.fundamentals.config.content.in_some_scenarios_you_might_want_a_component_to_render_directly_into_the_light_dom_e_g_to_inheri}}
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -47,27 +47,27 @@ class LightDomElement extends WebComponent {
 customElements.define('light-dom-element', LightDomElement)
 ```
 
-> [!NOTE]
-> When `shadow: false` is configured, `this.contentRoot` will reference the component element itself rather than a `ShadowRoot`. Dynamic stylesheets defined via the `stylesheet` property will not be scoped and may apply globally.
+> {{t.common.content.note}}
+> {{t.pages.documentation.fundamentals.config.content.when_shadow_false_is_configured_this_contentroot_will_reference_the_component_element_itself_rat}}
 
 ---
 
-### Shadow DOM Configuration Options
+### {{t.pages.documentation.fundamentals.config.content.shadow_dom_configuration_options}}
 
-When `shadow` is set to `true`, the rest of the configuration properties are passed directly to the native `Element.attachShadow()` method.
+{{t.pages.documentation.fundamentals.config.content.when_shadow_is_set_to_true_the_rest_of_the_configuration_properties_are_passed_directly_to_the_n}}
 
-| Option           | Type                  | Default   | Description                                                                                                                                                         |
+{{t.pages.documentation.fundamentals.config.content.option_type_default_description}}
 | :--------------- | :-------------------- | :-------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `shadow`         | `boolean`             | `true`    | Enables or disables Shadow DOM rendering.                                                                                                                           |
-| `mode`           | `'open' \| 'closed'`  | `'open'`  | Defines accessibility to the shadow root from outside JavaScript. If `'open'`, the shadow root is accessible via `element.shadowRoot`.                              |
-| `delegatesFocus` | `boolean`             | `false`   | When set to `true`, clicking a non-focusable part of the shadow DOM delegates focus to the first focusable element inside the shadow root.                          |
-| `clonable`       | `boolean`             | `false`   | If set to `true`, the shadow root can be cloned using `cloneNode()` (supported in newer specifications).                                                            |
-| `serializable`   | `boolean`             | `false`   | If set to `true`, the shadow root will be serialized when using APIs like `getHTML()` for Declarative Shadow DOM.                                                   |
-| `slotAssignment` | `'named' \| 'manual'` | `'named'` | Controls how nodes are assigned to slots. `'named'` assigns elements automatically based on their slot attribute. `'manual'` requires programmatic node assignment. |
+{{t.pages.documentation.fundamentals.config.content.shadow_boolean_true_enables_or_disables_shadow_dom_rendering}}
+{{t.pages.documentation.fundamentals.config.content.mode_open_closed_open_defines_accessibility_to_the_shadow_root_from_outside_javascript_if_open_t}}
+{{t.pages.documentation.fundamentals.config.content.delegatesfocus_boolean_false_when_set_to_true_clicking_a_non_focusable_part_of_the_shadow_dom_de}}
+{{t.pages.documentation.fundamentals.config.content.clonable_boolean_false_if_set_to_true_the_shadow_root_can_be_cloned_using_clonenode_supported_in}}
+{{t.pages.documentation.fundamentals.config.content.serializable_boolean_false_if_set_to_true_the_shadow_root_will_be_serialized_when_using_apis_lik}}
+{{t.pages.documentation.fundamentals.config.content.slotassignment_named_manual_named_controls_how_nodes_are_assigned_to_slots_named_assigns_element}}
 
-#### Example: Focus Delegation & Closed Shadow Root
+#### {{t.pages.documentation.fundamentals.config.content.example_focus_delegation_closed_shadow_root}}
 
-Here is an example of configuring a closed shadow root with focus delegation enabled:
+{{t.pages.documentation.fundamentals.config.content.here_is_an_example_of_configuring_a_closed_shadow_root_with_focus_delegation_enabled}}
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'

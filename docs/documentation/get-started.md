@@ -1,18 +1,18 @@
 ---
-name: Get Started
+name: '{{t.common.content.get_started}}'
 order: 2
-title: Get Started - WebComponent by Before Semicolon
-description: Learn how to build your first reactive Web Component using the WebComponent class.
+title: '{{t.pages.documentation.get_started.meta.get_started_webcomponent_by_before_semicolon}}'
+description: '{{t.pages.documentation.get_started.meta.learn_how_to_build_your_first_reactive_web_component_using_the_webcomponent_class}}'
 layout: document
 ---
 
-## Get Started
+## {{t.common.content.get_started}}
 
-This tutorial will guide you step-by-step through creating, registering, templating, and using your first reactive custom element using `@beforesemicolon/web-component`.
+{{t.pages.documentation.get_started.content.this_tutorial_will_guide_you_step_by_step_through_creating_registering_templating_and_using_your}}
 
-### Step 1: Declaring the Component Class
+### {{t.pages.documentation.get_started.content.step_1_declaring_the_component_class}}
 
-To create a new component, declare a class that extends `WebComponent`.
+{{t.pages.documentation.get_started.content.to_create_a_new_component_declare_a_class_that_extends_webcomponent}}
 
 ```javascript
 import { WebComponent } from '@beforesemicolon/web-component'
@@ -22,19 +22,19 @@ class MyButton extends WebComponent {
 }
 ```
 
-### Step 2: Defining the Custom Element Tag
+### {{t.pages.documentation.get_started.content.step_2_defining_the_custom_element_tag}}
 
-Register the component class in the global `CustomElementRegistry` using the standard `customElements.define` method.
+{{t.pages.documentation.get_started.content.register_the_component_class_in_the_global_customelementregistry_using_the_standard_customelemen}}
 
-Custom element names MUST contain at least one hyphen (`-`) and should be written in lowercase (kebab-case) to prevent conflicts with standard HTML elements.
+{{t.pages.documentation.get_started.content.custom_element_names_must_contain_at_least_one_hyphen_and_should_be_written_in_lowercase_kebab_c}}
 
 ```javascript
 customElements.define('my-button', MyButton)
 ```
 
-### Step 3: Adding a Template
+### {{t.pages.documentation.get_started.content.step_3_adding_a_template}}
 
-To render content, define a `render()` method in your class. The method should return an `HtmlTemplate` (created using the `html` tagged template literal), a plain HTML string, a native DOM `Node`, or `void`.
+{{t.pages.documentation.get_started.content.to_render_content_define_a_render_method_in_your_class_the_method_should_return_an_htmltemplate}}
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -48,9 +48,9 @@ class MyButton extends WebComponent {
 customElements.define('my-button', MyButton)
 ```
 
-### Step 4: Using the Custom Element in HTML
+### {{t.pages.documentation.get_started.content.step_4_using_the_custom_element_in_html}}
 
-Once the custom element is registered, you can place the `<my-button>` tag anywhere in your HTML document.
+{{t.pages.documentation.get_started.content.once_the_custom_element_is_registered_you_can_place_the_tag_anywhere_in_your_html_document}}
 
 ```html
 <!doctype html>
@@ -67,10 +67,10 @@ Once the custom element is registered, you can place the `<my-button>` tag anywh
 </html>
 ```
 
-### Next Steps
+### {{t.pages.documentation.get_started.content.next_steps}}
 
-Now that you have built your first web component, explore the core features that make `@beforesemicolon/web-component` powerful:
+{{t.pages.documentation.get_started.content.now_that_you_have_built_your_first_web_component_explore_the_core_features_that_make_beforesemic}}
 
-- **[Reactive Props](./props-and-state/props.md)**: Pass data into your components and handle attribute updates.
-- **[Reactive State](./props-and-state/state.md)**: Manage internal state and automatically trigger surgical DOM updates.
-- **[Lifecycle Hooks](./events-and-lifecycle/lifecycle.md)**: Run setup and cleanup code with `onMount` and `onDestroy`.
+- {{t.pages.documentation.get_started.content.reactive_props_props_and_state_props_md_pass_data_into_your_components_and_handle_attribute_upda}}
+- {{t.pages.documentation.get_started.content.reactive_state_props_and_state_state_md_manage_internal_state_and_automatically_trigger_surgical}}
+- {{t.pages.documentation.get_started.content.lifecycle_hooks_events_and_lifecycle_lifecycle_md_run_setup_and_cleanup_code_with_onmount_and_on}}

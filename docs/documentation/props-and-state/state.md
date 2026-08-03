@@ -1,18 +1,18 @@
 ---
-name: State
+name: '{{t.pages.documentation.props_and_state.state.meta.state}}'
 order: 5.2
 layout: document
-title: State - WebComponent by Before Semicolon
-description: Manage reactive local component state using initialState and setState.
+title: '{{t.pages.documentation.props_and_state.state.meta.state_webcomponent_by_before_semicolon}}'
+description: '{{t.pages.documentation.props_and_state.state.meta.manage_reactive_local_component_state_using_initialstate_and_setstate}}'
 ---
 
-## State
+## {{t.pages.documentation.props_and_state.state.content.state}}
 
-State is the internal reactive data owned and managed exclusively by the component. Unlike props, state is not exposed or mapped to HTML attributes, and it is intended to store data that changes over the lifecycle of the component (e.g., UI toggle status, input values, API fetch results).
+{{t.pages.documentation.props_and_state.state.content.state_is_the_internal_reactive_data_owned_and_managed_exclusively_by_the_component_unlike_props}}
 
-### Declaring Initial State
+### {{t.pages.documentation.props_and_state.state.content.declaring_initial_state}}
 
-To define a component's internal state, assign an object to the `initialState` class property. Each key in this object will be initialized as a reactive state getter.
+{{t.pages.documentation.props_and_state.state.content.to_define_a_component_s_internal_state_assign_an_object_to_the_initialstate_class_property_each}}
 
 ```javascript
 import { WebComponent } from '@beforesemicolon/web-component'
@@ -25,12 +25,12 @@ class CounterElement extends WebComponent {
 }
 ```
 
-### Reading State in Templates
+### {{t.pages.documentation.props_and_state.state.content.reading_state_in_templates}}
 
-Like props, the properties of `this.state` are reactive getter functions. You can access the values inside your templates by passing the getter directly or by invoking it.
+{{t.pages.documentation.props_and_state.state.content.like_props_the_properties_of_this_state_are_reactive_getter_functions_you_can_access_the_values}}
 
-- Pass the getter directly to let the template handle reactive bindings: `this.state.count`
-- Invoke it as a function when executing calculations or inside conditional blocks: `this.state.count()`
+- {{t.pages.documentation.props_and_state.state.content.pass_the_getter_directly_to_let_the_template_handle_reactive_bindings_this_state_count}}
+- {{t.pages.documentation.props_and_state.state.content.invoke_it_as_a_function_when_executing_calculations_or_inside_conditional_blocks_this_state_coun}}
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -51,22 +51,22 @@ class CounterElement extends WebComponent {
 }
 ```
 
-### Modifying State via `setState`
+### {{t.pages.documentation.props_and_state.state.content.modifying_state_via_setstate}}
 
-To update state reactively, call `this.setState()`. This method accepts either a partial state object or a callback function.
+{{t.pages.documentation.props_and_state.state.content.to_update_state_reactively_call_this_setstate_this_method_accepts_either_a_partial_state_object}}
 
-#### Object Merge Format
+#### {{t.pages.documentation.props_and_state.state.content.object_merge_format}}
 
-You can pass a partial object containing the fields you want to update. WebComponent will merge the updates into the state automatically, so you do not need to manually spread the rest of the state.
+{{t.pages.documentation.props_and_state.state.content.you_can_pass_a_partial_object_containing_the_fields_you_want_to_update_webcomponent_will_merge_t}}
 
 ```javascript
 // Updates only the count; label remains untouched
 this.setState({ count: 10 })
 ```
 
-#### Callback Format
+#### {{t.pages.documentation.props_and_state.state.content.callback_format}}
 
-If your new state depends on the previous state, pass a callback function. The callback receives the current state object with its evaluated values (not getters) and must return a partial state object.
+{{t.pages.documentation.props_and_state.state.content.if_your_new_state_depends_on_the_previous_state_pass_a_callback_function_the_callback_receives_t}}
 
 ```javascript
 this.setState((prev) => ({
@@ -74,9 +74,9 @@ this.setState((prev) => ({
 }))
 ```
 
-### Lifecycle Restrictions
+### {{t.pages.documentation.props_and_state.state.content.lifecycle_restrictions}}
 
-State updates trigger DOM updates. Because of this, calling `this.setState()` before the component is mounted (i.e. when `this.mounted` is `false`) or after it has been unmounted will result in an error.
+{{t.pages.documentation.props_and_state.state.content.state_updates_trigger_dom_updates_because_of_this_calling_this_setstate_before_the_component_is}}
 
 ```javascript
 class MyComponent extends WebComponent {
@@ -90,7 +90,7 @@ class MyComponent extends WebComponent {
 }
 ```
 
-If you need to fetch data or trigger state updates as soon as the component loads, do so in the `onMount` lifecycle hook:
+{{t.pages.documentation.props_and_state.state.content.if_you_need_to_fetch_data_or_trigger_state_updates_as_soon_as_the_component_loads_do_so_in_the_o}}
 
 ```javascript
 class MyComponent extends WebComponent {
@@ -107,9 +107,9 @@ class MyComponent extends WebComponent {
 }
 ```
 
-### Derived UI Example
+### {{t.pages.documentation.props_and_state.state.content.derived_ui_example}}
 
-Keep the source state intact and derive display values inside functions.
+{{t.pages.documentation.props_and_state.state.content.keep_the_source_state_intact_and_derive_display_values_inside_functions}}
 
 ```javascript
 import { WebComponent, html, repeat } from '@beforesemicolon/web-component'

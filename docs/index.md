@@ -1,34 +1,34 @@
 ---
-name: WebComponent
+name: '{{t.pages.home.meta.webcomponent}}'
 order: 0
-title: WebComponent by Before Semicolon
-description: Build reactive Web Components enhanced with state, props, scoped styles, lifecycles, and form integration — powered by Markup.
+title: '{{t.pages.home.meta.webcomponent_by_before_semicolon}}'
+description: '{{t.pages.home.meta.build_reactive_web_components_enhanced_with_state_props_scoped_styles_lifecycles_and_form_integr}}'
 layout: landing
 ---
 
-::: layout landing-hero version="v1.19.2" title="Web Components." title2="Now Reactive." primaryLabel="Get Started" secondaryLabel="npm i @beforesemicolon/web-component"
+::: layout landing-hero version="v1.19.2" title="{{t.pages.home.content.web_components}}" title2="{{t.pages.home.content.now_reactive}}" primaryLabel="{{t.common.content.get_started}}" secondaryLabel="npm i @beforesemicolon/web-component"
 
 === copy
 
-A tiny reactive layer over the native Web Components API. Props, state, scoped styles, and lifecycles &mdash; all built on [Markup](https://markup.beforesemicolon.com/).
+{{t.pages.home.content.a_tiny_reactive_layer_over_the_native_web_components_api_props_state_scoped_styles_and_lifecycle}}
 
 === stat
 
-## Native
+## {{t.pages.home.content.native}}
 
-CUSTOM ELEMENTS
+{{t.pages.home.content.custom_elements}}
 
 === stat
 
 ## 0
 
-DEPENDENCIES
+{{t.pages.home.content.dependencies}}
 
 === stat
 
 ## ∞
 
-FRAMEWORK-FRIENDLY
+{{t.pages.home.content.framework_friendly}}
 
 === code filename=hello-world.js lang=javascript
 
@@ -55,19 +55,19 @@ customElements.define('hello-world', HelloWorld)
 
 === header
 
-`// the ecosystem`
+{{t.pages.home.content.the_ecosystem}}
 
-## Built on Web Component.
+## {{t.pages.home.content.built_on_web_component}}
 
-Production-ready libraries built on top of Web Component &mdash; same custom-element foundation, modular packages.
+{{t.pages.home.content.production_ready_libraries_built_on_top_of_web_component_same_custom_element_foundation_modular}}
 
 === product title=Router package=@beforesemicolon/router color=accent icon=router href=https://router.beforesemicolon.com
 
-Declarative routing as web component tags &mdash; built on top of Web Component. Nested routes, params, 404s.
+{{t.pages.home.content.declarative_routing_as_web_component_tags_built_on_top_of_web_component_nested_routes_params_404}}
 
 === product title=Intl package=@beforesemicolon/intl color=primary icon=reactive href=https://intl.beforesemicolon.com
 
-Localization for component-first interfaces &mdash; built on top of Web Component. Locale scopes, messages, formatters.
+{{t.pages.home.content.localization_for_component_first_interfaces_built_on_top_of_web_component_locale_scopes_messages}}
 
 :::
 
@@ -75,47 +75,47 @@ Localization for component-first interfaces &mdash; built on top of Web Componen
 
 === header
 
-`// why web-component`
+{{t.pages.home.content.why_web_component}}
 
-## Custom Elements, supercharged.
+## {{t.pages.home.content.custom_elements_supercharged}}
 
-Everything you love about native Web Components &mdash; plus the reactivity, ergonomics, and tiny footprint of Markup.
+{{t.pages.home.content.everything_you_love_about_native_web_components_plus_the_reactivity_ergonomics_and_tiny_footprin}}
 
 === feature icon=reactive
 
-### Reactive props & state
+### {{t.pages.home.content.reactive_props_state}}
 
-Observed attributes become reactive props. Updating state updates only the DOM that depends on it.
+{{t.pages.home.content.observed_attributes_become_reactive_props_updating_state_updates_only_the_dom_that_depends_on_it}}
 
 === feature icon=tiny
 
-### Tiny
+### {{t.pages.home.content.tiny}}
 
-A thin layer over the native Web Components API. Built on Markup &mdash; no extra dependencies.
+{{t.pages.home.content.a_thin_layer_over_the_native_web_components_api_built_on_markup_no_extra_dependencies}}
 
 === feature icon=standards
 
-### Scoped styles
+### {{t.pages.home.content.scoped_styles}}
 
-Per-component stylesheets that ship with the element. No leaks, no conflicts, no CSS-in-JS runtime.
+{{t.pages.home.content.per_component_stylesheets_that_ship_with_the_element_no_leaks_no_conflicts_no_css_in_js_runtime}}
 
 === feature icon=plug
 
-### Native lifecycles
+### {{t.pages.home.content.native_lifecycles}}
 
-onMount, onUpdate, onDestroy, onAdoption &mdash; first-class hooks for everything Custom Elements expose.
+{{t.pages.home.content.onmount_onupdate_ondestroy_onadoption_first_class_hooks_for_everything_custom_elements_expose}}
 
 === feature icon=webComponents
 
-### Works everywhere
+### {{t.pages.home.content.works_everywhere}}
 
-Custom Elements run in any framework, in plain HTML, or in any tool that renders DOM.
+{{t.pages.home.content.custom_elements_run_in_any_framework_in_plain_html_or_in_any_tool_that_renders_dom}}
 
 === feature icon=surgical
 
-### Built on Markup
+### {{t.pages.home.content.built_on_markup}}
 
-Same reactive engine, same templating, same 0-build philosophy. Drop in a script tag and ship.
+{{t.pages.home.content.same_reactive_engine_same_templating_same_0_build_philosophy_drop_in_a_script_tag_and_ship}}
 
 :::
 
@@ -123,13 +123,13 @@ Same reactive engine, same templating, same 0-build philosophy. Drop in a script
 
 === header
 
-`// see it in action`
+{{t.pages.home.content.see_it_in_action}}
 
-## Real components. Native tags.
+## {{t.pages.home.content.real_components_native_tags}}
 
-Build focused elements that own their props, state, styles, lifecycle work, and public events.
+{{t.pages.home.content.build_focused_elements_that_own_their_props_state_styles_lifecycle_work_and_public_events}}
 
-=== example label="Quantity stepper" color=accent filename=quantity-stepper.js lang=javascript
+=== example label="{{t.pages.home.content.quantity_stepper}}" color=accent filename=quantity-stepper.js lang=javascript
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -167,7 +167,7 @@ class QuantityStepper extends WebComponent {
 customElements.define('quantity-stepper', QuantityStepper)
 ```
 
-=== example label="Todo list" color=accent filename=todo-list.js lang=javascript
+=== example label="{{t.pages.home.content.todo_list}}" color=accent filename=todo-list.js lang=javascript
 
 ```javascript
 import { WebComponent, html, repeat } from '@beforesemicolon/web-component'
@@ -206,7 +206,7 @@ class TodoList extends WebComponent {
 customElements.define('todo-list', TodoList)
 ```
 
-=== example label="Pricing toggle" color=accent filename=pricing-toggle.js lang=javascript
+=== example label="{{t.pages.home.content.pricing_toggle}}" color=accent filename=pricing-toggle.js lang=javascript
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -244,7 +244,7 @@ class PricingToggle extends WebComponent {
 customElements.define('pricing-toggle', PricingToggle)
 ```
 
-=== example label="Validated field" color=accent filename=email-field.js lang=javascript
+=== example label="{{t.pages.home.content.validated_field}}" color=accent filename=email-field.js lang=javascript
 
 ```javascript
 import { WebComponent, html } from '@beforesemicolon/web-component'
@@ -285,7 +285,7 @@ class EmailField extends WebComponent {
 customElements.define('email-field', EmailField)
 ```
 
-=== example label="Reactive stylesheet" color=accent filename=status-pill.js lang=javascript
+=== example label="{{t.pages.home.content.reactive_stylesheet}}" color=accent filename=status-pill.js lang=javascript
 
 ```javascript
 import {
@@ -332,11 +332,11 @@ customElements.define('status-pill', StatusPill)
 
 === header
 
-`// quick start`
+{{t.pages.home.content.quick_start}}
 
-## Install in seconds.
+## {{t.pages.home.content.install_in_seconds}}
 
-Choose your preferred installation method. Works everywhere JavaScript runs.
+{{t.pages.home.content.choose_your_preferred_installation_method_works_everywhere_javascript_runs}}
 
 === tab key=cdn label=CDN command="<script src=&quot;https://unpkg.com/@beforesemicolon/web-component/dist/client.js&quot;></script>"
 
@@ -348,10 +348,10 @@ Choose your preferred installation method. Works everywhere JavaScript runs.
 
 :::
 
-::: layout landing-cta title="Build reactive Web Components," title2="your way."
+::: layout landing-cta title="{{t.pages.home.content.build_reactive_web_components}}" title2="{{t.pages.home.content.your_way}}"
 
 === copy
 
-Combine the simplicity of vanilla Web Standards with the power of modern reactivity.
+{{t.pages.home.content.combine_the_simplicity_of_vanilla_web_standards_with_the_power_of_modern_reactivity}}
 
 :::
