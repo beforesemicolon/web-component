@@ -3,18 +3,26 @@ import fs from 'fs'
 import path from 'path'
 
 const createSectionRedirects = (locales) => {
-    const redirects = {
-        'documentation/fundamentals':
-            '/documentation/fundamentals/creating-components',
-        'documentation/props-and-state': '/documentation/props-and-state/props',
-        'documentation/styling': '/documentation/styling/stylesheet',
-        'documentation/events-and-lifecycle':
-            '/documentation/events-and-lifecycle/events',
-        'documentation/advanced': '/documentation/advanced/form-integration',
-    }
+    const sectionLandingRoutes = [
+        'documentation/fundamentals/creating-components',
+        'documentation/props-and-state/props',
+        'documentation/styling/stylesheet',
+        'documentation/events-and-lifecycle/events',
+        'documentation/advanced/form-integration',
+    ]
 
     locales.forEach((locale) => {
-        Object.entries(redirects).forEach(([from, to]) => {
+        const localePath = path.join(
+            process.cwd(),
+            'docs',
+            'locale',
+            `${locale}.json`
+        )
+        const routes = JSON.parse(fs.readFileSync(localePath, 'utf8'))._routes
+
+        sectionLandingRoutes.forEach((routeId) => {
+            const to = routes[routeId]
+            const from = to.split('/').slice(0, -1).join('/')
             const indexFile = path.join(
                 process.cwd(),
                 'website',

@@ -1,0 +1,836 @@
+{
+    "_routes": {
+        "documentation/advanced/browser-globals": "/documentacao/avancado/globais-do-navegador",
+        "documentation/advanced/content-root-and-root": "/documentacao/avancado/raiz-de-conteudo-e-raiz",
+        "documentation/advanced/form-integration": "/documentacao/avancado/integracao-de-formularios",
+        "documentation/ai": "/documentacao/ai",
+        "documentation/events-and-lifecycle/error-handling": "/documentacao/eventos-e-ciclo-de-vida/tratamento-de-erros",
+        "documentation/events-and-lifecycle/events": "/documentacao/eventos-e-ciclo-de-vida/eventos",
+        "documentation/events-and-lifecycle/lifecycle": "/documentacao/eventos-e-ciclo-de-vida/ciclo-de-vida",
+        "documentation/fundamentals/config": "/documentacao/fundamentos/configuracao",
+        "documentation/fundamentals/creating-components": "/documentacao/fundamentos/criacao-de-componentes",
+        "documentation/fundamentals/rendering": "/documentacao/fundamentos/renderizacao",
+        "documentation/fundamentals/typescript": "/documentacao/fundamentos/typescript",
+        "documentation/get-started": "/documentacao/primeiros-passos",
+        "documentation/guide": "/documentacao/guia",
+        "documentation/index": "/documentacao/",
+        "documentation/installation": "/documentacao/instalacao",
+        "documentation/props-and-state/props": "/documentacao/propriedades-e-estado/propriedades",
+        "documentation/props-and-state/refs": "/documentacao/propriedades-e-estado/refs",
+        "documentation/props-and-state/state": "/documentacao/propriedades-e-estado/estado",
+        "documentation/styling/css-utility": "/documentacao/estilos/utilitario-css",
+        "documentation/styling/stylesheet": "/documentacao/estilos/folha-de-estilo",
+        "documentation/styling/update-stylesheet": "/documentacao/estilos/atualizar-folha-de-estilo",
+        "index": "/"
+    },
+    "common": {
+        "navigation": {
+            "home": "Início",
+            "content": "Conteúdo",
+            "features": "Funcionalidades",
+            "code": "Código",
+            "install": "Instalar",
+            "documentation": "Documentação",
+            "docs": "Docs",
+            "learningResources": "Recursos de aprendizagem",
+            "essentialsTraining": "Treinamento essencial",
+            "aboutBeforeSemicolon": "Sobre a Before Semicolon",
+            "openSource": "Código aberto",
+            "website": "Site",
+            "blog": "Blog",
+            "youtubeChannel": "Canal do YouTube"
+        },
+        "actions": {
+            "editDoc": "editar este documento",
+            "getStarted": "Começar",
+            "readDocs": "Ler a documentação",
+            "copy": "Copiar",
+            "copied": "Copiado",
+            "copyCode": "Copiar código",
+            "codeCopied": "Código copiado",
+            "commandCopied": "Comando copiado",
+            "copyInstallCommand": "Copiar comando de instalação do {{manager}}",
+            "previousExample": "Exemplo anterior",
+            "nextExample": "Próximo exemplo"
+        },
+        "accessibility": {
+            "installationPackageManager": "Gerenciador de pacotes de instalação",
+            "goToSlide": "Ir para o slide {{number}}",
+            "mobileMenu": {
+                "open": "Abrir o menu da documentação",
+                "close": "Fechar o menu da documentação"
+            }
+        },
+        "labels": {
+            "exampleUppercase": "EXEMPLO"
+        },
+        "footer": {
+            "description": "Web Components reativos com estado, props, estilos com escopo, ciclos de vida e integração com formulários.",
+            "copyright": "Copyright © 2026 Before Semicolon. Todos os direitos reservados."
+        },
+        "content": {
+            "get_started_get_started_md": "[Primeiros passos](./get-started.md)",
+            "guide_best_practices_guide_md": "[Guia e práticas recomendadas](./guide.md)",
+            "creating_components_fundamentals_creating_components_md": "[Criando componentes](./fundamentals/creating-components.md)",
+            "note": "[!NOTA]",
+            "get_started": "Comece"
+        }
+    },
+    "pages": {
+        "documentation": {
+            "advanced": {
+                "browser_globals": {
+                    "meta": {
+                        "browser_globals": "Navegadores globais",
+                        "browser_globals_webcomponent_by_before_semicolon": "Globais do navegador - WebComponent por Before Semicolon",
+                        "use_webcomponent_and_re_exported_markup_apis_via_cdn_and_global_window_namespaces": "Use WebComponent e APIs Markup reexportadas por meio de CDN e namespaces de janela global."
+                    },
+                    "content": {
+                        "browser_globals": "Navegadores globais",
+                        "for_quick_prototyping_testing_or_simple_web_pages_you_might_prefer_not_to_set_up_a_build_pipelin": "Para prototipagem rápida, testes ou páginas da web simples, talvez você prefira não configurar um pipeline de construção (como Webpack, Vite ou Rollup). `@beforesemicolon/web-component` oferece suporte total a configurações de **construção zero**, oferecendo um script de cliente pré-empacotado que expõe todas as funções da API em um único namespace global do navegador.",
+                        "cdn_integration": "Integração CDN",
+                        "to_use_the_component_library_directly_in_your_html_files_load_the_client_script_from_a_cdn_such": "Para usar a biblioteca de componentes diretamente em seus arquivos HTML, carregue o script do cliente de um CDN (como `unpkg.com` ou `jsdelivr.net`):",
+                        "once_loaded_the_library_attaches_a_single_global_variable_bfs_to_the_browser_s_window_object": "Depois de carregada, a biblioteca anexa uma única variável global `BFS` ao objeto `window` do navegador.",
+                        "the_bfs_global_namespace": "O namespace global `BFS`",
+                        "the_window_bfs_namespace_is_structured_as_follows": "O namespace `window.BFS` está estruturado da seguinte forma:",
+                        "window_bfs_webcomponent_the_core_component_base_class": "**`window.BFS.WebComponent`**: a classe base do componente principal.",
+                        "window_bfs_css_the_tagged_template_function_for_creating_reactive_scoped_css": "**`window.BFS.css`**: a função de modelo marcada para criar CSS com escopo reativo.",
+                        "window_bfs_markup_an_object_containing_all_the_re_exported_apis_from_the_underlying_beforesemico": "**`window.BFS.MARKUP`**: um objeto que contém todas as APIs reexportadas do pacote `@beforesemicolon/markup` subjacente.",
+                        "re_exported_markup_apis_under_bfs_markup": "APIs Markup reexportadas em `BFS.MARKUP`",
+                        "through_bfs_markup_you_can_access_all_template_rendering_and_reactivity_tools": "Através do `BFS.MARKUP`, você pode acessar todas as ferramentas de renderização e reatividade de modelos:",
+                        "html_tagged_template_function_for_rendering_dom_elements": "**`html`**: função de modelo marcado para renderizar elementos DOM.",
+                        "state_creates_reactive_state_getters_and_setters": "**`state`**: Cria getters e setters de estado reativo.",
+                        "effect_tracks_side_effects_depending_on_states": "**`effect`**: Rastreia os efeitos colaterais dependendo dos estados.",
+                        "helper_utilities_when_repeat_suspense_visible_etc": "**Utilitários auxiliares**: `when`, `repeat`, `suspense`, `visible`, etc.",
+                        "complete_zero_build_example": "Exemplo completo de construção zero",
+                        "here_is_a_complete_single_file_html_page_showing_how_to_declare_and_use_a_reactive_custom_elemen": "Aqui está uma página HTML completa de arquivo único mostrando como declarar e usar um elemento personalizado reativo sem nenhum compilador ou empacotador:",
+                        "standard_es_modules_alternative": "Alternativa de módulos ES padrão",
+                        "if_you_want_to_use_modern_javascript_imports_import_syntax_without_a_bundler_you_can_import_dire": "Se quiser usar importações JavaScript modernas (sintaxe `import`) sem um bundler, você pode importar diretamente do CDN se o navegador suportar módulos ES:",
+                        "pin_the_package_version_for_production_pages_so_cdn_updates_cannot_change_behavior_unexpectedly": "Fixe a versão do pacote nas páginas de produção para que as atualizações do CDN não possam alterar o comportamento inesperadamente."
+                    }
+                },
+                "content_root_and_root": {
+                    "meta": {
+                        "content_root_root": "Raiz e raiz do conteúdo",
+                        "content_root_root_webcomponent_by_before_semicolon": "Raiz e raiz de conteúdo - WebComponent por Before Semicolon",
+                        "learn_how_to_resolve_component_rendering_targets_using_contentroot_and_locate_ancestor_contexts": "Aprenda como resolver destinos de renderização de componentes usando contentRoot e localizar contextos ancestrais usando root."
+                    },
+                    "content": {
+                        "content_root_root": "Raiz e raiz do conteúdo",
+                        "when_building_web_components_managing_dom_boundaries_specifically_shadow_dom_boundaries_is_key_t": "Ao construir componentes da web, o gerenciamento de limites DOM (especificamente limites Shadow DOM) é fundamental para o estilo adequado dos elementos, roteamento de eventos e travessia DOM. `@beforesemicolon/web-component` simplifica isso expondo dois getters de contexto: `contentRoot` e `root`.",
+                        "content_root": "Raiz de conteúdo",
+                        "the_contentroot_property_represents_the_element_container_where_the_component_s_template_is_rend": "A propriedade `contentRoot` representa o container do elemento onde o template do componente é renderizado.",
+                        "the_value_of_contentroot_depends_on_your_component_s_shadow_dom_configuration": "O valor de `contentRoot` depende da configuração Shadow DOM do seu componente:",
+                        "shadow_dom_enabled_config_shadow_true_default_contentroot_returns_the_element_s_own_shadowroot_a": "**Shadow DOM ativado (`config.shadow = true` - Padrão)**: `contentRoot` retorna o próprio `ShadowRoot` do elemento. Toda a renderização, montagem de modelos e estilos de escopo acontecem dentro desse limite de sombra.",
+                        "shadow_dom_disabled_config_shadow_false_contentroot_returns_the_custom_element_instance_itself_h": "**Shadow DOM desativado (`config.shadow = false`)**: `contentRoot` retorna a própria instância do elemento personalizado (`HTMLElement`). Os modelos são renderizados diretamente na luz DOM como filhos do elemento personalizado.",
+                        "practical_usage": "Uso prático",
+                        "if_you_need_to_query_elements_rendered_by_your_component_template_manually_instead_of_using_the": "Se você precisar consultar elementos renderizados pelo seu modelo de componente manualmente (em vez de usar a [API Refs](../props-and-state/refs.md)), você deve pesquisar dentro do `contentRoot`:",
+                        "root": "Raiz",
+                        "the_root_property_returns_the_closest_ancestor_root_container_containing_this_component": "A propriedade `root` retorna o contêiner raiz ancestral mais próximo que contém este componente.",
+                        "when_the_component_is_connected_to_the_dom_it_climbs_the_node_hierarchy_searching_for_an_ancesto": "Quando o componente está conectado ao DOM, ele sobe na hierarquia de nós procurando por um ancestral `ShadowRoot`:",
+                        "if_the_component_is_nested_inside_the_shadow_dom_of_another_parent_web_component_this_root_retur": "Se o componente estiver aninhado dentro da sombra DOM de **outro** componente da web pai, `this.root` retornará o `ShadowRoot` desse pai.",
+                        "if_the_component_is_placed_directly_in_the_main_page_layout_this_root_returns_the_main_page_docu": "Se o componente for colocado diretamente no layout da página principal, `this.root` retornará a página principal `document`.",
+                        "this_root_is_highly_useful_for_locating_shared_stylesheet_registries_resolving_theme_configurati": "`this.root` é altamente útil para localizar registros de folhas de estilo compartilhadas, resolver configurações de temas ou ouvir eventos no limite da subárvore atual:",
+                        "comparison_this_root_vs_native_getrootnode": "Comparação: `this.root` vs `getRootNode()` nativo",
+                        "the_native_dom_api_provides_a_node_getrootnode_options_method_it_is_important_to_contrast_how_th": "A API nativa DOM fornece um método `node.getRootNode(options)`. É importante contrastar como o `this.root` difere:",
+                        "focus_of_search": "**Foco da pesquisa**:",
+                        "this_root_searches_for_the_parent_context_in_which_the_custom_element_itself_lives": "`this.root` procura o **contexto pai** no qual o próprio elemento personalizado reside.",
+                        "native_getrootnode_called_on_the_custom_element_itself_returns_the_same_outer_document_or_outer": "`getRootNode()` nativo chamado no próprio elemento personalizado retorna o mesmo documento externo ou raiz de sombra externa. No entanto, se chamado em nós _dentro_ da própria sombra DOM do elemento, o `getRootNode()` nativo retornará a raiz de sombra _própria_ do componente.",
+                        "context_resolution": "**Resolução de Contexto**:",
+                        "this_root_resolves_early_during_connectedcallback_and_provides_a_guaranteed_reference_to_the_sur": "`this.root` é resolvido antecipadamente durante `connectedCallback` e fornece uma referência garantida ao contexto do ambiente circundante.",
+                        "this_makes_this_root_the_preferred_property_to_use_when_a_nested_child_element_needs_to_communic": "Isso torna `this.root` a propriedade preferencial a ser usada quando um elemento filho aninhado precisa se comunicar para cima ou registrar-se com um provedor de contexto pai sem vazar para o escopo `document` global."
+                    }
+                },
+                "form_integration": {
+                    "meta": {
+                        "form_integration": "Integração de formulário",
+                        "form_integration_webcomponent_by_before_semicolon": "Integração de formulários - WebComponent por Before Semicolon",
+                        "build_form_associated_custom_elements_with_elementinternals_submitted_values_validation_disabled": "Crie elementos personalizados associados a formulários com ElementInternals, valores enviados, validação, estado desabilitado, redefinição e restauração de estado."
+                    },
+                    "content": {
+                        "form_integration": "Integração de formulário",
+                        "custom_elements_can_render_inside_a_but_that_does_not_automatically_make_them_form_controls_a_no": "Elementos personalizados podem ser renderizados dentro de um `<form>`, mas isso não os torna automaticamente controles. Um elemento personalizado normal é ignorado por `FormData`, validação de restrição nativa, estado desativado do conjunto de campos e comportamento de redefinição de formulário, a menos que opte pela API **Elementos personalizados associados a formulários** do navegador.",
+                        "beforesemicolon_web_component_supports_that_native_api_directly_it_exposes_the_element_s_element": "`@beforesemicolon/web-component` oferece suporte direto a essa API nativa. Ele expõe a instância `ElementInternals` do elemento como `this.internals`, enquanto você usa retornos de chamada de navegador padrão, como `formAssociatedCallback()`, `formDisabledCallback()`, `formResetCallback()` e `formStateRestoreCallback()`.",
+                        "the_default_problem": "O problema padrão",
+                        "start_with_a_component_that_wraps_a_native_input": "Comece com um componente que agrupa uma entrada nativa:",
+                        "you_can_place_it_in_a_form": "Você pode colocá-lo em um formulário:",
+                        "but_submitting_the_form_will_not_include_firstname": "Mas o envio do formulário não incluirá `firstName`:",
+                        "the_browser_sees_the_custom_element_as_an_element_not_as_a_successful_form_control_with_a_submit": "O navegador vê o elemento personalizado como um elemento, não como um controle de formulário bem-sucedido com um valor enviado.",
+                        "enable_form_association": "Habilitar associação de formulário",
+                        "add_static_formassociated_true_so_the_browser_treats_the_custom_element_as_form_associated": "Adicione `static formAssociated = true` para que o navegador trate o elemento personalizado como associado ao formulário:",
+                        "this_is_native_custom_element_behavior_not_a_webcomponent_specific_abstraction_it_allows_the_ele": "Este é o comportamento nativo do elemento personalizado, não uma abstração específica do WebComponent. Ele permite que o elemento seja associado a um formulário pai e receba retornos de chamada de formulário nativo.",
+                        "form_association_alone_does_not_submit_a_value_it_only_lets_the_custom_element_participate_in_th": "A associação de formulário por si só não envia um valor. Ele permite apenas que o elemento personalizado participe do sistema de formulário. Você ainda precisa do `this.internals.setFormValue()`.",
+                        "elementinternals": "ElementInternals",
+                        "this_internals_exposes_the_native_elementinternals_object_created_with_attachinternals": "`this.internals` expõe o objeto `ElementInternals` nativo criado com `attachInternals()`.",
+                        "use_it_to_communicate_with_the_parent_form": "Use-o para se comunicar com o formulário pai:",
+                        "setformvalue_value_controls_what_formdata_receives_for_the_element_s_name": "`setFormValue(value)`: controla o que `FormData` recebe para o `name` do elemento.",
+                        "setvalidity_flags_message_anchor_controls_native_validity_state": "`setValidity(flags, message, anchor)`: controla o estado de validade nativo.",
+                        "reportvalidity_asks_the_browser_to_show_validation_ui": "`reportValidity()`: solicita que o navegador mostre a UI de validação.",
+                        "form_returns_the_associated_form": "`form`: retorna o formulário associado.",
+                        "labels_returns_labels_associated_with_the_custom_element": "`labels`: retorna rótulos associados ao elemento customizado.",
+                        "register_the_submitted_value": "Cadastre o valor enviado",
+                        "call_setformvalue_whenever_the_component_value_changes_the_submitted_field_name_comes_from_the_c": "Chame `setFormValue()` sempre que o valor do componente for alterado. O nome do campo enviado vem do próprio atributo `name` do elemento personalizado.",
+                        "now_the_same_form_produces_useful_data": "Agora, o mesmo formulário produz dados úteis:",
+                        "you_can_also_register_an_initial_value_when_the_browser_associates_the_element_with_a_form": "Você também pode registrar um valor inicial quando o navegador associa o elemento a um formulário:",
+                        "validation": "Validação",
+                        "a_form_associated_custom_element_can_use_native_validation_instead_of_inventing_a_parallel_error": "Um elemento personalizado associado ao formulário pode usar validação nativa em vez de inventar um sistema de erro paralelo. Um padrão comum é delegar a validade ao controle nativo interno e, em seguida, relatar essa validade por meio do `ElementInternals`.",
+                        "setvalidity_accepts_the_same_validity_flags_exposed_by_native_form_controls_passing_an_empty_or": "`setValidity()` aceita os mesmos sinalizadores de validade expostos pelos controles de formulário nativos. Passar um `ValidityState` vazio ou válido elimina o erro. Passar um elemento âncora permite que o navegador posicione a UI de validação nativa perto do controle interno relevante.",
+                        "native_form_callbacks": "Retornos de chamada de formulário nativo",
+                        "form_associated_custom_elements_use_native_callback_names_webcomponent_does_not_wrap_these_becau": "Os elementos personalizados associados ao formulário usam nomes de retorno de chamada nativos. WebComponent não os agrupa porque fazem parte da plataforma do navegador.",
+                        "formassociatedcallback_form": "`formAssociatedCallback(form)`",
+                        "called_when_the_browser_associates_or_disassociates_the_element_with_a_form_use_this_to_register": "Chamado quando o navegador associa ou desassocia o elemento a um formulário. Use isto para registrar o valor inicial enviado e a validade.",
+                        "formdisabledcallback_disabled": "`formDisabledCallback(disabled)`",
+                        "called_when_the_element_becomes_disabled_because_its_own_disabled_attribute_changed_or_because_a": "Chamado quando o elemento é desabilitado porque seu próprio atributo `disabled` foi alterado ou porque um ancestral `<fieldset>` mudou de estado desabilitado.",
+                        "if_your_template_passes_this_props_disabled_into_an_internal_input_assigning_this_disabled_updat": "Se o seu modelo passar `this.props.disabled` para uma entrada interna, a atribuição de `this.disabled` atualiza a propriedade e mantém o controle renderizado sincronizado.",
+                        "formresetcallback": "`formResetCallback()`",
+                        "called_when_the_parent_form_resets_use_it_to_restore_the_component_s_default_value_clear_validat": "Chamado quando o formulário pai é redefinido. Use-o para restaurar o valor padrão do componente, limpar o estado de validação e atualizar o valor do formulário nativo.",
+                        "formstaterestorecallback_state_mode": "`formStateRestoreCallback(state, mode)`",
+                        "called_when_the_browser_restores_form_state_for_example_after_navigation_or_autocomplete_use_it": "Chamado quando o navegador restaura o estado do formulário, por exemplo, após navegação ou preenchimento automático. Use-o para restaurar o valor visível e o valor enviado do componente.",
+                        "complete_text_field": "Campo de texto completo",
+                        "this_example_keeps_the_custom_element_api_small_while_integrating_with_native_form_submission_va": "Este exemplo mantém a API do elemento personalizado pequena enquanto se integra ao envio de formulário nativo, validação, redefinição, estado desativado do conjunto de campos e comportamento de restauração.",
+                        "use_it_like_a_normal_form_field": "Use-o como um campo de formulário normal:",
+                        "practical_rules": "Regras Práticas",
+                        "add_static_formassociated_true_only_to_components_that_should_behave_as_native_form_controls": "Adicione `static formAssociated = true` somente aos componentes que devem se comportar como controles de formulário nativos.",
+                        "always_call_this_internals_setformvalue_when_the_submitted_value_changes": "Sempre chame `this.internals.setFormValue()` quando o valor enviado for alterado.",
+                        "keep_the_submitted_value_and_the_visible_internal_control_value_synchronized": "Mantenha o valor enviado e o valor de controle interno visível sincronizados.",
+                        "use_this_internals_setvalidity_when_the_custom_element_should_participate_in_native_constraint_v": "Use `this.internals.setValidity()` quando o elemento customizado precisar participar da validação de restrição nativa.",
+                        "use_formdisabledcallback_to_respond_to_ancestor_changes": "Use `formDisabledCallback()` para responder às alterações do ancestral `<fieldset disabled>`.",
+                        "use_formresetcallback_to_restore_defaults_when_the_parent_form_resets": "Use `formResetCallback()` para restaurar os padrões quando o formulário pai for redefinido.",
+                        "use_formstaterestorecallback_for_browser_restore_and_autocomplete_flows": "Use `formStateRestoreCallback()` para restauração do navegador e fluxos de preenchimento automático.",
+                        "keep_component_events_like_change_useful_for_app_code_but_do_not_rely_on_events_for_native_form": "Mantenha eventos de componentes como `change` úteis para o código do aplicativo, mas não dependa de eventos para envio de formulário nativo."
+                    }
+                }
+            },
+            "ai": {
+                "meta": {
+                    "ai_guide": "Guia de IA",
+                    "ai_guide_webcomponent_by_before_semicolon": "Guia de IA - WebComponent por Before Semicolon",
+                    "ai_first_guide_to_beforesemicolon_web_component_apis_source_boundaries_and_common_implementation": "Primeiro guia de IA para APIs @beforesemicolon/web-component, limites de origem e erros comuns de implementação."
+                },
+                "content": {
+                    "ai_guide": "Guia de IA",
+                    "use_this_page_first_if_you_are_an_ai_agent_scanning_the_webcomponent_docs": "Use esta página primeiro se você for um agente de IA verificando os documentos do WebComponent.",
+                    "read_first": "Leia primeiro",
+                    "what_is_webcomponent_index_md": "[O que é WebComponent?](./index.md)",
+                    "props_props_and_state_props_md": "[Adereços](./props-and-state/props.md)",
+                    "state_props_and_state_state_md": "[Estado](./props-and-state/state.md)",
+                    "stylesheet_styling_stylesheet_md": "[Folha de estilo](./styling/stylesheet.md)",
+                    "events_events_and_lifecycle_events_md": "[Eventos](./events-and-lifecycle/events.md)",
+                    "package_boundary": "Limite do pacote",
+                    "beforesemicolon_web_component_exports_webcomponent_htmlcomponentelement_css_and_the_webcomponent": "`@beforesemicolon/web-component` exporta `WebComponent`, `HTMLComponentElement`, `css` e os tipos específicos de WebComponent.",
+                    "it_also_re_exports_beforesemicolon_markup_so_examples_can_import_html_repeat_when_state_and_othe": "Ele também reexporta `@beforesemicolon/markup`, portanto, os exemplos podem importar `html`, `repeat`, `when`, `state` e outras APIs Markup de `@beforesemicolon/web-component`.",
+                    "the_browser_bundle_exposes_window_bfs_webcomponent_window_bfs_css_and_window_bfs_markup": "O pacote do navegador expõe `window.BFS.WebComponent`, `window.BFS.css` e `window.BFS.MARKUP`.",
+                    "runtime_facts": "Fatos sobre o tempo de execução",
+                    "static_observedattributes_defines_public_attributes_and_creates_camelcase_reactive_props_under_t": "`static observedAttributes` define atributos públicos e cria props reativos camelCase em `this.props`.",
+                    "default_prop_values_are_class_fields_with_the_camelcase_prop_name": "Os valores padrão da propriedade são campos de classe com o nome da propriedade camelCase.",
+                    "initialstate_defines_local_state_getters_under_this_state": "`initialState` define getters de estado local em `this.state`.",
+                    "this_setstate_only_works_after_the_component_is_mounted": "`this.setState()` só funciona após a montagem do componente.",
+                    "this_dispatch_name_detail_creates_a_customevent_with_detail_add_native_custom_event_options_manu": "`this.dispatch(name, detail)` cria um `CustomEvent` com `detail`. Adicione opções de eventos personalizados nativos manualmente somente se a API de tempo de execução for alterada para suportá-las.",
+                    "render_may_return_a_markup_htmltemplate_a_string_a_dom_node_or_nothing": "`render()` pode retornar um Markup `HtmlTemplate`, uma string, um DOM `Node` ou nada.",
+                    "stylesheet_accepts_a_css_string_a_cssstylesheet_or_a_reactive_css_result": "`stylesheet` aceita uma string CSS, um `CSSStyleSheet` ou um resultado `css` reativo.",
+                    "config_shadow_defaults_to_true": "`config.shadow` é padronizado como `true`.",
+                    "when_config_shadow_false_host_selectors_are_rewritten_to_the_custom_element_tag": "Quando `config.shadow = false`, os seletores `:host` são reescritos na tag do elemento personalizado.",
+                    "common_tasks": "Tarefas Comuns",
+                    "public_input_add_the_kebab_case_name_to_static_observedattributes_and_read_this_props_camelname": "Entrada pública: adicione o nome do kebab-case a `static observedAttributes` e leia `this.props.camelName`.",
+                    "internal_ui_state_add_a_key_to_initialstate_and_update_it_with_this_setstate": "Estado interno da UI: adicione uma chave a `initialState` e atualize-a com `this.setState()`.",
+                    "dom_element_access_add_ref_name_and_use_this_refs_name_0_after_render": "Acesso ao elemento DOM: adicione `ref=\"name\"` e use `this.refs.name?.[0]` após a renderização.",
+                    "component_output_call_this_dispatch_event_name_value": "Saída do componente: chame `this.dispatch('event-name', { value })`.",
+                    "mount_side_effects_use_onmount_and_return_cleanup": "Monte efeitos colaterais: use `onMount()` e retorne a limpeza.",
+                    "prop_reactions_use_onupdate_name_newvalue_oldvalue": "Reações prop: use `onUpdate(name, newValue, oldValue)`.",
+                    "scoped_css_assign_stylesheet": "CSS com escopo: atribua `stylesheet`.",
+                    "reactive_css_assign_stylesheet_css": "CSS reativo: atribua `stylesheet = css\\`...\\``.",
+                    "native_forms_set_static_formassociated_true_and_use_this_internals": "Formulários nativos: defina `static formAssociated = true` e use `this.internals`.",
+                    "avoid": "Evite",
+                    "do_not_call_this_setstate_in_the_constructor_or_during_class_field_initialization": "Não chame `this.setState()` no construtor ou durante a inicialização do campo de classe.",
+                    "do_not_mutate_arrays_or_objects_inside_state_in_place_return_a_new_value_from_setstate": "Não altere matrizes ou objetos dentro do estado no local; retorne um novo valor de `setState`.",
+                    "do_not_document_native_lifecycle_callbacks_as_extension_points_use_onmount_onupdate_ondestroy_an": "Não documente retornos de chamada de ciclo de vida nativos como pontos de extensão; use `onMount`, `onUpdate`, `onDestroy` e `onAdoption`.",
+                    "do_not_assume_dispatch_bubbles_or_crosses_shadow_boundaries_unless_the_source_code_supports_opti": "Não assuma bolhas `dispatch()` ou cruze limites de sombra, a menos que o código-fonte suporte opções para isso.",
+                    "do_not_use_long_one_line_custom_element_examples_when_several_attributes_are_present": "Não use exemplos longos de elementos customizados de uma linha quando vários atributos estiverem presentes."
+                }
+            },
+            "events_and_lifecycle": {
+                "error_handling": {
+                    "meta": {
+                        "error_handling": "Tratamento de erros",
+                        "error_handling_webcomponent_by_before_semicolon": "Tratamento de erros - WebComponent por Before Semicolon",
+                        "intercept_and_process_runtime_errors_from_render_state_updates_styles_or_lifecycles_using_the_on": "Intercepte e processe erros de tempo de execução de renderização, atualizações de estado, estilos ou ciclos de vida usando o gancho onError."
+                    },
+                    "content": {
+                        "error_handling": "Tratamento de erros",
+                        "handling_runtime_errors_gracefully_is_crucial_for_building_robust_web_applications_beforesemicol": "Lidar com erros de tempo de execução com elegância é crucial para a construção de aplicativos da Web robustos. O `@beforesemicolon/web-component` apresenta um gancho `onError()` centralizado que permite interceptar e tratar erros que ocorrem dentro dos limites do componente.",
+                        "the_onerror_hook": "O gancho `onError`",
+                        "by_default_the_onerror_hook_logs_the_error_to_the_console_using_console_error": "Por padrão, o gancho `onError` registra o erro no console usando `console.error`.",
+                        "you_can_override_this_method_to_customize_how_your_component_handles_errors_such_as_showing_a_to": "Você pode substituir esse método para personalizar como seu componente lida com erros, como mostrar uma notificação do sistema, registrar em um serviço externo ou despachar um evento de erro.",
+                        "what_triggers_onerror": "O que aciona o `onError`?",
+                        "the_component_automatically_wraps_internal_processes_in_try_catch_blocks_if_any_of_the_following": "O componente agrupa automaticamente os processos internos em blocos `try/catch`. Se alguma das operações a seguir falhar, o erro será detectado e passado para o gancho `onError`:",
+                        "state_mutations_errors_during_this_setstate_such_as_trying_to_update_state_on_an_unmounted_compo": "**Mutações de estado**: Erros durante `this.setState()`, como tentar atualizar o estado em um componente desmontado.",
+                        "dynamic_stylesheet_updates_errors_inside_this_updatestylesheet_or_when_compiling_reactive_styles": "**Atualizações dinâmicas de folhas de estilo**: erros dentro de `this.updateStylesheet()` ou ao compilar estilos reativos usando a tag de modelo `css`.",
+                        "custom_event_dispatching_errors_occurring_while_creating_or_dispatching_custom_events_through_th": "**Envio de eventos personalizados**: Erros que ocorrem durante a criação ou envio de eventos personalizados por meio de `this.dispatch()`.",
+                        "lifecycle_connections_errors_thrown_during_the_component_connection_or_adoption_phases_including": "**Conexões do ciclo de vida**: erros gerados durante as fases de conexão ou adoção do componente, incluindo configurações dentro de `onMount()` e `onAdoption()`.",
+                        "lifecycle_disconnections_errors_thrown_when_the_component_is_being_disconnected_including_during": "**Desconexões do ciclo de vida**: erros gerados quando o componente está sendo desconectado, inclusive durante os retornos de chamada de limpeza de montagem e `onDestroy()`.",
+                        "centralized_error_tracking_pattern": "Padrão centralizado de rastreamento de erros",
+                        "in_larger_applications_repeating_error_handling_logic_in_every_component_is_inefficient_the_reco": "Em aplicações maiores, repetir a lógica de tratamento de erros em cada componente é ineficiente. O padrão recomendado é construir uma classe `Component` base que estenda `WebComponent` para centralizar o registro em log e a telemetria de erros em todos os componentes.",
+                        "here_is_an_example_of_a_base_class_setup": "Aqui está um exemplo de configuração de classe base:",
+                        "now_instead_of_extending_webcomponent_directly_your_feature_components_extend_basecomponent": "Agora, em vez de estender `WebComponent` diretamente, seus componentes de recursos estendem `BaseComponent`:",
+                        "reporting_your_own_component_errors": "Relatando seus próprios erros de componentes",
+                        "onerror_is_not_only_for_errors_webcomponent_catches_internally_if_your_component_has_its_own_asy": "`onError()` não serve apenas para erros que o WebComponent captura internamente. Se o seu componente tiver seu próprio trabalho assíncrono, manipuladores de eventos ou código imperativo, detecte esses erros localmente e chame `this.onError(error)`.",
+                        "this_is_especially_useful_when_all_components_extend_a_shared_base_component_the_base_class_beco": "Isto é especialmente útil quando todos os componentes estendem um componente base compartilhado. A classe base torna-se o único limite de relatório, enquanto os componentes individuais decidem quais falhas locais devem ser relatadas.",
+                        "you_can_use_the_same_approach_inside_event_handlers": "Você pode usar a mesma abordagem dentro de manipuladores de eventos:",
+                        "this_keeps_the_component_s_local_control_flow_explicit_while_still_routing_every_report_through": "Isso mantém o fluxo de controle local do componente explícito enquanto ainda roteia cada relatório por meio da mesma implementação básica do `onError()`."
+                    }
+                },
+                "events": {
+                    "meta": {
+                        "events": "Eventos",
+                        "events_webcomponent_by_before_semicolon": "Eventos - WebComponent por Before Semicolon",
+                        "learn_how_to_dispatch_and_listen_to_custom_events_in_webcomponent_using_the_dispatch_method": "Aprenda como despachar e ouvir eventos personalizados em WebComponent usando o método de expedição."
+                    },
+                    "content": {
+                        "events": "Eventos",
+                        "custom_elements_often_need_to_communicate_changes_or_actions_back_to_their_parents_or_the_rest_o": "Os elementos personalizados geralmente precisam comunicar alterações ou ações aos seus pais ou ao restante do aplicativo. `@beforesemicolon/web-component` fornece um método auxiliar integrado, `this.dispatch()`, para despachar eventos DOM personalizados de forma limpa.",
+                        "dispatching_custom_events": "Despachando eventos personalizados",
+                        "to_dispatch_a_custom_event_from_inside_a_component_use_the_this_dispatch_name_detail_method": "Para despachar um evento personalizado de dentro de um componente, use o método `this.dispatch(name, detail)`.",
+                        "this_method_is_a_convenient_wrapper_around_the_native_dispatchevent_api_it_instantiates_a_standa": "Este método é um wrapper conveniente em torno da API `dispatchEvent` nativa. Ele instancia um `CustomEvent` padrão e passa o segundo argumento como `event.detail`.",
+                        "here_is_a_practical_example_of_a_counter_component_that_dispatches_an_event_whenever_the_count_c": "Aqui está um exemplo prático de um componente contador que despacha um evento sempre que a contagem muda:",
+                        "passing_payloads": "Passando cargas úteis",
+                        "the_second_parameter_to_this_dispatch_is_an_optional_detail_object_containing_any_custom_data_in": "O segundo parâmetro para `this.dispatch` é um objeto `detail` opcional que contém quaisquer dados customizados. No ouvinte de eventos de recebimento, essa carga útil está disponível por meio de `event.detail`.",
+                        "listening_to_custom_events": "Ouvindo eventos personalizados",
+                        "since_components_are_native_custom_elements_you_can_listen_to_these_events_using_standard_web_ap": "Como os componentes são elementos personalizados nativos, você pode ouvir esses eventos usando APIs da web padrão ou diretamente nos modelos Markup.",
+                        "in_markup_templates": "Nos modelos Markup",
+                        "markup_templates_support_binding_event_listeners_for_any_standard_or_custom_event_by_prefixing_t": "Os modelos Markup suportam ouvintes de eventos de ligação para qualquer evento padrão ou personalizado prefixando o nome do evento com `on`.",
+                        "for_example_if_your_custom_element_is_named_and_dispatches_a_countchange_event_you_can_listen_to": "Por exemplo, se o seu elemento personalizado for denominado `<counter-button>` e despachar um evento `countchange`, você poderá ouvi-lo em um modelo como este:",
+                        "using_native_event_listeners": "Usando ouvintes de eventos nativos",
+                        "you_can_also_interact_with_the_component_imperatively_in_standard_javascript_using_the_native_ad": "Você também pode interagir imperativamente com o componente no padrão JavaScript usando o método nativo `addEventListener`:",
+                        "event_boundary_notes": "Notas de limite do evento",
+                        "this_dispatch_intentionally_keeps_a_small_api": "`this.dispatch()` mantém intencionalmente uma pequena API:",
+                        "if_you_need_custom_event_options_such_as_bubbles_composed_or_cancelable_use_the_native_api_direc": "Se você precisar de opções de eventos personalizados, como `bubbles`, `composed` ou `cancelable`, use a API nativa diretamente:"
+                    }
+                },
+                "lifecycle": {
+                    "meta": {
+                        "lifecycle": "Ciclo de vida",
+                        "lifecycle_webcomponent_by_before_semicolon": "Ciclo de vida - WebComponent por Before Semicolon",
+                        "learn_how_to_hook_into_key_execution_stages_of_your_webcomponent_using_onmount_ondestroy_onupdat": "Aprenda como conectar-se aos principais estágios de execução do seu WebComponent usando os efeitos onMount, onDestroy, onUpdate, onAdoption, onError e Markup."
+                    },
+                    "content": {
+                        "lifecycle": "Ciclo de vida",
+                        "every_beforesemicolon_web_component_instance_transitions_through_a_series_of_lifecycle_phases_st": "Cada instância `@beforesemicolon/web-component` passa por uma série de fases do ciclo de vida, desde sua construção até sua destruição e remoção do DOM.",
+                        "instead_of_dealing_with_native_custom_element_callback_names_beforesemicolon_web_component_provi": "Em vez de lidar com nomes de retorno de chamada de elementos personalizados nativos, `@beforesemicolon/web-component` fornece ganchos limpos e de alto nível para lidar com erros de configuração, efeitos colaterais, atualizações, limpeza, adoção e tempo de execução.",
+                        "lifecycle_hook_methods": "Métodos de gancho de ciclo de vida",
+                        "onmount": "`onMount()`",
+                        "called_when_the_element_is_first_connected_to_the_dom_this_is_the_ideal_place_to_run_setups_such": "Chamado quando o elemento é conectado pela primeira vez ao DOM. Este é o local ideal para executar configurações como configurar temporizadores, buscar dados remotos ou adicionar ouvintes de eventos.",
+                        "cleanup_function_the_onmount_method_can_optionally_return_a_cleanup_function_if_provided_this_fu": "**Função de limpeza**: O método `onMount()` pode retornar opcionalmente uma função de limpeza. Se fornecida, esta função é executada automaticamente quando o componente é desconectado do DOM, logo antes de `onDestroy()` ser chamado.",
+                        "ondestroy": "`onDestroy()`",
+                        "called_when_the_element_is_disconnected_and_removed_from_the_dom_use_this_hook_for_final_cleanup": "Chamado quando o elemento é desconectado e removido do DOM. Use este gancho para limpezas finais se elas ainda não tiverem sido tratadas no retorno de chamada de limpeza retornado por `onMount()`.",
+                        "onupdate_name_newvalue_oldvalue": "`onUpdate(name, newValue, oldValue)`",
+                        "called_when_an_observed_attribute_declared_in_static_observedattributes_changes_value_this_hook": "Chamado quando um atributo observado (declarado em `static observedAttributes`) muda de valor. Este gancho funciona somente depois que o componente está totalmente montado.",
+                        "onadoption": "`onAdoption()`",
+                        "called_when_the_browser_s_native_adoptedcallback_fires_which_happens_when_the_custom_element_is": "Chamado quando o `adoptedCallback()` nativo do navegador é acionado, o que acontece quando o elemento personalizado é movido para um novo documento. Isso é incomum na maioria dos aplicativos, mas é útil para cenários de iframe, portal, migração de documentos e testes.",
+                        "onerror_error": "`onError(error)`",
+                        "called_when_webcomponent_catches_an_error_from_rendering_state_updates_stylesheet_updates_lifecy": "Chamado quando WebComponent detecta um erro de renderização, atualizações de estado, atualizações de folha de estilo, execução do ciclo de vida, adoção ou limpeza. A implementação padrão registra o erro com `console.error`.",
+                        "use_onerror_for_component_local_error_reporting_or_fallback_state_avoid_throwing_inside_onerror": "Use `onError()` para relatório de erros locais do componente ou estado de fallback. Evite jogar dentro de `onError()`, a menos que você queira intencionalmente que o erro escape do limite do componente.",
+                        "side_effects_with_effect": "Efeitos colaterais com `effect()`",
+                        "because_webcomponent_is_powered_by_markup_you_can_use_markup_s_effect_helper_for_reactive_side_e": "Como o WebComponent é desenvolvido com Markup, você pode usar o auxiliar `effect()` do Markup para efeitos colaterais reativos. Um efeito é executado imediatamente, rastreia quaisquer getters reativos que lê de forma síncrona e é executado novamente quando esses valores mudam.",
+                        "use_effect_when_the_side_effect_should_follow_reactive_props_or_state_keep_it_out_of_render_so_r": "Use `effect()` quando o efeito colateral deve seguir props ou estados reativos. Mantenha-o fora do `render()` para que a renderização permaneça declarativa.",
+                        "the_function_returned_by_effect_unsubscribes_the_effect_returning_it_from_onmount_ties_the_effec": "A função retornada por `effect()` cancela a assinatura do efeito. Retorná-lo de `onMount()` vincula o efeito ao tempo de vida do componente, portanto, WebComponent o chama quando o elemento é desconectado.",
+                        "checking_mount_status": "Verificando o status da montagem",
+                        "you_can_check_whether_the_component_is_currently_connected_to_the_dom_using_the_this_mounted_boo": "Você pode verificar se o componente está atualmente conectado ao DOM usando o getter booleano `this.mounted`.",
+                        "this_is_particularly_useful_when_performing_asynchronous_tasks_like_fetching_data_to_prevent_upd": "Isto é particularmente útil ao executar tarefas assíncronas (como buscar dados) para evitar a atualização do estado em um componente desmontado, o que de outra forma geraria um erro.",
+                        "lifecycle_order_of_execution": "Ordem de execução do ciclo de vida",
+                        "understanding_the_exact_sequence_in_which_callbacks_are_invoked_helps_in_structuring_components": "Compreender a sequência exata em que os retornos de chamada são invocados ajuda a estruturar os componentes adequadamente. Os ciclos de vida são executados na seguinte sequência:",
+                        "constructor": "**`constructor`**",
+                        "the_browser_instantiates_the_element_beforesemicolon_web_component_maps_static_observedattribute": "O navegador instancia o elemento. `@beforesemicolon/web-component` mapeia `static observedAttributes` para getters e setters de props reativos internos, gerando erros se algum prop entrar em conflito com palavras-chave reservadas.",
+                        "render": "**`render`**",
+                        "called_during_the_connection_phase_the_component_renders_its_template_and_appends_it_to_its_cont": "Chamado durante a fase de conexão. O componente renderiza seu modelo e o anexa à raiz do conteúdo.",
+                        "stylesheet_configuration": "**`stylesheet configuration`**",
+                        "initializes_and_applies_stylesheets_e_g_from_the_stylesheet_property_or_the_css_tagged_template": "Inicializa e aplica folhas de estilo (por exemplo, da propriedade `stylesheet` ou do modelo marcado `css`).",
+                        "onmount_2": "**`onMount`**",
+                        "triggered_immediately_after_rendering_is_complete_and_stylesheets_are_attached_the_return_value": "Acionado imediatamente após a conclusão da renderização e as folhas de estilo serem anexadas. O valor de retorno (se for uma função) é armazenado em cache como retorno de chamada de limpeza de montagem.",
+                        "effect_callbacks": "**Retornos de chamada `effect`**",
+                        "markup_effects_created_during_onmount_run_immediately_and_re_run_later_when_their_tracked_reacti": "Os efeitos Markup criados durante o `onMount()` são executados imediatamente e executados novamente mais tarde, quando seus getters reativos rastreados mudam. Se o efeito unsubscribe for retornado de `onMount()`, ele se tornará o retorno de chamada de limpeza de montagem do componente.",
+                        "onupdate": "**`onUpdate`**",
+                        "runs_every_time_an_observed_attribute_changes_only_while_the_component_is_mounted": "Executa sempre que um atributo observado é alterado (somente enquanto o componente está montado).",
+                        "adoptedcallback_onadoption": "**`adoptedCallback`/`onAdoption`**",
+                        "runs_when_the_browser_adopts_the_element_into_a_different_document": "É executado quando o navegador adota o elemento em um documento diferente.",
+                        "mount_cleanup": "**`Mount Cleanup`**",
+                        "runs_the_cleanup_function_returned_by_onmount_if_any_when_the_element_disconnects": "Executa a função de limpeza retornada por `onMount()` (se houver) quando o elemento é desconectado.",
+                        "ondestroy_2": "**`onDestroy`**",
+                        "runs_immediately_after_the_mount_cleanup_function_finishes": "É executado imediatamente após a conclusão da função de limpeza de montagem.",
+                        "onerror": "**`onError`**",
+                        "runs_whenever_webcomponent_catches_an_error_from_one_of_its_guarded_rendering_update_stylesheet_lifec": "É executado sempre que o WebComponent detecta um erro em um de seus caminhos protegidos de renderização, atualização, folha de estilo, ciclo de vida, adoção ou limpeza."
+                    }
+                }
+            },
+            "fundamentals": {
+                "config": {
+                    "meta": {
+                        "config": "Configuração",
+                        "config_webcomponent_by_before_semicolon": "Configuração - WebComponent por Before Semicolon",
+                        "configure_shadow_dom_shadow_root_options_on_your_components": "Configure as opções de raiz de sombra Shadow DOM em seus componentes."
+                    },
+                    "content": {
+                        "config": "Configuração",
+                        "by_default_beforesemicolon_web_component_creates_an_encapsulated_shadow_dom_for_each_component_y": "Por padrão, `@beforesemicolon/web-component` cria um Shadow DOM encapsulado para cada componente. Você pode personalizar a configuração do Shadow DOM ou desativá-la completamente usando a propriedade de classe `config`.",
+                        "default_configuration": "Configuração padrão",
+                        "if_you_do_not_define_a_custom_config_property_the_component_defaults_to_the_following_settings": "Se você não definir uma propriedade `config` customizada, o componente assumirá como padrão as seguintes configurações:",
+                        "disabling_shadow_dom": "Desativando Sombra DOM",
+                        "in_some_scenarios_you_might_want_a_component_to_render_directly_into_the_light_dom_e_g_to_inheri": "Em alguns cenários, você pode querer que um componente seja renderizado diretamente no Light DOM (por exemplo, para herdar facilmente todas as folhas de estilo CSS globais ou para construir componentes headless). Você pode fazer isso configurando `shadow: false` no objeto `config`.",
+                        "when_shadow_false_is_configured_this_contentroot_will_reference_the_component_element_itself_rat": "Quando `shadow: false` for configurado, `this.contentRoot` fará referência ao próprio elemento do componente em vez de `ShadowRoot`. As folhas de estilo dinâmicas definidas por meio da propriedade `stylesheet` não terão escopo definido e poderão ser aplicadas globalmente.",
+                        "shadow_dom_configuration_options": "Opções de configuração Shadow DOM",
+                        "when_shadow_is_set_to_true_the_rest_of_the_configuration_properties_are_passed_directly_to_the_n": "Quando `shadow` é configurado como `true`, o restante das propriedades de configuração são passadas diretamente para o método nativo `Element.attachShadow()`.",
+                        "option_type_default_description": "| Opção | Tipo | Padrão | Descrição |",
+                        "shadow_boolean_true_enables_or_disables_shadow_dom_rendering": "| `shadow` | `boolean` | `true` | Ativa ou desativa a renderização Shadow DOM.                                                                                                                           |",
+                        "mode_open_closed_open_defines_accessibility_to_the_shadow_root_from_outside_javascript_if_open_t": "| `mode` | `'open' \\| 'closed'` | `'open'` | Define a acessibilidade à raiz sombra de fora do JavaScript. Se for `'open'`, a raiz sombra poderá ser acessada por meio de `element.shadowRoot`.                              |",
+                        "delegatesfocus_boolean_false_when_set_to_true_clicking_a_non_focusable_part_of_the_shadow_dom_de": "| `delegatesFocus` | `boolean` | `false` | Quando definido como `true`, clicar em uma parte não focável da sombra DOM delega o foco para o primeiro elemento focável dentro da raiz da sombra.                          |",
+                        "clonable_boolean_false_if_set_to_true_the_shadow_root_can_be_cloned_using_clonenode_supported_in": "| `clonable` | `boolean` | `false` | Se definido como `true`, a raiz sombra pode ser clonada usando `cloneNode()` (suportado em especificações mais recentes).                                                            |",
+                        "serializable_boolean_false_if_set_to_true_the_shadow_root_will_be_serialized_when_using_apis_lik": "| `serializable` | `boolean` | `false` | Se definido como `true`, a raiz de sombra será serializada ao usar APIs como `getHTML()` para Declarative Shadow DOM.                                                   |",
+                        "slotassignment_named_manual_named_controls_how_nodes_are_assigned_to_slots_named_assigns_element": "| `slotAssignment` | `'named' \\| 'manual'` | `'named'` | Controla como os nós são atribuídos aos slots. `'named'` atribui elementos automaticamente com base em seu atributo de slot. `'manual'` requer atribuição de nó programático. |",
+                        "example_focus_delegation_closed_shadow_root": "Exemplo: Delegação de foco e raiz de sombra fechada",
+                        "here_is_an_example_of_configuring_a_closed_shadow_root_with_focus_delegation_enabled": "Aqui está um exemplo de configuração de uma shadow root fechada com delegação de foco habilitada:"
+                    }
+                },
+                "creating_components": {
+                    "meta": {
+                        "creating_components": "Criando Componentes",
+                        "creating_components_webcomponent_by_before_semicolon": "Criando Componentes - WebComponent por Before Semicolon",
+                        "learn_how_to_subclass_webcomponent_and_register_your_custom_elements": "Aprenda como subclassificar WebComponent e registrar seus elementos personalizados."
+                    },
+                    "content": {
+                        "creating_components": "Criando Componentes",
+                        "to_create_a_new_custom_element_with_beforesemicolon_web_component_you_subclass_the_webcomponent": "Para criar um novo elemento customizado com `@beforesemicolon/web-component`, você cria uma subclasse da classe base `WebComponent` e a registra no navegador usando `customElements.define()`.",
+                        "here_is_a_basic_example_of_a_component": "Aqui está um exemplo básico de um componente:",
+                        "tag_naming_requirements": "Requisitos de nomenclatura de tags",
+                        "custom_element_tag_names_must_adhere_to_the_standard_html_specification": "Os nomes de tags de elementos personalizados devem aderir à especificação padrão HTML:",
+                        "must_contain_at_least_one_hyphen_this_distinguishes_custom_elements_from_standard_html_elements": "**Deve conter pelo menos um hífen (`-`)**: Isso distingue elementos personalizados de elementos HTML padrão. Por exemplo, `my-element`, `todo-list` e `fancy-btn` são válidos, enquanto `myelement` ou `button` são inválidos.",
+                        "must_start_with_a_lowercase_ascii_letter_e_g_a_z": "**Deve começar com uma letra ASCII minúscula** (por exemplo, `a-z`).",
+                        "cannot_contain_uppercase_letters_standard_html_parsers_treat_tag_names_as_case_insensitive_so_cu": "**Não pode conter letras maiúsculas**: Os analisadores HTML padrão tratam os nomes das tags como não diferenciando maiúsculas de minúsculas, portanto, as tags dos elementos personalizados são definidas em letras minúsculas.",
+                        "subclassing_webcomponent": "Subclassificando WebComponent",
+                        "the_webcomponent_class_inherits_from_the_native_htmlelement_this_means_your_component_is_a_nativ": "A classe `WebComponent` herda do `HTMLElement` nativo. Isso significa que seu componente é um elemento personalizado nativo e tem acesso a todas as propriedades, métodos e retornos de chamada de ciclo de vida padrão do DOM, ao mesmo tempo que adiciona recursos de reatividade e conveniência.",
+                        "reserved_properties": "Propriedades Reservadas",
+                        "because_webcomponent_and_the_native_htmlelement_define_essential_properties_and_methods_for_life": "Como `WebComponent` e o `HTMLElement` nativo definem propriedades e métodos essenciais para gerenciamento de ciclo de vida, renderização, estado e estilo, você **não** pode usar esses nomes como propriedades de componentes reativos (props).",
+                        "below_is_the_complete_list_of_reserved_property_names_that_cannot_be_overridden_or_declared_in_o": "Abaixo está a lista completa de nomes de propriedades reservadas que não podem ser substituídas ou declaradas em `observedAttributes` para mapeamento de props:",
+                        "base_configuration_styling": "Configuração e estilo básicos",
+                        "config_used_to_define_shadow_dom_configuration": "`config`: Usado para definir a configuração Shadow DOM.",
+                        "stylesheet_used_to_define_scoped_stylesheets_e_g_via_css_tagged_templates": "`stylesheet`: Usado para definir folhas de estilo com escopo definido (por exemplo, por meio de modelos marcados com `css`).",
+                        "updatestylesheet_sheet_method_to_dynamically_update_replace_the_stylesheet": "`updateStylesheet(sheet)`: Método para atualizar/substituir dinamicamente a folha de estilo.",
+                        "reactivity_internal_refs": "Reatividade e referências internas",
+                        "props_object_containing_reactive_prop_getters": "`props`: Objeto contendo getters de prop reativos.",
+                        "initialstate_object_containing_initial_values_for_internal_state": "`initialState`: Objeto contendo valores iniciais para estado interno.",
+                        "state_object_containing_reactive_state_getters": "`state`: Objeto contendo getters de estado reativos.",
+                        "setstate_newstate_callback_method_used_to_reactively_update_the_internal_state": "`setState(newState | callback)`: Método utilizado para atualizar reativamente o estado interno.",
+                        "refs_object_containing_references_to_elements_marked_with_the_ref_attribute_in_the_template": "`refs`: Objeto contendo referências a elementos marcados com o atributo `ref` no template.",
+                        "dom_shadow_roots": "DOM e raízes sombrias",
+                        "mounted_boolean_getter_indicating_if_the_component_is_currently_connected_to_the_dom": "`mounted`: Getter booleano que indica se o componente está atualmente conectado ao DOM.",
+                        "contentroot_getter_returning_the_render_target_shadowroot_or_the_element_itself_if_shadow_dom_is": "`contentRoot`: Getter que retorna o destino de renderização (`ShadowRoot` ou o próprio elemento se a sombra DOM estiver desabilitada).",
+                        "root_getter_returning_the_ancestor_shadow_root_or_document_of_the_element": "`root`: Getter que retorna a raiz shadow do ancestral ou documento do elemento.",
+                        "internals_getter_returning_the_elementinternals_instance_via_attachinternals_useful_for_form_ass": "`internals`: Getter que retorna a instância `ElementInternals` (via `attachInternals()`), útil para associação de formulários e acessibilidade.",
+                        "render_method_that_returns_the_html_template_or_node_to_be_rendered": "`render()`: Método que retorna o template HTML ou Node a ser renderizado.",
+                        "dispatch_name_detail_method_to_fire_custom_dom_events_easily": "`dispatch(name, detail)`: Método para disparar facilmente eventos DOM personalizados.",
+                        "lifecycle_methods": "Métodos de ciclo de vida",
+                        "connectedcallback_native_element_connection_handler_use_onmount_instead_for_custom_behavior": "`connectedCallback()`: Manipulador de conexão de elemento nativo. Use `onMount()` para comportamento personalizado.",
+                        "attributechangedcallback_name_oldvalue_newvalue_native_attribute_change_handler_use_onupdate_ins": "`attributeChangedCallback(name, oldValue, newValue)`: Manipulador de mudança de atributo nativo. Use `onUpdate()` para comportamento personalizado.",
+                        "disconnectedcallback_native_element_disconnection_handler_use_ondestroy_instead_for_custom_behav": "`disconnectedCallback()`: Manipulador de desconexão de elemento nativo. Use `onDestroy()` para comportamento personalizado.",
+                        "adoptedcallback_native_adoption_handler_use_onadoption_instead_for_custom_behavior": "`adoptedCallback()`: Manipulador de adoção nativo. Use `onAdoption()` para comportamento personalizado.",
+                        "onerror_error_callback_executed_when_errors_occur_within_lifecycles_or_rendering": "`onError(error)`: Retorno de chamada executado quando ocorrem erros nos ciclos de vida ou na renderização.",
+                        "native_htmlelement_properties": "Propriedades nativas de HTMLElement",
+                        "style_standard_css_declaration_block": "`style`: Bloco de declaração CSS padrão.",
+                        "classname_standard_class_name_string": "`className`: Sequência de nome de classe padrão.",
+                        "classlist_standard_class_token_list": "`classList`: Lista de tokens de classe padrão.",
+                        "warning": "[!AVISO]",
+                        "attempting_to_define_any_of_these_reserved_names_as_custom_props_or_mapping_them_via_observedatt": "Tentar definir qualquer um desses nomes reservados como props personalizados ou mapeá-los por meio de `observedAttributes` causará conflitos com o comportamento principal do tempo de execução e poderá interromper a reatividade ou o ciclo de vida do componente."
+                    }
+                },
+                "rendering": {
+                    "meta": {
+                        "rendering": "Renderização",
+                        "rendering_webcomponent_by_before_semicolon": "Renderização - WebComponent por Before Semicolon",
+                        "learn_about_the_render_method_and_how_content_slots_work": "Aprenda sobre o método render() e como funcionam os slots de conteúdo."
+                    },
+                    "content": {
+                        "rendering": "Renderização",
+                        "the_primary_way_to_define_a_component_s_visual_interface_is_by_implementing_the_render_method_th": "A principal forma de definir a interface visual de um componente é implementando o método `render()`. Este método é chamado uma vez durante a inicialização do componente. O conteúdo retornado é renderizado no `contentRoot` do componente (que é a raiz da sombra ou o próprio elemento se a sombra DOM estiver desabilitada).",
+                        "the_render_method": "O método render()",
+                        "the_render_method_has_the_following_signature": "O método `render()` possui a seguinte assinatura:",
+                        "supported_return_types": "Tipos de devolução suportados",
+                        "htmltemplate_the_recommended_return_type_built_using_the_html_tagged_template_from_beforesemicol": "**`HtmlTemplate`**: O tipo de retorno recomendado. Construído usando o modelo marcado `html` de `@beforesemicolon/web-component`. Ele é compilado em atualizações DOM altamente eficientes que atualizam apenas os valores dinâmicos específicos em seu modelo.",
+                        "string_a_raw_html_string_can_be_returned_note_that_returning_raw_strings_does_not_benefit_from_t": "**`string`**: Uma string HTML bruta pode ser retornada. Observe que o retorno de strings brutas não se beneficia das atualizações reativas cirúrgicas fornecidas por `HtmlTemplate`.",
+                        "native_node_you_can_return_standard_dom_nodes_created_programmatically": "**`Node` nativo**: você pode retornar nós DOM padrão criados programaticamente.",
+                        "null_or_void_headless_or_logic_only_components_that_do_not_render_any_markup_can_return_null_or": "**`null` ou `void`**: componentes headless ou somente lógicos que não renderizam nenhuma marcação podem retornar `null` ou omitir o valor de retorno.",
+                        "slot_projections": "Projeções de slots",
+                        "web_components_support_content_projection_via_the_element_allowing_users_to_pass_markup_down_int": "Web Components oferece suporte à projeção de conteúdo por meio do elemento `<slot>`, permitindo que os usuários passem a marcação para seu componente. Por padrão, `@beforesemicolon/web-component` suporta slots padrão e slots nomeados.",
+                        "default_slots": "Slots padrão",
+                        "an_unnamed_acts_as_the_default_catch_all_container_for_any_children_passed_inside_your_custom_el": "Um `<slot>` sem nome atua como o contêiner padrão para todos os filhos passados dentro do seu elemento personalizado.",
+                        "component_definition": "**Definição do componente:**",
+                        "usage_in_html": "**Uso em HTML:**",
+                        "named_slots": "Slots Nomeados",
+                        "to_project_content_into_specific_locations_use_named_slots_you_specify_the_name_using_the_name_a": "Para projetar conteúdo em locais específicos, use slots nomeados. Você especifica o nome usando o atributo `name` no `<slot>` e combina-o usando o atributo `slot` no elemento a ser projetado."
+                    }
+                },
+                "typescript": {
+                    "meta": {
+                        "typescript": "TypeScript",
+                        "typescript_webcomponent_by_before_semicolon": "TypeScript - WebComponent por Before Semicolon",
+                        "complete_type_safety_and_generics_integration_in_webcomponent": "Integração completa de segurança de tipo e genéricos no WebComponent."
+                    },
+                    "content": {
+                        "typescript": "TypeScript",
+                        "beforesemicolon_web_component_is_designed_with_first_class_typescript_support_offering_complete": "O `@beforesemicolon/web-component` foi projetado com suporte TypeScript de primeira classe, oferecendo segurança de tipo completa para propriedades, estado interno, ligações de referência e interfaces de elementos personalizados.",
+                        "subclassing_with_generics": "Subclassificação com genéricos",
+                        "the_webcomponent_base_class_accepts_two_optional_generic_parameters_props_and_state": "A classe base `WebComponent` aceita dois parâmetros genéricos opcionais: `Props` e `State`.",
+                        "custom_element_references": "Referências de elementos personalizados",
+                        "when_working_with_dom_apis_or_template_references_you_often_need_a_reference_type_that_contains": "Ao trabalhar com APIs DOM ou referências de modelo, muitas vezes você precisa de um tipo de referência que contenha as propriedades personalizadas do seu elemento e as APIs `WebComponent`/`HTMLElement` padrão.",
+                        "the_htmlcomponentelement_utility_type_provides_this_capability_it_combines_the_webcomponent_clas": "O tipo de utilitário `HTMLComponentElement<Props>` fornece esse recurso. Ele combina a classe `WebComponent` com suas assinaturas de propriedades personalizadas (sem a necessidade de getters) para que você possa ler ou gravar valores diretamente.",
+                        "exported_utility_types": "Tipos de utilitários exportados",
+                        "the_following_typescript_utility_types_are_exported_from_the_library_to_help_build_typed_compone": "Os seguintes tipos de utilitário TypeScript são exportados da biblioteca para ajudar a construir arquiteturas baseadas em componentes digitados:",
+                        "objectinterface": "`ObjectInterface<P>`",
+                        "constraints_checking_helper_representing_an_object_containing_key_value_pairs_where_keys_must_be": "Auxiliar de verificação de restrições que representa um objeto contendo pares chave-valor onde as chaves devem ser `string`, `number` ou `symbol`.",
+                        "props": "`Props<P>`",
+                        "maps_each_key_in_a_properties_interface_p_to_a_reactive_stategetter_from_beforesemicolon_markup": "Mapeia cada chave em uma interface de propriedades `P` para um `StateGetter` reativo de `@beforesemicolon/markup`. Isso corresponde ao tipo de `this.props`.",
+                        "propssetters": "`PropsSetters<P>`",
+                        "maps_each_key_in_a_properties_interface_p_to_a_reactive_statesetter_from_beforesemicolon_markup": "Mapeia cada chave em uma interface de propriedades `P` para um `StateSetter` reativo de `@beforesemicolon/markup`.",
+                        "state": "`State<S>`",
+                        "maps_each_key_in_a_state_interface_s_to_a_reactive_stategetter_from_beforesemicolon_markup_this": "Mapeia cada chave em uma interface de estado `S` para um `StateGetter` reativo de `@beforesemicolon/markup`. Isso corresponde ao tipo de `this.state`.",
+                        "statesetters": "`StateSetters<S>`",
+                        "maps_each_key_in_a_state_interface_s_to_a_reactive_statesetter_from_beforesemicolon_markup": "Mapeia cada chave em uma interface de estado `S` para um `StateSetter` reativo de `@beforesemicolon/markup`."
+                    }
+                }
+            },
+            "get_started": {
+                "meta": {
+                    "get_started_webcomponent_by_before_semicolon": "Primeiros passos - WebComponent por Before Semicolon",
+                    "learn_how_to_build_your_first_reactive_web_component_using_the_webcomponent_class": "Aprenda como construir seu primeiro Web Component reativo usando a classe WebComponent."
+                },
+                "content": {
+                    "this_tutorial_will_guide_you_step_by_step_through_creating_registering_templating_and_using_your": "Este tutorial irá guiá-lo passo a passo na criação, registro, modelagem e uso de seu primeiro elemento personalizado reativo usando `@beforesemicolon/web-component`.",
+                    "step_1_declaring_the_component_class": "Etapa 1: Declarando a Classe do Componente",
+                    "to_create_a_new_component_declare_a_class_that_extends_webcomponent": "Para criar um novo componente, declare uma classe que estenda `WebComponent`.",
+                    "step_2_defining_the_custom_element_tag": "Etapa 2: Definindo a tag do elemento personalizado",
+                    "register_the_component_class_in_the_global_customelementregistry_using_the_standard_customelemen": "Registre a classe do componente no `CustomElementRegistry` global usando o método `customElements.define` padrão.",
+                    "custom_element_names_must_contain_at_least_one_hyphen_and_should_be_written_in_lowercase_kebab_c": "Os nomes dos elementos personalizados DEVEM conter pelo menos um hífen (`-`) e devem ser escritos em letras minúsculas (kebab-case) para evitar conflitos com elementos HTML padrão.",
+                    "step_3_adding_a_template": "Etapa 3: adicionar um modelo",
+                    "to_render_content_define_a_render_method_in_your_class_the_method_should_return_an_htmltemplate": "Para renderizar conteúdo, defina um método `render()` em sua classe. O método deve retornar um `HtmlTemplate` (criado usando o literal de modelo marcado com `html`), uma string HTML simples, um DOM nativo, `Node` ou `void`.",
+                    "step_4_using_the_custom_element_in_html": "Etapa 4: usando o elemento personalizado em HTML",
+                    "once_the_custom_element_is_registered_you_can_place_the_tag_anywhere_in_your_html_document": "Depois que o elemento personalizado for registrado, você poderá colocar a tag `<my-button>` em qualquer lugar do documento HTML.",
+                    "next_steps": "Próximas etapas",
+                    "now_that_you_have_built_your_first_web_component_explore_the_core_features_that_make_beforesemic": "Agora que você construiu seu primeiro componente da web, explore os principais recursos que tornam o `@beforesemicolon/web-component` poderoso:",
+                    "reactive_props_props_and_state_props_md_pass_data_into_your_components_and_handle_attribute_upda": "**[Propriedades reativas](./props-and-state/props.md)**: passe dados para seus componentes e lide com atualizações de atributos.",
+                    "reactive_state_props_and_state_state_md_manage_internal_state_and_automatically_trigger_surgical": "**[Estado reativo](./props-and-state/state.md)**: gerencie o estado interno e acione automaticamente atualizações cirúrgicas do DOM.",
+                    "lifecycle_hooks_events_and_lifecycle_lifecycle_md_run_setup_and_cleanup_code_with_onmount_and_on": "**[Lifecycle Hooks](./events-and-lifecycle/lifecycle.md)**: execute o código de configuração e limpeza com `onMount` e `onDestroy`."
+                }
+            },
+            "guide": {
+                "meta": {
+                    "guide_best_practices": "Guia e melhores práticas",
+                    "webcomponent_guide_and_best_practices_before_semicolon": "Guia e práticas recomendadas do WebComponent - Before Semicolon",
+                    "practical_conventions_for_building_reactive_custom_elements_with_beforesemicolon_web_component": "Convenções práticas para construir elementos reativos personalizados com @beforesemicolon/web-component."
+                },
+                "content": {
+                    "guide_best_practices": "Guia e melhores práticas",
+                    "use_beforesemicolon_web_component_when_you_want_native_custom_elements_with_a_small_reactive_lay": "Use `@beforesemicolon/web-component` quando desejar elementos personalizados nativos com uma pequena camada reativa para modelos, props, estado, estilos com escopo, ganchos de ciclo de vida e integração de formulários.",
+                    "core_rules": "Regras Básicas",
+                    "keep_render_declarative_return_html_a_node_a_string_or_nothing_do_not_start_timers_fetch_data_su": "**Mantenha `render()` declarativo**: Retorne `html`, um `Node`, uma string ou nada. Não inicie temporizadores, busque dados, assine eventos globais ou altere o estado dentro de `render()`.",
+                    "use_observed_attributes_for_public_inputs_put_external_inputs_in_static_observedattributes_provi": "**Use atributos observados para entradas públicas**: coloque entradas externas em `static observedAttributes`, forneça padrões como campos de classe e leia-os em `this.props`.",
+                    "use_state_for_owned_ui_data_put_private_component_data_in_initialstate_and_update_it_with_this_s": "**Usar estado para dados de IU próprios**: coloque dados de componentes privados em `initialState` e atualize-os com `this.setState()`.",
+                    "pass_reactive_getters_directly_when_possible_use_this_state_count_or_this_props_label_in_templat": "**Passe getters reativos diretamente quando possível**: Use `${this.state.count}` ou `${this.props.label}` em modelos. Chame getters dentro de cálculos, condições ou manipuladores de eventos.",
+                    "use_lifecycle_hooks_for_side_effects_start_work_in_onmount_return_cleanup_from_onmount_or_use_on": "**Use ganchos de ciclo de vida para efeitos colaterais**: comece a trabalhar em `onMount()`, retorne a limpeza de `onMount()` ou use `onDestroy()` e responda às alterações de prop em `onUpdate()`.",
+                    "prefer_ref_before_queryselector_use_ref_for_template_owned_elements_and_reach_for_contentroot_on": "**Prefira `ref` antes de `querySelector`**: Use `ref` para elementos de propriedade do modelo e alcance `contentRoot` somente quando a consulta dinâmica for genuinamente mais clara.",
+                    "dispatch_public_events_use_this_dispatch_name_detail_for_component_outputs_consumers_listen_with": "**Enviar eventos públicos**: Use `this.dispatch(name, detail)` para saídas de componentes. Os consumidores ouvem com APIs DOM normais ou manipuladores Markup `on...`.",
+                    "component_shape": "Forma do Componente",
+                    "attribute_formatting": "Formatação de atributos",
+                    "break_long_custom_element_usage_across_lines_it_keeps_examples_readable_and_avoids_horizontal_sc": "Interrompa o uso prolongado de elementos personalizados entre linhas. Mantém os exemplos legíveis e evita a rolagem horizontal.",
+                    "props_vs_state": "Adereços vs Estado",
+                    "use_props_for_values_controlled_by_the_outside_page_use_state_for_values_the_component_owns": "Use props para valores controlados pela página externa. Use state para valores que o componente possui.",
+                    "side_effects": "Efeitos colaterais",
+                    "use_onmount_for_browser_subscriptions_and_return_a_cleanup_function": "Use `onMount()` para assinaturas de navegador e retorne uma função de limpeza.",
+                    "styling": "Estilo",
+                    "use_stylesheet_for_static_css_and_css_when_styles_depend_on_props_or_state": "Use `stylesheet` para CSS estático e `css` quando os estilos dependem de props ou estado.",
+                    "form_controls": "Controles de formulário",
+                    "use_static_formassociated_true_only_for_controls_that_should_participate_in_native_form_submissi": "Use `static formAssociated = true` somente para controles que devem participar do envio ou validação do formulário nativo."
+                }
+            },
+            "index": {
+                "meta": {
+                    "what_is_webcomponent": "O que é WebComponent?",
+                    "what_is_webcomponent_webcomponent_by_before_semicolon": "O que é WebComponent? - WebComponent por Before Semicolon",
+                    "webcomponent_is_a_reactive_layer_on_top_of_native_web_components_api_powered_by_markup_it_adds_s": "WebComponent é uma camada reativa sobre a API Web Components nativa, desenvolvida por Markup. Ele adiciona estado, props, estilos de escopo e ciclos de vida."
+                },
+                "content": {
+                    "what_is_webcomponent": "O que é WebComponent?",
+                    "beforesemicolon_web_component_is_a_lightweight_compiler_free_reactive_layer_built_on_top_of_the": "`@beforesemicolon/web-component` é uma camada reativa leve e sem compilador construída sobre a API Web Components nativa. Ele é alimentado pelo mecanismo de modelo [@beforesemicolon/markup](https://markup.beforesemicolon.com) para trazer reatividade, gerenciamento de estado e estilo de escopo para elementos personalizados padrão.",
+                    "by_design_the_native_web_components_apis_are_low_level_and_verbose_writing_raw_custom_elements_o": "Por design, as APIs Web Components nativas são de baixo nível e detalhadas. A gravação de elementos personalizados brutos geralmente resulta em padrões redundantes para manipulação de DOM, rastreamento de atributos, manipulação de eventos e atualizações manuais da interface do usuário. A classe base `WebComponent` simplifica esse processo, permitindo criar componentes reativos independentes usando APIs de navegador padrão.",
+                    "key_enhancements": "Principais melhorias",
+                    "webcomponent_wraps_native_custom_elements_with_several_major_enhancements": "WebComponent envolve elementos personalizados nativos com vários aprimoramentos importantes:",
+                    "state_management_reactive_internal_state_that_triggers_targeted_dom_updates_when_mutated_via_set": "**Gerenciamento de estado**: estado interno reativo que aciona atualizações DOM direcionadas quando modificado por meio de `setState`.",
+                    "props_management_maps_observed_attributes_directly_to_reactive_properties_handling_automatic_cam": "**Gerenciamento de props**: mapeia atributos observados diretamente para propriedades reativas, lidando com conversão e desserialização automáticas de camelCase.",
+                    "component_styling_first_class_support_for_cssstylesheet_objects_css_import_assertions_and_reacti": "**Estilo de componentes**: suporte de primeira classe para objetos `CSSStyleSheet`, asserções de importação CSS e folhas de estilo reativas por meio do modelo marcado com `css`.",
+                    "form_integration_out_of_the_box_support_for_form_associated_custom_elements_exposing_standard_fo": "**Integração de formulários**: suporte pronto para uso para elementos personalizados associados a formulários, expondo verificação de formulário padrão e APIs de configuração de valor.",
+                    "lifecycles_predictable_wrappers_around_native_element_connection_callbacks_supporting_cleanup_fu": "**Ciclos de vida**: wrappers previsíveis em torno de retornos de chamada de conexão de elementos nativos, com suporte a retornos de funções de limpeza.",
+                    "template_refs_easily_reference_and_query_rendered_dom_elements_without_using_verbose_queryselect": "**Referências de modelo**: faça referência e consulte facilmente elementos DOM renderizados sem usar chamadas `querySelector` ou `shadowRoot` detalhadas.",
+                    "error_handling_a_centralized_onerror_hook_to_catch_and_process_runtime_rendering_or_lifecycle_er": "**Tratamento de erros**: um gancho `onError` centralizado para capturar e processar renderização em tempo de execução ou erros de ciclo de vida.",
+                    "event_dispatching_a_clean_dispatch_helper_to_fire_standard_customevent_instances_with_typed_deta": "**Envio de eventos**: um auxiliar `dispatch` limpo para disparar instâncias `CustomEvent` padrão com cargas detalhadas digitadas.",
+                    "start_here": "Comece aqui",
+                    "ai_guide_ai_md": "[Guia de IA](./ai.md)",
+                    "full_example": "Exemplo completo",
+                    "here_is_a_complete_reactive_counter_component_implemented_in_typescript_showcasing_props_state_e": "Aqui está um componente completo de contador reativo implementado em TypeScript, apresentando props, estado, envio de eventos, folhas de estilo e renderização de modelo:",
+                    "in_your_html_you_can_simply_use_the_tag_normally": "No seu HTML você pode simplesmente usar a tag normalmente."
+                }
+            },
+            "installation": {
+                "meta": {
+                    "installation": "Instalação",
+                    "installation_webcomponent_by_before_semicolon": "Instalação - WebComponent por Before Semicolon",
+                    "install_webcomponent_via_npm_yarn_pnpm_or_include_it_via_cdn": "Instale o WebComponent via npm, yarn, pnpm ou inclua-o via CDN."
+                },
+                "content": {
+                    "installation": "Instalação",
+                    "beforesemicolon_web_component_is_a_plug_and_play_library_it_does_not_require_complex_build_steps": "`@beforesemicolon/web-component` é uma biblioteca plug-and-play. Não requer etapas complexas de construção, configuração de compilador ou empacotadores. Você pode usá-lo instalando-o por meio de um gerenciador de pacotes ou incluindo-o diretamente de um CDN em uma tag de script de navegador padrão.",
+                    "via_package_managers": "Por meio de gerenciadores de pacotes",
+                    "install_the_package_using_your_package_manager_of_choice": "Instale o pacote usando o gerenciador de pacotes de sua preferência:",
+                    "npm": "npm",
+                    "yarn": "yarn",
+                    "pnpm": "pnpm",
+                    "once_installed_you_can_import_webcomponent_styling_utilities_and_markup_templating_functions_dir": "Depois de instalado, você pode importar `WebComponent`, utilitários de estilo e funções de modelo Markup diretamente em seus arquivos JavaScript ou TypeScript:",
+                    "via_cdn": "Via CDN",
+                    "for_rapid_prototyping_or_zero_build_environments_you_can_include_the_script_from_a_cdn_such_as_u": "Para ambientes de prototipagem rápida ou de construção zero, você pode incluir o script de um CDN (como **unpkg** ou **jsDelivr**) no `<head>` do seu documento.",
+                    "latest_version": "Versão mais recente",
+                    "specific_version": "Versão Específica",
+                    "cdn_global_namespaces": "Namespaces globais CDN",
+                    "when_using_the_client_cdn_build_beforesemicolon_web_component_exposes_a_global_variable_bfs_unde": "Ao usar a construção CDN do cliente, `@beforesemicolon/web-component` expõe uma variável global `BFS`. Neste namespace, você pode acessar os elementos principais:",
+                    "bfs_webcomponent_the_base_class_for_building_custom_elements": "**`BFS.WebComponent`**: a classe base para a construção de elementos personalizados.",
+                    "bfs_css_the_tagged_template_styling_helper": "**`BFS.css`**: o auxiliar de estilo de modelo marcado.",
+                    "bfs_markup_the_underlying_markup_library_namespace_containing_html_state_effect_and_other_templa": "**`BFS.MARKUP`**: o namespace da biblioteca Markup subjacente contendo `html`, `state`, `effect` e outros utilitários de modelo.",
+                    "here_is_an_example_of_accessing_these_apis_from_browser_native_scripts": "Aqui está um exemplo de acesso a essas APIs a partir de scripts nativos do navegador:"
+                }
+            },
+            "props_and_state": {
+                "props": {
+                    "meta": {
+                        "props": "Props",
+                        "props_webcomponent_by_before_semicolon": "Adereços - WebComponent por Before Semicolon",
+                        "define_and_read_reactive_external_properties_mapped_to_observed_attributes": "Defina e leia propriedades externas reativas mapeadas para atributos observados."
+                    },
+                    "content": {
+                        "props": "Props",
+                        "props_are_the_external_inputs_to_your_component_in_webcomponent_props_are_bound_to_html_attribut": "Props são as entradas externas do seu componente. No WebComponent, os props são vinculados aos atributos HTML, fornecendo uma maneira reativa e contínua de receber dados de pais ou consumidores externos.",
+                        "declaring_props": "Declarando props",
+                        "to_declare_reactive_props_add_their_attribute_names_to_the_static_observedattributes_array_webco": "Para declarar props reativos, adicione seus nomes de atributos ao array `static observedAttributes`. WebComponent monitora automaticamente esses atributos e configura getters/setters reativos na instância do elemento.",
+                        "case_conversion": "Conversão de Caso",
+                        "html_attributes_are_case_insensitive_and_conventionally_written_in_kebab_case_e_g_card_title_web": "Os atributos HTML não diferenciam maiúsculas de minúsculas e são convencionalmente escritos em kebab-case (por exemplo, `card-title`). WebComponent converte automaticamente esses atributos kebab-case em propriedades camelCase na instância da classe (por exemplo, `cardTitle`).",
+                        "for_example": "Por exemplo:",
+                        "card_title_becomes_cardtitle": "`card-title` torna-se `cardTitle`",
+                        "is_open_becomes_isopen": "`is-open` torna-se `isOpen`",
+                        "disabled_remains_disabled": "`disabled` permanece `disabled`",
+                        "default_values": "Valores padrão",
+                        "you_can_specify_default_values_for_your_props_by_defining_them_as_class_fields_if_the_correspond": "Você pode especificar valores padrão para suas propriedades definindo-as como campos de classe. Se o atributo correspondente não estiver presente no elemento quando ele for montado, o valor padrão será usado.",
+                        "reading_props_in_templates": "Lendo acessórios em modelos",
+                        "inside_the_component_class_you_can_access_the_reactive_getter_functions_via_this_props": "Dentro da classe do componente, você pode acessar as funções getter reativas via `this.props`.",
+                        "since_these_props_are_reactive_signal_getters_they_should_be_invoked_as_functions_to_read_their": "Como esses props são getters de sinais reativos, eles devem ser invocados como funções para ler seu valor atual (por exemplo, `this.props.cardTitle()`). Quando usado em modelos Markup, passar a função getter diretamente permite que o modelo assine atualizações automaticamente:",
+                        "passing_this_props_cardtitle_directly_as_an_expression_in_the_template_without_calling_it_works": "Passar `this.props.cardTitle` diretamente como uma expressão no modelo (sem chamá-lo) funciona porque Markup foi projetado para resolver getters de forma reativa. Se você estiver fazendo cálculos ou renderização condicional dentro de um retorno de chamada de função, chame-o como uma função: `this.props.isOpen()`.",
+                        "attribute_parsing_serialization": "Análise e serialização de atributos",
+                        "webcomponent_does_not_serialize_and_deserialize_prop_values_as_a_component_data_protocol": "WebComponent não serializa e desserializa valores prop como um protocolo de dados de componente.",
+                        "there_are_two_different_paths": "Existem dois caminhos diferentes:",
+                        "string_attributes_literal_html_attributes_and_setattribute_values_are_browser_strings_webcompone": "**Atributos de string**: atributos literais HTML e valores `setAttribute()` são strings de navegador. WebComponent passa essas strings por meio de seu analisador JSON interno, de modo que valores de aparência primitiva podem se tornar primitivos e valores de aparência JSON podem se tornar matrizes ou objetos.",
+                        "property_reference_values_values_assigned_through_the_component_property_including_values_passed": "**Valores de propriedade/referência**: os valores atribuídos por meio da propriedade do componente, incluindo valores passados de expressões Markup, são mantidos como valores JavaScript. Objetos, matrizes, funções e outros não primitivos são passados ​​por referência e não são gravados em atributos HTML.",
+                        "primitive_property_values_when_you_assign_a_primitive_value_directly_to_the_component_property_w": "**Valores de propriedades primitivas**: quando você atribui um valor primitivo diretamente à propriedade do componente, o WebComponent o espelha de volta para o atributo kebab-case correspondente.",
+                        "in_this_html_only_example_webcomponent_receives_strings_from_the_browser_and_parses_json_compati": "Neste exemplo somente HTML, WebComponent recebe strings do navegador e analisa valores compatíveis com JSON antes de atualizar `this.props`:",
+                        "card_title_remains_the_string_my_project": "`card-title` continua sendo a sequência `\"My Project\"`.",
+                        "count_becomes_the_number_3": "`count` passa a ser o número `3`.",
+                        "enabled_becomes_the_boolean_true": "`enabled` torna-se o booleano `true`.",
+                        "tags_becomes_the_array_ui_release": "`tags` torna-se a matriz `[\"ui\", \"release\"]`.",
+                        "when_a_parent_template_passes_a_non_primitive_value_keep_it_as_a_reference_instead_of_stringifyi": "Quando um modelo pai passa um valor não primitivo, mantenha-o como referência em vez de restringi-lo:",
+                        "the_project_prop_is_the_original_object_reference_it_is_not_converted_to_json_placed_in_the_dom": "A propriedade `project` é a referência do objeto original. Ele não é convertido em JSON, colocado em DOM como uma sequência de atributos e analisado novamente posteriormente.",
+                        "imperative_updates": "Atualizações imperativas",
+                        "you_can_also_read_and_write_props_imperatively_directly_on_the_element_instance_primitive_values": "Você também pode ler e escrever props imperativamente diretamente na instância do elemento. Os valores primitivos são sincronizados com os atributos HTML. Valores não primitivos atualizam a propriedade reativa diretamente e permanecem como referências.",
+                        "practical_component_example": "Exemplo prático de componente"
+                    }
+                },
+                "refs": {
+                    "meta": {
+                        "refs": "Referências",
+                        "refs_webcomponent_by_before_semicolon": "Referências - WebComponent por Before Semicolon",
+                        "safely_reference_and_interact_with_rendered_dom_elements_inside_your_templates": "Faça referência e interaja com segurança com elementos DOM renderizados dentro de seus modelos."
+                    },
+                    "content": {
+                        "refs": "Referências",
+                        "while_declarative_programming_is_preferred_there_are_times_when_you_need_to_access_dom_elements": "Embora a programação declarativa seja preferida, há momentos em que você precisa acessarDOMelementos diretamente para realizar operações imperativas (por exemplo, focar uma entrada, reproduzir um vídeo, inicializar bibliotecas de terceiros ou medir dimensões de elementos). WebComponent integraMarkupde`ref`sistema para permitir que você faça referência a elementos facilmente.",
+                        "binding_refs_in_templates": "Vinculando referências em modelos",
+                        "to_bind_a_dom_element_add_a_ref_attribute_with_a_unique_name_to_any_element_in_your_template": "Para vincular um elemento DOM, adicione um atributo `ref` com um nome exclusivo a qualquer elemento em seu modelo.",
+                        "accessing_refs_via_this_refs": "Acessando referências via `this.refs`",
+                        "you_can_access_all_bound_elements_using_the_this_refs_getter": "Você pode acessar todos os elementos vinculados usando o getter `this.refs`.",
+                        "since_multiple_elements_can_share_the_same_ref_name_each_key_in_this_refs_returns_an_array_of_el": "Como vários elementos podem compartilhar o mesmo nome de referência, cada chave em `this.refs` retorna uma **matriz** de elementos que correspondem a esse nome de referência. Se houver apenas um elemento com essa ref, ele ainda será retornado dentro de um array (por exemplo, como o primeiro elemento: `this.refs.textInput[0]`).",
+                        "refs_and_lifecycle": "Referências e ciclo de vida",
+                        "references_are_only_populated_after_the_component_is_rendered_and_mounted_they_are_not_available": "As referências só são preenchidas depois que o componente é renderizado e montado. Eles não estão disponíveis dentro do `constructor`.",
+                        "if_you_need_to_perform_imperative_operations_immediately_when_the_element_appears_use_the_onmoun": "Se você precisar executar operações imperativas imediatamente quando o elemento aparecer, use o gancho de ciclo de vida `onMount`.",
+                        "multiple_elements_dynamic_refs": "Múltiplos Elementos/Referências Dinâmicas",
+                        "you_can_use_the_same_ref_name_on_multiple_elements_to_group_them_webcomponent_will_return_all_re": "Você pode usar o mesmo nome de referência em vários elementos para agrupá-los. WebComponent retornará todos os elementos renderizados que compartilham esse nome de referência na ordem em que aparecem.",
+                        "refs_are_dynamic_if_elements_are_conditionally_rendered_e_g_using_helper_functions_like_when_the": "As referências são dinâmicas. Se os elementos forem renderizados condicionalmente (por exemplo, usando funções auxiliares como `when`), eles serão adicionados ou removidos dos arrays `this.refs` de acordo. Sempre verifique se o array ref e seus elementos existem antes de acessá-los."
+                    }
+                },
+                "state": {
+                    "meta": {
+                        "state": "State",
+                        "state_webcomponent_by_before_semicolon": "Estado - WebComponent por Before Semicolon",
+                        "manage_reactive_local_component_state_using_initialstate_and_setstate": "Gerencie o estado local reativo do componente usando initialState e setState."
+                    },
+                    "content": {
+                        "state": "State",
+                        "state_is_the_internal_reactive_data_owned_and_managed_exclusively_by_the_component_unlike_props": "Estado são os dados reativos internos de propriedade e gerenciados exclusivamente pelo componente. Ao contrário dos props, o estado não é exposto ou mapeado para atributos HTML e destina-se a armazenar dados que mudam ao longo do ciclo de vida do componente (por exemplo, status de alternância da IU, valores de entrada, resultados de busca de API).",
+                        "declaring_initial_state": "Declarando o estado inicial",
+                        "to_define_a_component_s_internal_state_assign_an_object_to_the_initialstate_class_property_each": "Para definir o estado interno de um componente, atribua um objeto à propriedade da classe `initialState`. Cada chave neste objeto será inicializada como um getter de estado reativo.",
+                        "reading_state_in_templates": "Lendo o estado em modelos",
+                        "like_props_the_properties_of_this_state_are_reactive_getter_functions_you_can_access_the_values": "Assim como os props, as propriedades de `this.state` são funções getter reativas. Você pode acessar os valores dentro dos seus modelos passando o getter diretamente ou invocando-o.",
+                        "pass_the_getter_directly_to_let_the_template_handle_reactive_bindings_this_state_count": "Passe o getter diretamente para permitir que o modelo lide com ligações reativas: `this.state.count`",
+                        "invoke_it_as_a_function_when_executing_calculations_or_inside_conditional_blocks_this_state_coun": "Invoque-o como uma função ao executar cálculos ou dentro de blocos condicionais: `this.state.count()`",
+                        "modifying_state_via_setstate": "Modificando estado via `setState`",
+                        "to_update_state_reactively_call_this_setstate_this_method_accepts_either_a_partial_state_object": "Para atualizar o estado de forma reativa, chame `this.setState()`. Este método aceita um objeto de estado parcial ou uma função de retorno de chamada.",
+                        "object_merge_format": "Formato de mesclagem de objetos",
+                        "you_can_pass_a_partial_object_containing_the_fields_you_want_to_update_webcomponent_will_merge_t": "Você pode passar um objeto parcial contendo os campos que deseja atualizar. O WebComponent mesclará as atualizações no estado automaticamente, portanto, você não precisará espalhar manualmente o restante do estado.",
+                        "callback_format": "Formato de retorno de chamada",
+                        "if_your_new_state_depends_on_the_previous_state_pass_a_callback_function_the_callback_receives_t": "Se o seu novo estado depender do estado anterior, passe uma função de retorno de chamada. O retorno de chamada recebe o objeto de estado atual com seus valores avaliados (não getters) e deve retornar um objeto de estado parcial.",
+                        "lifecycle_restrictions": "Restrições de ciclo de vida",
+                        "state_updates_trigger_dom_updates_because_of_this_calling_this_setstate_before_the_component_is": "As atualizações de estado acionam atualizações DOM. Por causa disso, chamar `this.setState()` antes de o componente ser montado (ou seja, quando `this.mounted` é `false`) ou depois de ter sido desmontado resultará em um erro.",
+                        "if_you_need_to_fetch_data_or_trigger_state_updates_as_soon_as_the_component_loads_do_so_in_the_o": "Se você precisar buscar dados ou acionar atualizações de estado assim que o componente for carregado, faça isso no gancho do ciclo de vida `onMount`:",
+                        "derived_ui_example": "Exemplo de UI derivada",
+                        "keep_the_source_state_intact_and_derive_display_values_inside_functions": "Mantenha o estado de origem intacto e derive valores de exibição dentro das funções."
+                    }
+                }
+            },
+            "styling": {
+                "css_utility": {
+                    "meta": {
+                        "css_utility": "Utilitário CSS",
+                        "css_utility_webcomponent_by_before_semicolon": "Utilitário css - WebComponent por Before Semicolon",
+                        "use_the_css_tagged_template_literal_to_build_highly_reactive_and_dynamic_component_styles": "Use o modelo literal com tag css para criar estilos de componentes altamente reativos e dinâmicos."
+                    },
+                    "content": {
+                        "css_utility": "Utilitário CSS",
+                        "for_stylesheets_that_need_to_change_dynamically_in_response_to_state_or_property_updates_webcomp": "Para folhas de estilo que precisam ser alteradas dinamicamente em resposta a atualizações de estado ou propriedade, o WebComponent fornece o literal de modelo marcado com `css`. Este utilitário permite injetar funções reativas e auxiliares Markup diretamente em seu código CSS.",
+                        "how_it_works": "Como funciona",
+                        "the_css_tag_returns_an_instance_of_the_cssstyle_class_under_the_hood_any_function_interpolated_i": "A tag `css` retorna uma instância da classe `CSSStyle`. Nos bastidores, qualquer função interpolada dentro do literal do modelo é automaticamente encapsulada em um Markup `effect`.",
+                        "when_any_reactive_prop_or_state_getter_is_called_inside_these_functions_it_registers_as_a_depend": "Quando qualquer suporte reativo ou getter de estado é chamado dentro dessas funções, ele é registrado como uma dependência. Sempre que essas dependências mudam, o efeito é executado novamente e o WebComponent atualiza dinamicamente as folhas de estilo adotadas pelo componente, sem recriar o elemento da folha de estilo.",
+                        "practical_example": "Exemplo prático",
+                        "in_the_following_example_the_background_and_text_color_of_the_badge_change_reactively_based_on_t": "No exemplo a seguir, o plano de fundo e a cor do texto do emblema mudam reativamente com base no valor da propriedade `status`.",
+                        "using_markup_helpers_when_is": "Usando auxiliares Markup (`when` e `is`)",
+                        "to_make_dynamic_styling_cleaner_you_can_use_beforesemicolon_markup_s_reactive_helpers_like_when": "Para tornar o estilo dinâmico mais limpo, você pode usar os auxiliares reativos do `@beforesemicolon/markup`, como `when()` e `is()` diretamente dentro de suas strings de estilo. Eles retornam funções reativas que resolvem valores dinamicamente.",
+                        "is_getter_expectedvalue_checks_if_a_getter_returns_a_matching_value": "`is(getter, expectedValue)`: Verifica se um getter retorna um valor correspondente.",
+                        "when_condition_thenvalue_otherwisevalue_evaluates_a_condition_can_be_a_getter_or_a_function_and": "`when(condition, thenValue, otherwiseValue)`: Avalia uma condição (pode ser um getter ou uma função) e retorna o valor correspondente.",
+                        "here_is_the_same_example_using_these_helpers": "Aqui está o mesmo exemplo usando esses ajudantes:",
+                        "the_cssstyle_class": "A classe `CSSStyle`",
+                        "the_css_function_parses_the_strings_and_values_into_a_cssstyle_instance_the_class_has_the_follow": "A função `css` analisa as strings e os valores em uma instância `CSSStyle`. A classe possui a seguinte API pública:",
+                        "tostring_evaluates_and_returns_the_stylesheet_as_a_plain_css_string": "**`toString()`**: avalia e retorna a folha de estilo como uma string CSS simples.",
+                        "onupdate_callback_registers_a_callback_function_that_is_invoked_with_the_updated_css_string_when": "**`onUpdate(callback)`**: registra uma função de retorno de chamada que é chamada com a string CSS atualizada sempre que qualquer valor reativo interpolado é alterado.",
+                        "webcomponent_hooks_into_the_onupdate_method_automatically_meaning_you_rarely_need_to_call_onupda": "O WebComponent se conecta automaticamente ao método `onUpdate`, o que significa que você raramente precisa chamar `onUpdate` manualmente em seu aplicativo."
+                    }
+                },
+                "stylesheet": {
+                    "meta": {
+                        "stylesheet": "Folha de estilo",
+                        "stylesheet_webcomponent_by_before_semicolon": "Folha de estilo - WebComponent por Before Semicolon",
+                        "learn_how_to_load_assign_and_manage_component_styles_using_the_stylesheet_property": "Aprenda como carregar, atribuir e gerenciar estilos de componentes usando a propriedade stylesheet."
+                    },
+                    "content": {
+                        "stylesheet": "Folha de estilo",
+                        "the_stylesheet_class_property_is_the_primary_way_to_define_styling_for_your_component_webcompone": "A propriedade de classe `stylesheet` é a principal forma de definir o estilo do seu componente. WebComponent aceita uma variedade de formatos de folha de estilo e os processa automaticamente com base nas configurações do Shadow DOM.",
+                        "supported_stylesheet_formats": "Formatos de folha de estilo suportados",
+                        "you_can_assign_a_css_string_a_native_cssstylesheet_instance_or_a_css_import_assertion_to_the_sty": "Você pode atribuir uma sequência CSS, uma instância `CSSStyleSheet` nativa ou uma asserção de importação CSS à propriedade `stylesheet`.",
+                        "text_1_css_strings": "1. Cordas CSS",
+                        "the_simplest_way_is_to_define_your_stylesheet_as_a_plain_css_string": "A maneira mais simples é definir sua folha de estilo como uma string CSS simples:",
+                        "text_2_css_import_assertions": "2. Asserções de importação CSS",
+                        "if_your_build_environment_or_browser_supports_css_module_imports_you_can_import_a_css_file_direc": "Se o seu ambiente de construção ou navegador suportar importações do módulo CSS, você poderá importar um arquivo `.css` diretamente e atribuir a exportação da folha de estilo:",
+                        "text_3_native_cssstylesheet": "3. `CSSStyleSheet` nativo",
+                        "you_can_also_construct_stylesheets_imperatively": "Você também pode construir folhas de estilo imperativamente:",
+                        "shadow_dom_vs_light_dom_behavior": "Comportamento de sombra DOM vs. luz DOM",
+                        "behind_the_scenes_webcomponent_uses_adopted_stylesheets_to_inject_your_styles_where_those_styles": "Nos bastidores, o WebComponent usa **Folhas de estilo adotadas** para injetar seus estilos. O local onde essas folhas de estilo são adotadas depende da configuração do seu componente.",
+                        "under_shadow_dom_default": "Sob sombra DOM (padrão)",
+                        "if_shadow_dom_is_active_the_style_is_adopted_by_the_shadow_root_of_the_component_it_keeps_styles": "Se Shadow DOM estiver ativo, o estilo é adotado pela Shadow Root do componente. Mantém os estilos isolados e permite o uso do seletor `:host`.",
+                        "under_light_dom": "Sob luz DOM",
+                        "if_you_disable_shadow_dom_by_setting_config_shadow_false_the_component_cannot_adopt_styles_local": "Se você desabilitar Shadow DOM configurando `config.shadow = false`, o componente não poderá adotar estilos localmente, pois não há Shadow Root. WebComponent lida com isso adotando os estilos no documento (ou o mais próximo que contém a raiz de sombra ancestral).",
+                        "because_global_styles_can_leak_webcomponent_automatically_parses_and_rewrites_specific_selectors": "Como os estilos globais podem vazar, o WebComponent analisa e reescreve automaticamente seletores específicos:",
+                        "host_is_rewritten_to_the_custom_element_s_tag_name_e_g_my_element": "`:host` é reescrito com o nome da tag do elemento personalizado (por exemplo, `my-element`).",
+                        "host_context_selector_is_rewritten_to_match_the_target_context_e_g_selector_my_element": "`:host-context(selector)` é reescrito para corresponder ao contexto de destino (por exemplo, `selector my-element`).",
+                        "this_ensures_your_styling_rules_continue_to_work_as_expected_even_if_you_decide_to_toggle_the_sh": "Isso garante que suas regras de estilo continuem funcionando conforme o esperado, mesmo se você decidir alternar a configuração do Shadow DOM."
+                    }
+                },
+                "update_stylesheet": {
+                    "meta": {
+                        "updatestylesheet": "updateStylesheet",
+                        "updatestylesheet_webcomponent_by_before_semicolon": "updateStylesheet - WebComponent por Before Semicolon",
+                        "swap_stylesheets_dynamically_at_runtime_using_updatestylesheet": "Troque folhas de estilo dinamicamente em tempo de execução usando updateStylesheet."
+                    },
+                    "content": {
+                        "updatestylesheet": "updateStylesheet",
+                        "while_the_css_tagged_template_is_perfect_for_fine_grained_style_changes_there_are_times_when_you": "Embora o modelo marcado `css` seja perfeito para mudanças de estilo refinadas, há momentos em que você precisa substituir ou desanexar totalmente as folhas de estilo (por exemplo, trocando temas globais, alternando entre folhas de estilo no modo claro e escuro ou manipulando folhas de estilo de terceiros). Você pode executar essas atualizações dinâmicas usando `this.updateStylesheet()`.",
+                        "method_signature": "Assinatura do Método",
+                        "parameters": "Parâmetros",
+                        "sheet": "**`sheet`**:",
+                        "cssstylesheet_adopts_the_new_stylesheet_object_directly": "`CSSStyleSheet`: Adota diretamente o novo objeto de folha de estilo.",
+                        "string_parses_the_css_string_into_a_stylesheet_rewrites_host_selectors_if_shadow_dom_is_disabled": "`string`: analisa a string CSS em uma folha de estilo, reescreve os seletores `:host` se Shadow DOM estiver desabilitado e o adota.",
+                        "null_detaches_and_removes_the_current_stylesheet_from_the_element_s_content_root_or_document": "`null`: Desanexa e remove a folha de estilo atual da raiz de conteúdo do elemento (ou documento).",
+                        "dynamic_theme_swapping_example": "Exemplo de troca dinâmica de tema",
+                        "in_this_example_we_define_two_themes_and_swap_the_stylesheet_dynamically_when_a_user_clicks_a_bu": "Neste exemplo, definimos dois temas e trocamos a folha de estilo dinamicamente quando um usuário clica em um botão:",
+                        "detaching_stylesheets": "Desanexando folhas de estilo",
+                        "to_remove_all_styling_applied_via_the_component_s_stylesheet_property_call_this_updatestylesheet": "Para remover todos os estilos aplicados por meio da propriedade de folha de estilo do componente, chame `this.updateStylesheet(null)`:",
+                        "how_webcomponent_handles_swapping": "Como o WebComponent lida com a troca",
+                        "when_you_call_updatestylesheet_sheet_webcomponent_will": "Quando você chama `updateStylesheet(sheet)`, o WebComponent irá:",
+                        "locate_the_currently_active_stylesheet_and_filter_it_out_of_the_container_s_adoptedstylesheets_a": "Localize a folha de estilo atualmente ativa e filtre-a da matriz `adoptedStyleSheets` do contêiner.",
+                        "convert_the_new_stylesheet_parameter_into_a_native_cssstylesheet_if_it_is_a_string": "Converta o novo parâmetro de folha de estilo em um `CSSStyleSheet` nativo se for uma string.",
+                        "apply_light_dom_selector_rewriting_e_g_converting_host_to_the_element_s_tag_name_if_config_shado": "Aplique a reescrita do seletor Light DOM (por exemplo, convertendo `:host` para o nome da tag do elemento) se `config.shadow` for `false`.",
+                        "append_the_new_stylesheet_to_adoptedstylesheets_on_either": "Anexe a nova folha de estilo a `adoptedStyleSheets` em:",
+                        "the_element_s_shadowroot_if_shadow_dom_is_enabled": "O `ShadowRoot` do elemento (se Shadow DOM estiver habilitado).",
+                        "the_document_or_parent_shadow_root_if_shadow_dom_is_disabled": "O `document` ou Shadow Root pai (se Shadow DOM estiver desabilitado)."
+                    }
+                }
+            }
+        },
+        "home": {
+            "meta": {
+                "webcomponent": "WebComponent",
+                "webcomponent_by_before_semicolon": "WebComponent por Before Semicolon",
+                "build_reactive_web_components_enhanced_with_state_props_scoped_styles_lifecycles_and_form_integr": "Crie Web Components reativo aprimorado com estado, props, estilos de escopo, ciclos de vida e integração de formulários - com tecnologia Markup."
+            },
+            "content": {
+                "web_components": "Web Components.",
+                "now_reactive": "Agora reativo.",
+                "a_tiny_reactive_layer_over_the_native_web_components_api_props_state_scoped_styles_and_lifecycle": "Uma pequena camada reativa sobre a API Web Components nativa. Props, estado, estilos com escopo e ciclos de vida — todos criados em [Markup](https://markup.beforesemicolon.com/).",
+                "native": "Nativo",
+                "custom_elements": "ELEMENTOS PERSONALIZADOS",
+                "dependencies": "DEPENDÊNCIAS",
+                "framework_friendly": "AMIGÁVEL À ESTRUTURA",
+                "the_ecosystem": "`// the ecosystem`",
+                "built_on_web_component": "Construído em Web Component.",
+                "production_ready_libraries_built_on_top_of_web_component_same_custom_element_foundation_modular": "Bibliotecas prontas para produção construídas sobre Web Component — mesma base de elementos personalizados, pacotes modulares.",
+                "declarative_routing_as_web_component_tags_built_on_top_of_web_component_nested_routes_params_404": "Roteamento declarativo como tags de componentes da web — construído sobre Web Component. Rotas aninhadas, parâmetros, 404s.",
+                "localization_for_component_first_interfaces_built_on_top_of_web_component_locale_scopes_messages": "Localização para interfaces que priorizam os componentes — construídas com base no Web Component. Escopos de localidade, mensagens, formatadores.",
+                "why_web_component": "`// why web-component`",
+                "custom_elements_supercharged": "Elementos personalizados, sobrecarregados.",
+                "everything_you_love_about_native_web_components_plus_the_reactivity_ergonomics_and_tiny_footprin": "Tudo o que você adora no Web Components nativo — além da reatividade, ergonomia e tamanho reduzido do Markup.",
+                "reactive_props_state": "Adereços reativos e estado",
+                "observed_attributes_become_reactive_props_updating_state_updates_only_the_dom_that_depends_on_it": "Atributos observados tornam-se props reativos. A atualização do estado atualiza apenas o DOM que depende dele.",
+                "tiny": "Minúsculo",
+                "a_thin_layer_over_the_native_web_components_api_built_on_markup_no_extra_dependencies": "Uma camada fina sobre a API Web Components nativa. Construído em Markup — sem dependências extras.",
+                "scoped_styles": "Estilos com escopo",
+                "per_component_stylesheets_that_ship_with_the_element_no_leaks_no_conflicts_no_css_in_js_runtime": "Folhas de estilo por componente fornecidas com o elemento. Sem vazamentos, sem conflitos, sem tempo de execução CSS-in-JS.",
+                "native_lifecycles": "Ciclos de vida nativos",
+                "onmount_onupdate_ondestroy_onadoption_first_class_hooks_for_everything_custom_elements_expose": "onMount, onUpdate, onDestroy, onAdoption — ganchos de primeira classe para tudo o que os elementos personalizados expõem.",
+                "works_everywhere": "Funciona em qualquer lugar",
+                "custom_elements_run_in_any_framework_in_plain_html_or_in_any_tool_that_renders_dom": "Elementos personalizados são executados em qualquer estrutura, em HTML simples ou em qualquer ferramenta que renderize DOM.",
+                "built_on_markup": "Construído em Markup",
+                "same_reactive_engine_same_templating_same_0_build_philosophy_drop_in_a_script_tag_and_ship": "O mesmo mecanismo reativo, o mesmo modelo, a mesma filosofia de construção 0. Insira uma tag de script e envie.",
+                "see_it_in_action": "`// see it in action`",
+                "real_components_native_tags": "Componentes reais. Tags nativas.",
+                "build_focused_elements_that_own_their_props_state_styles_lifecycle_work_and_public_events": "Crie elementos focados que possuam seus props, estado, estilos, trabalho de ciclo de vida e eventos públicos.",
+                "quantity_stepper": "Passo a passo de quantidade",
+                "todo_list": "Lista de tarefas",
+                "pricing_toggle": "Alternar preços",
+                "validated_field": "Campo validado",
+                "reactive_stylesheet": "Folha de estilo reativa",
+                "quick_start": "`// quick start`",
+                "install_in_seconds": "Instale em segundos.",
+                "choose_your_preferred_installation_method_works_everywhere_javascript_runs": "Escolha seu método de instalação preferido. Funciona em qualquer lugar que o JavaScript seja executado.",
+                "build_reactive_web_components": "Construir Web Components reativo,",
+                "your_way": "do seu jeito.",
+                "combine_the_simplicity_of_vanilla_web_standards_with_the_power_of_modern_reactivity": "Combine a simplicidade dos Web Standards vanilla com o poder da reatividade moderna."
+            }
+        }
+    }
+}

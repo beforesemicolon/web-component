@@ -24,6 +24,50 @@
         "index": "/"
     },
     "common": {
+        "navigation": {
+            "home": "Home",
+            "content": "Content",
+            "features": "Features",
+            "code": "Code",
+            "install": "Install",
+            "documentation": "Documentation",
+            "docs": "Docs",
+            "learningResources": "Learning Resources",
+            "essentialsTraining": "Essentials Training",
+            "aboutBeforeSemicolon": "About Before Semicolon",
+            "openSource": "Open Source",
+            "website": "Website",
+            "blog": "Blog",
+            "youtubeChannel": "YouTube Channel"
+        },
+        "actions": {
+            "editDoc": "edit this doc",
+            "getStarted": "Get Started",
+            "readDocs": "Read the Docs",
+            "copy": "Copy",
+            "copied": "Copied",
+            "copyCode": "Copy code",
+            "codeCopied": "Code copied",
+            "commandCopied": "Command copied",
+            "copyInstallCommand": "Copy {{manager}} install command",
+            "previousExample": "Previous example",
+            "nextExample": "Next example"
+        },
+        "accessibility": {
+            "installationPackageManager": "Installation package manager",
+            "goToSlide": "Go to slide {{number}}",
+            "mobileMenu": {
+                "open": "Open documentation menu",
+                "close": "Close documentation menu"
+            }
+        },
+        "labels": {
+            "exampleUppercase": "EXAMPLE"
+        },
+        "footer": {
+            "description": "Reactive Web Components enhanced with state, props, scoped styles, lifecycles, and form integration.",
+            "copyright": "Copyright © 2026 Before Semicolon. All rights reserved."
+        },
         "content": {
             "get_started_get_started_md": "[Get Started](./get-started.md)",
             "guide_best_practices_guide_md": "[Guide & Best Practices](./guide.md)",

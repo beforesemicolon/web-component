@@ -1,0 +1,836 @@
+{
+    "_routes": {
+        "documentation/advanced/browser-globals": "/文档/高级/浏览器全局变量",
+        "documentation/advanced/content-root-and-root": "/文档/高级/内容根节点和根节点",
+        "documentation/advanced/form-integration": "/文档/高级/表单集成",
+        "documentation/ai": "/文档/ai",
+        "documentation/events-and-lifecycle/error-handling": "/文档/事件和生命周期/错误处理",
+        "documentation/events-and-lifecycle/events": "/文档/事件和生命周期/事件",
+        "documentation/events-and-lifecycle/lifecycle": "/文档/事件和生命周期/生命周期",
+        "documentation/fundamentals/config": "/文档/基础/配置",
+        "documentation/fundamentals/creating-components": "/文档/基础/创建组件",
+        "documentation/fundamentals/rendering": "/文档/基础/渲染",
+        "documentation/fundamentals/typescript": "/文档/基础/typescript",
+        "documentation/get-started": "/文档/快速开始",
+        "documentation/guide": "/文档/指南",
+        "documentation/index": "/文档/",
+        "documentation/installation": "/文档/安装",
+        "documentation/props-and-state/props": "/文档/属性和状态/属性",
+        "documentation/props-and-state/refs": "/文档/属性和状态/refs",
+        "documentation/props-and-state/state": "/文档/属性和状态/状态",
+        "documentation/styling/css-utility": "/文档/样式/css实用程序",
+        "documentation/styling/stylesheet": "/文档/样式/样式表",
+        "documentation/styling/update-stylesheet": "/文档/样式/更新样式表",
+        "index": "/"
+    },
+    "common": {
+        "navigation": {
+            "home": "首页",
+            "content": "目录",
+            "features": "功能",
+            "code": "代码",
+            "install": "安装",
+            "documentation": "文档",
+            "docs": "文档",
+            "learningResources": "学习资源",
+            "essentialsTraining": "基础培训",
+            "aboutBeforeSemicolon": "关于 Before Semicolon",
+            "openSource": "开源",
+            "website": "网站",
+            "blog": "博客",
+            "youtubeChannel": "YouTube 频道"
+        },
+        "actions": {
+            "editDoc": "编辑本文档",
+            "getStarted": "开始使用",
+            "readDocs": "阅读文档",
+            "copy": "复制",
+            "copied": "已复制",
+            "copyCode": "复制代码",
+            "codeCopied": "代码已复制",
+            "commandCopied": "命令已复制",
+            "copyInstallCommand": "复制 {{manager}} 安装命令",
+            "previousExample": "上一个示例",
+            "nextExample": "下一个示例"
+        },
+        "accessibility": {
+            "installationPackageManager": "安装包管理器",
+            "goToSlide": "转到第 {{number}} 张幻灯片",
+            "mobileMenu": {
+                "open": "打开文档菜单",
+                "close": "关闭文档菜单"
+            }
+        },
+        "labels": {
+            "exampleUppercase": "示例"
+        },
+        "footer": {
+            "description": "增强了状态、props、作用域样式、生命周期和表单集成能力的响应式 Web Components。",
+            "copyright": "版权所有 © 2026 Before Semicolon。保留所有权利。"
+        },
+        "content": {
+            "get_started_get_started_md": "[开始](./get-started.md)",
+            "guide_best_practices_guide_md": "[指南和最佳实践](./guide.md)",
+            "creating_components_fundamentals_creating_components_md": "[创建组件](./fundamentals/creating-components.md)",
+            "note": "[！注意]",
+            "get_started": "开始使用"
+        }
+    },
+    "pages": {
+        "documentation": {
+            "advanced": {
+                "browser_globals": {
+                    "meta": {
+                        "browser_globals": "浏览器全局变量",
+                        "browser_globals_webcomponent_by_before_semicolon": "浏览器全局 - WebComponent by Before Semicolon",
+                        "use_webcomponent_and_re_exported_markup_apis_via_cdn_and_global_window_namespaces": "使用 WebComponent 并通过 CDN 和全局窗口命名空间重新导出 Markup API。"
+                    },
+                    "content": {
+                        "browser_globals": "浏览器全局变量",
+                        "for_quick_prototyping_testing_or_simple_web_pages_you_might_prefer_not_to_set_up_a_build_pipelin": "对于快速原型设计、测试或简单网页，您可能不希望设置构建管道（如 Webpack、Vite 或 Rollup）。 `@beforesemicolon/web-component` 通过提供预捆绑的客户端脚本来完全支持**零构建**设置，该脚本在单个浏览器全局命名空间上公开所有 API 函数。",
+                        "cdn_integration": "CDN集成",
+                        "to_use_the_component_library_directly_in_your_html_files_load_the_client_script_from_a_cdn_such": "要直接在 HTML 文件中使用组件库，请从 CDN（例如 `unpkg.com` 或 `jsdelivr.net`）加载客户端脚本：",
+                        "once_loaded_the_library_attaches_a_single_global_variable_bfs_to_the_browser_s_window_object": "加载后，该库会将单个全局变量 `BFS` 附加到浏览器的 `window` 对象。",
+                        "the_bfs_global_namespace": "`BFS` 全局命名空间",
+                        "the_window_bfs_namespace_is_structured_as_follows": "`window.BFS` 命名空间的结构如下：",
+                        "window_bfs_webcomponent_the_core_component_base_class": "**`window.BFS.WebComponent`**：核心组件基类。",
+                        "window_bfs_css_the_tagged_template_function_for_creating_reactive_scoped_css": "**`window.BFS.css`**：用于创建反应性作用域 CSS 的标记模板函数。",
+                        "window_bfs_markup_an_object_containing_all_the_re_exported_apis_from_the_underlying_beforesemico": "**`window.BFS.MARKUP`**：包含从底层 `@beforesemicolon/markup` 包中重新导出的所有 API 的对象。",
+                        "re_exported_markup_apis_under_bfs_markup": "在 `BFS.MARKUP` 下重新导出 Markup API",
+                        "through_bfs_markup_you_can_access_all_template_rendering_and_reactivity_tools": "通过`BFS.MARKUP`，您可以访问所有模板渲染和反应性工具：",
+                        "html_tagged_template_function_for_rendering_dom_elements": "**`html`**：用于渲染 DOM 元素的标记模板函数。",
+                        "state_creates_reactive_state_getters_and_setters": "**`state`**：创建反应式状态 getter 和 setter。",
+                        "effect_tracks_side_effects_depending_on_states": "**`effect`**：根据状态跟踪副作用。",
+                        "helper_utilities_when_repeat_suspense_visible_etc": "**帮助实用程序**：`when`、`repeat`、`suspense`、`visible` 等。",
+                        "complete_zero_build_example": "完整的零构建示例",
+                        "here_is_a_complete_single_file_html_page_showing_how_to_declare_and_use_a_reactive_custom_elemen": "这是一个完整的单文件 HTML 页面，展示了如何在没有任何编译器或捆绑器的情况下声明和使用反应式自定义元素：",
+                        "standard_es_modules_alternative": "标准 ES 模块替代方案",
+                        "if_you_want_to_use_modern_javascript_imports_import_syntax_without_a_bundler_you_can_import_dire": "如果您想在没有捆绑程序的情况下使用现代 JavaScript 导入（`import` 语法），如果浏览器支持 ES 模块，则可以直接从 CDN 导入：",
+                        "pin_the_package_version_for_production_pages_so_cdn_updates_cannot_change_behavior_unexpectedly": "固定生产页面的包版本，以便 CDN 更新不会意外更改行为。"
+                    }
+                },
+                "content_root_and_root": {
+                    "meta": {
+                        "content_root_root": "内容根与根",
+                        "content_root_root_webcomponent_by_before_semicolon": "内容根和根 - WebComponent by Before Semicolon",
+                        "learn_how_to_resolve_component_rendering_targets_using_contentroot_and_locate_ancestor_contexts": "了解如何使用 contentRoot 解析组件呈现目标并使用 root 定位祖先上下文。"
+                    },
+                    "content": {
+                        "content_root_root": "内容根与根",
+                        "when_building_web_components_managing_dom_boundaries_specifically_shadow_dom_boundaries_is_key_t": "构建 Web 组件时，管理 DOM 边界（特别是影子 DOM 边界）是正确元素样式、事件路由和 DOM 遍历的关键。 `@beforesemicolon/web-component` 通过公开两个上下文getter来简化此操作：`contentRoot` 和 `root`。",
+                        "content_root": "内容根",
+                        "the_contentroot_property_represents_the_element_container_where_the_component_s_template_is_rend": "`contentRoot` 属性表示呈现组件模板的元素容器。",
+                        "the_value_of_contentroot_depends_on_your_component_s_shadow_dom_configuration": "`contentRoot` 的值取决于组件的 Shadow DOM 配置：",
+                        "shadow_dom_enabled_config_shadow_true_default_contentroot_returns_the_element_s_own_shadowroot_a": "**启用阴影 DOM（`config.shadow = true` - 默认）**：`contentRoot` 返回元素自己的 `ShadowRoot`。所有渲染、模板安装和作用域样式都发生在该阴影边界内。",
+                        "shadow_dom_disabled_config_shadow_false_contentroot_returns_the_custom_element_instance_itself_h": "**阴影 DOM 禁用 (`config.shadow = false`)**：`contentRoot` 返回自定义元素实例本身 (`HTMLElement`)。模板作为自定义元素的子元素直接渲染到灯光 DOM 中。",
+                        "practical_usage": "实际使用",
+                        "if_you_need_to_query_elements_rendered_by_your_component_template_manually_instead_of_using_the": "如果您需要手动查询组件模板渲染的元素（而不是使用 [Refs API](../props-and-state/refs.md)），您应该在 `contentRoot` 中搜索：",
+                        "root": "根",
+                        "the_root_property_returns_the_closest_ancestor_root_container_containing_this_component": "`root` 属性返回包含此组件的最近祖先根容器。",
+                        "when_the_component_is_connected_to_the_dom_it_climbs_the_node_hierarchy_searching_for_an_ancesto": "当组件连接到 DOM 时，它会爬升节点层次结构，搜索祖先 `ShadowRoot`：",
+                        "if_the_component_is_nested_inside_the_shadow_dom_of_another_parent_web_component_this_root_retur": "如果该组件嵌套在 **另一个** 父 Web 组件的影子 DOM 内，则 `this.root` 返回该父组件的 `ShadowRoot`。",
+                        "if_the_component_is_placed_directly_in_the_main_page_layout_this_root_returns_the_main_page_docu": "如果组件直接放置在主页面布局中，`this.root` 返回主页面`document`。",
+                        "this_root_is_highly_useful_for_locating_shared_stylesheet_registries_resolving_theme_configurati": "`this.root` 对于定位共享样式表注册表、解析主题配置或侦听当前子树边界的事件非常有用：",
+                        "comparison_this_root_vs_native_getrootnode": "比较：`this.root` 与原生 `getRootNode()`",
+                        "the_native_dom_api_provides_a_node_getrootnode_options_method_it_is_important_to_contrast_how_th": "本机 DOM API 提供了 `node.getRootNode(options)` 方法。对比 `this.root` 的不同之处非常重要：",
+                        "focus_of_search": "**搜索重点**：",
+                        "this_root_searches_for_the_parent_context_in_which_the_custom_element_itself_lives": "`this.root` 搜索自定义元素本身所在的**父上下文**。",
+                        "native_getrootnode_called_on_the_custom_element_itself_returns_the_same_outer_document_or_outer": "对自定义元素本身调用的本机 `getRootNode()` 返回相同的外部文档或外部影子根。但是，如果在元素自己的影子 DOM 内部的节点上调用，则本机 `getRootNode()` 将返回组件自己的影子根。",
+                        "context_resolution": "**上下文解析**：",
+                        "this_root_resolves_early_during_connectedcallback_and_provides_a_guaranteed_reference_to_the_sur": "`this.root` 在 `connectedCallback` 期间尽早解析，并提供对周围环境上下文的有保证的参考。",
+                        "this_makes_this_root_the_preferred_property_to_use_when_a_nested_child_element_needs_to_communic": "当嵌套子元素需要向上通信或向父上下文提供程序注册而不泄漏到全局 `document` 范围时，这使得 `this.root` 成为首选属性。"
+                    }
+                },
+                "form_integration": {
+                    "meta": {
+                        "form_integration": "表单整合",
+                        "form_integration_webcomponent_by_before_semicolon": "表单集成 - WebComponent by Before Semicolon",
+                        "build_form_associated_custom_elements_with_elementinternals_submitted_values_validation_disabled": "使用 ElementInternals、提交值、验证、禁用状态、重置和状态恢复构建与表单相关的自定义元素。"
+                    },
+                    "content": {
+                        "form_integration": "表单整合",
+                        "custom_elements_can_render_inside_a_but_that_does_not_automatically_make_them_form_controls_a_no": "自定义元素可以在 `<form>` 内部呈现，但这不会自动使它们形成控件。正常的自定义元素会被 `FormData`、本机约束验证、字段集禁用状态和表单重置行为忽略，除非它选择进入浏览器的 **表单关联自定义元素** API。",
+                        "beforesemicolon_web_component_supports_that_native_api_directly_it_exposes_the_element_s_element": "`@beforesemicolon/web-component` 直接支持本机 API。它将元素的 `ElementInternals` 实例公开为 `this.internals`，同时您使用标准浏览器回调，例如 `formAssociatedCallback()`、`formDisabledCallback()`、`formResetCallback()` 和 `formStateRestoreCallback()`。",
+                        "the_default_problem": "默认问题",
+                        "start_with_a_component_that_wraps_a_native_input": "从包装本机输入的组件开始：",
+                        "you_can_place_it_in_a_form": "您可以将其放入表单中：",
+                        "but_submitting_the_form_will_not_include_firstname": "但提交表格时不会包含`firstName`：",
+                        "the_browser_sees_the_custom_element_as_an_element_not_as_a_successful_form_control_with_a_submit": "浏览器将自定义元素视为元素，而不是具有提交值的成功表单控件。",
+                        "enable_form_association": "启用表单关联",
+                        "add_static_formassociated_true_so_the_browser_treats_the_custom_element_as_form_associated": "添加 `static formAssociated = true` 以便浏览器将自定义元素视为与表单关联：",
+                        "this_is_native_custom_element_behavior_not_a_webcomponent_specific_abstraction_it_allows_the_ele": "这是本机自定义元素行为，而不是特定于 WebComponent 的抽象。它允许元素与父表单关联并接收本机表单回调。",
+                        "form_association_alone_does_not_submit_a_value_it_only_lets_the_custom_element_participate_in_th": "单独的表单关联不提交值。它只允许自定义元素参与表单系统。您仍然需要 `this.internals.setFormValue()`。",
+                        "elementinternals": "ElementInternals",
+                        "this_internals_exposes_the_native_elementinternals_object_created_with_attachinternals": "`this.internals` 公开使用 `attachInternals()` 创建的本机 `ElementInternals` 对象。",
+                        "use_it_to_communicate_with_the_parent_form": "使用它与父表单进行通信：",
+                        "setformvalue_value_controls_what_formdata_receives_for_the_element_s_name": "`setFormValue(value)`：控制 `FormData` 为元素的 `name` 接收的内容。",
+                        "setvalidity_flags_message_anchor_controls_native_validity_state": "`setValidity(flags, message, anchor)`：控制本机有效性状态。",
+                        "reportvalidity_asks_the_browser_to_show_validation_ui": "`reportValidity()`：要求浏览器显示验证 UI。",
+                        "form_returns_the_associated_form": "`form`：返回关联的表单。",
+                        "labels_returns_labels_associated_with_the_custom_element": "`labels`：返回与自定义元素关联的标签。",
+                        "register_the_submitted_value": "注册提交的值",
+                        "call_setformvalue_whenever_the_component_value_changes_the_submitted_field_name_comes_from_the_c": "每当组件值发生变化时，调用 `setFormValue()`。提交的字段名称来自自定义元素自己的 `name` 属性。",
+                        "now_the_same_form_produces_useful_data": "现在，相同的表单会生成有用的数据：",
+                        "you_can_also_register_an_initial_value_when_the_browser_associates_the_element_with_a_form": "您还可以在浏览器将元素与表单关联时注册一个初始值：",
+                        "validation": "验证",
+                        "a_form_associated_custom_element_can_use_native_validation_instead_of_inventing_a_parallel_error": "与表单相关的自定义元素可以使用本机验证，而不是发明并行错误系统。常见的模式是将有效性委托给内部本机控件，然后通过 `ElementInternals` 报告该有效性。",
+                        "setvalidity_accepts_the_same_validity_flags_exposed_by_native_form_controls_passing_an_empty_or": "`setValidity()` 接受本机表单控件公开的相同有效性标志。传递空或有效的 `ValidityState` 会清除错误。通过传递锚元素，浏览器可以将本机验证 UI 定位在相关内部控件附近。",
+                        "native_form_callbacks": "原生表单回调",
+                        "form_associated_custom_elements_use_native_callback_names_webcomponent_does_not_wrap_these_becau": "与表单相关的自定义元素使用本机回调名称。 WebComponent 不会包装它们，因为它们是浏览器平台的一部分。",
+                        "formassociatedcallback_form": "`formAssociatedCallback(form)`",
+                        "called_when_the_browser_associates_or_disassociates_the_element_with_a_form_use_this_to_register": "当浏览器将元素与表单关联或取消关联时调用。用它来注册初始提交的值和有效性。",
+                        "formdisabledcallback_disabled": "`formDisabledCallback(disabled)`",
+                        "called_when_the_element_becomes_disabled_because_its_own_disabled_attribute_changed_or_because_a": "当元素因其自身的 `disabled` 属性更改或因为祖先 `<fieldset>` 更改禁用状态而变为禁用时调用。",
+                        "if_your_template_passes_this_props_disabled_into_an_internal_input_assigning_this_disabled_updat": "如果您的模板将 `this.props.disabled` 传递到内部输入，则分配 `this.disabled` 会更新props并保持渲染控件同步。",
+                        "formresetcallback": "`formResetCallback()`",
+                        "called_when_the_parent_form_resets_use_it_to_restore_the_component_s_default_value_clear_validat": "当父窗体重置时调用。用它来恢复组件的默认值、清除验证状态以及更新本机表单值。",
+                        "formstaterestorecallback_state_mode": "`formStateRestoreCallback(state, mode)`",
+                        "called_when_the_browser_restores_form_state_for_example_after_navigation_or_autocomplete_use_it": "当浏览器恢复表单状态时调用，例如在导航或自动完成之后。用它来恢复组件的可见值和提交值。",
+                        "complete_text_field": "完整的文本字段",
+                        "this_example_keeps_the_custom_element_api_small_while_integrating_with_native_form_submission_va": "此示例保持自定义元素 API 较小，同时与本机表单提交、验证、重置、字段集禁用状态和恢复行为集成。",
+                        "use_it_like_a_normal_form_field": "像普通表单字段一样使用它：",
+                        "practical_rules": "实用规则",
+                        "add_static_formassociated_true_only_to_components_that_should_behave_as_native_form_controls": "仅将 `static formAssociated = true` 添加到应充当本机表单控件的组件。",
+                        "always_call_this_internals_setformvalue_when_the_submitted_value_changes": "当提交的值发生变化时，始终调用 `this.internals.setFormValue()`。",
+                        "keep_the_submitted_value_and_the_visible_internal_control_value_synchronized": "保持提交的值和可见的内部控制值同步。",
+                        "use_this_internals_setvalidity_when_the_custom_element_should_participate_in_native_constraint_v": "当自定义元素应参与本机约束验证时，请使用 `this.internals.setValidity()`。",
+                        "use_formdisabledcallback_to_respond_to_ancestor_changes": "使用 `formDisabledCallback()` 响应祖先 `<fieldset disabled>` 更改。",
+                        "use_formresetcallback_to_restore_defaults_when_the_parent_form_resets": "当父窗体重置时，使用 `formResetCallback()` 恢复默认值。",
+                        "use_formstaterestorecallback_for_browser_restore_and_autocomplete_flows": "使用 `formStateRestoreCallback()` 进行浏览器恢复和自动完成流程。",
+                        "keep_component_events_like_change_useful_for_app_code_but_do_not_rely_on_events_for_native_form": "保持 `change` 等组件事件对应用程序代码有用，但不要依赖事件进行本机表单提交。"
+                    }
+                }
+            },
+            "ai": {
+                "meta": {
+                    "ai_guide": "人工智能指南",
+                    "ai_guide_webcomponent_by_before_semicolon": "AI 指南 - WebComponent by Before Semicolon",
+                    "ai_first_guide_to_beforesemicolon_web_component_apis_source_boundaries_and_common_implementation": "有关 @beforesemicolon/web-component API、源边界和常见实施错误的 AI 优先指南。"
+                },
+                "content": {
+                    "ai_guide": "人工智能指南",
+                    "use_this_page_first_if_you_are_an_ai_agent_scanning_the_webcomponent_docs": "如果您是扫描 WebComponent 文档的 AI 代理，请首先使用此页面。",
+                    "read_first": "首先阅读",
+                    "what_is_webcomponent_index_md": "[什么是WebComponent？](./index.md)",
+                    "props_props_and_state_props_md": "[props](./props-and-state/props.md)",
+                    "state_props_and_state_state_md": "[状态](./props-and-state/state.md)",
+                    "stylesheet_styling_stylesheet_md": "[样式表](./styling/stylesheet.md)",
+                    "events_events_and_lifecycle_events_md": "[事件](./events-and-lifecycle/events.md)",
+                    "package_boundary": "封装边界",
+                    "beforesemicolon_web_component_exports_webcomponent_htmlcomponentelement_css_and_the_webcomponent": "`@beforesemicolon/web-component` 导出 `WebComponent`、`HTMLComponentElement`、`css` 和特定于 WebComponent 的类型。",
+                    "it_also_re_exports_beforesemicolon_markup_so_examples_can_import_html_repeat_when_state_and_othe": "它还重新导出 `@beforesemicolon/markup`，因此示例可以从 `@beforesemicolon/web-component` 导入 `html`、`repeat`、`when`、`state` 和其他 Markup API。",
+                    "the_browser_bundle_exposes_window_bfs_webcomponent_window_bfs_css_and_window_bfs_markup": "浏览器捆绑包公开 `window.BFS.WebComponent`、`window.BFS.css` 和 `window.BFS.MARKUP`。",
+                    "runtime_facts": "运行时事实",
+                    "static_observedattributes_defines_public_attributes_and_creates_camelcase_reactive_props_under_t": "`static observedAttributes` 定义公共属性，并在 `this.props` 下创建 camelCase 响应式 props。",
+                    "default_prop_values_are_class_fields_with_the_camelcase_prop_name": "默认 prop 值是以 camelCase prop 名称声明的类字段。",
+                    "initialstate_defines_local_state_getters_under_this_state": "`initialState` 在 `this.state` 下定义本地状态 getter。",
+                    "this_setstate_only_works_after_the_component_is_mounted": "`this.setState()` 仅在安装组件后才起作用。",
+                    "this_dispatch_name_detail_creates_a_customevent_with_detail_add_native_custom_event_options_manu": "`this.dispatch(name, detail)` 使用 `detail` 创建 `CustomEvent`。仅当运行时 API 更改为支持本机自定义事件选项时，才手动添加本机自定义事件选项。",
+                    "render_may_return_a_markup_htmltemplate_a_string_a_dom_node_or_nothing": "`render()` 可能返回 Markup `HtmlTemplate`、字符串、DOM `Node`，或者什么也不返回。",
+                    "stylesheet_accepts_a_css_string_a_cssstylesheet_or_a_reactive_css_result": "`stylesheet` 接受 CSS 字符串、`CSSStyleSheet` 或反应式 `css` 结果。",
+                    "config_shadow_defaults_to_true": "`config.shadow` 默认为 `true`。",
+                    "when_config_shadow_false_host_selectors_are_rewritten_to_the_custom_element_tag": "当`config.shadow = false`、`:host`选择器被重写为自定义元素标签时。",
+                    "common_tasks": "常见任务",
+                    "public_input_add_the_kebab_case_name_to_static_observedattributes_and_read_this_props_camelname": "公共输入：将 kebab-case 名称添加到 `static observedAttributes` 并读取 `this.props.camelName`。",
+                    "internal_ui_state_add_a_key_to_initialstate_and_update_it_with_this_setstate": "内部UI状态：向`initialState`添加密钥并用`this.setState()`更新它。",
+                    "dom_element_access_add_ref_name_and_use_this_refs_name_0_after_render": "DOM 元素访问：添加 `ref=\"name\"` 并在渲染后使用 `this.refs.name?.[0]`。",
+                    "component_output_call_this_dispatch_event_name_value": "组件输出：调用`this.dispatch('event-name', { value })`。",
+                    "mount_side_effects_use_onmount_and_return_cleanup": "挂载副作用：使用 `onMount()` 并返回清理。",
+                    "prop_reactions_use_onupdate_name_newvalue_oldvalue": "props反应：使用 `onUpdate(name, newValue, oldValue)`。",
+                    "scoped_css_assign_stylesheet": "范围 CSS：分配 `stylesheet`。",
+                    "reactive_css_assign_stylesheet_css": "反应式 CSS：分配 `stylesheet = css\\`...\\``。",
+                    "native_forms_set_static_formassociated_true_and_use_this_internals": "本机形式：设置 `static formAssociated = true` 并使用 `this.internals`。",
+                    "avoid": "避免",
+                    "do_not_call_this_setstate_in_the_constructor_or_during_class_field_initialization": "不要在构造函数中或类字段初始化期间调用 `this.setState()`。",
+                    "do_not_mutate_arrays_or_objects_inside_state_in_place_return_a_new_value_from_setstate": "不要就地改变状态内的数组或对象；从 `setState` 返回一个新值。",
+                    "do_not_document_native_lifecycle_callbacks_as_extension_points_use_onmount_onupdate_ondestroy_an": "不要将本机生命周期回调记录为扩展点；使用 `onMount`、`onUpdate`、`onDestroy` 和 `onAdoption`。",
+                    "do_not_assume_dispatch_bubbles_or_crosses_shadow_boundaries_unless_the_source_code_supports_opti": "不要假设 `dispatch()` 出现气泡或跨越阴影边界，除非源代码支持此类选项。",
+                    "do_not_use_long_one_line_custom_element_examples_when_several_attributes_are_present": "当存在多个属性时，请勿使用长的单行自定义元素示例。"
+                }
+            },
+            "events_and_lifecycle": {
+                "error_handling": {
+                    "meta": {
+                        "error_handling": "错误处理",
+                        "error_handling_webcomponent_by_before_semicolon": "错误处理 - WebComponent by Before Semicolon",
+                        "intercept_and_process_runtime_errors_from_render_state_updates_styles_or_lifecycles_using_the_on": "使用 onError 钩子拦截并处理来自渲染、状态更新、样式或生命周期的运行时错误。"
+                    },
+                    "content": {
+                        "error_handling": "错误处理",
+                        "handling_runtime_errors_gracefully_is_crucial_for_building_robust_web_applications_beforesemicol": "优雅地处理运行时错误对于构建健壮的 Web 应用程序至关重要。 `@beforesemicolon/web-component` 具有集中式 `onError()` 挂钩，允许您拦截和处理组件边界内发生的错误。",
+                        "the_onerror_hook": "`onError` 挂钩",
+                        "by_default_the_onerror_hook_logs_the_error_to_the_console_using_console_error": "默认情况下，`onError` 挂钩使用 `console.error` 将错误记录到控制台。",
+                        "you_can_override_this_method_to_customize_how_your_component_handles_errors_such_as_showing_a_to": "您可以重写此方法来自定义组件处理错误的方式，例如显示 toast 通知、记录到外部服务或调度错误事件。",
+                        "what_triggers_onerror": "什么触发 `onError`？",
+                        "the_component_automatically_wraps_internal_processes_in_try_catch_blocks_if_any_of_the_following": "该组件自动将内部进程包装在 `try/catch` 块中。如果以下任何操作失败，则会捕获错误并将其传递到 `onError` 挂钩：",
+                        "state_mutations_errors_during_this_setstate_such_as_trying_to_update_state_on_an_unmounted_compo": "**状态突变**：`this.setState()` 期间出现错误，例如尝试更新已卸载组件上的状态。",
+                        "dynamic_stylesheet_updates_errors_inside_this_updatestylesheet_or_when_compiling_reactive_styles": "**动态样式表更新**：`this.updateStylesheet()` 内部或使用 `css` 模板标记编译反应式样式时出现错误。",
+                        "custom_event_dispatching_errors_occurring_while_creating_or_dispatching_custom_events_through_th": "**自定义事件调度**：通过 `this.dispatch()` 创建或调度自定义事件时发生错误。",
+                        "lifecycle_connections_errors_thrown_during_the_component_connection_or_adoption_phases_including": "**生命周期连接**：在组件连接或采用阶段抛出的错误，包括 `onMount()` 和 `onAdoption()` 内部的设置。",
+                        "lifecycle_disconnections_errors_thrown_when_the_component_is_being_disconnected_including_during": "**生命周期断开连接**：组件断开连接时引发的错误，包括挂载清理回调和 `onDestroy()` 期间。",
+                        "centralized_error_tracking_pattern": "集中式错误跟踪模式",
+                        "in_larger_applications_repeating_error_handling_logic_in_every_component_is_inefficient_the_reco": "在较大的应用程序中，在每个组件中重复错误处理逻辑是低效的。建议的模式是构建一个基本 `Component` 类，该类扩展 `WebComponent` 以集中所有组件的日志记录和错误遥测。",
+                        "here_is_an_example_of_a_base_class_setup": "这是基类设置的示例：",
+                        "now_instead_of_extending_webcomponent_directly_your_feature_components_extend_basecomponent": "现在，您的功能组件不再直接扩展 `WebComponent`，而是扩展 `BaseComponent`：",
+                        "reporting_your_own_component_errors": "报告您自己的组件错误",
+                        "onerror_is_not_only_for_errors_webcomponent_catches_internally_if_your_component_has_its_own_asy": "`onError()` 不仅适用于 WebComponent 内部捕获的错误。如果您的组件有自己的异步工作、事件处理程序或命令式代码，请在本地捕获这些错误并调用 `this.onError(error)`。",
+                        "this_is_especially_useful_when_all_components_extend_a_shared_base_component_the_base_class_beco": "当所有组件都扩展共享的基础组件时，这尤其有用。基类成为单一报告边界，而各个组件决定应报告哪些本地故障。",
+                        "you_can_use_the_same_approach_inside_event_handlers": "您可以在事件处理程序中使用相同的方法：",
+                        "this_keeps_the_component_s_local_control_flow_explicit_while_still_routing_every_report_through": "这使组件的本地控制流保持明确，同时仍然通过相同的基本 `onError()` 实现路由每个报告。"
+                    }
+                },
+                "events": {
+                    "meta": {
+                        "events": "活动",
+                        "events_webcomponent_by_before_semicolon": "事件 - WebComponent by Before Semicolon",
+                        "learn_how_to_dispatch_and_listen_to_custom_events_in_webcomponent_using_the_dispatch_method": "了解如何使用调度方法在 WebComponent 中调度和侦听自定义事件。"
+                    },
+                    "content": {
+                        "events": "活动",
+                        "custom_elements_often_need_to_communicate_changes_or_actions_back_to_their_parents_or_the_rest_o": "自定义元素通常需要将更改或操作传达回其父级或应用程序的其余部分。 `@beforesemicolon/web-component` 提供内置帮助程序方法 `this.dispatch()`，以干净地分派自定义 DOM 事件。",
+                        "dispatching_custom_events": "调度自定义事件",
+                        "to_dispatch_a_custom_event_from_inside_a_component_use_the_this_dispatch_name_detail_method": "要从组件内部调度自定义事件，请使用 `this.dispatch(name, detail)` 方法。",
+                        "this_method_is_a_convenient_wrapper_around_the_native_dispatchevent_api_it_instantiates_a_standa": "此方法是本机 `dispatchEvent` API 的便捷包装。它实例化一个标准 `CustomEvent` 并将第二个参数作为 `event.detail` 传递。",
+                        "here_is_a_practical_example_of_a_counter_component_that_dispatches_an_event_whenever_the_count_c": "下面是一个计数器组件的实际示例，每当计数发生变化时，该组件就会调度一个事件：",
+                        "passing_payloads": "传递有效负载",
+                        "the_second_parameter_to_this_dispatch_is_an_optional_detail_object_containing_any_custom_data_in": "`this.dispatch` 的第二个参数是包含任何自定义数据的可选 `detail` 对象。在接收事件侦听器中，可以通过 `event.detail` 获得此有效负载。",
+                        "listening_to_custom_events": "监听自定义事件",
+                        "since_components_are_native_custom_elements_you_can_listen_to_these_events_using_standard_web_ap": "由于组件是本机自定义元素，因此您可以使用标准 Web API 或直接在 Markup 模板内监听这些事件。",
+                        "in_markup_templates": "在 Markup 模板中",
+                        "markup_templates_support_binding_event_listeners_for_any_standard_or_custom_event_by_prefixing_t": "Markup 模板支持通过在事件名称前添加 `on` 前缀来绑定任何标准或自定义事件的事件侦听器。",
+                        "for_example_if_your_custom_element_is_named_and_dispatches_a_countchange_event_you_can_listen_to": "例如，如果您的自定义元素名为 `<counter-button>` 并调度 `countchange` 事件，您可以在模板中监听它，如下所示：",
+                        "using_native_event_listeners": "使用本机事件监听器",
+                        "you_can_also_interact_with_the_component_imperatively_in_standard_javascript_using_the_native_ad": "您还可以使用本机 `addEventListener` 方法以命令方式与标准 JavaScript 中的组件进行交互：",
+                        "event_boundary_notes": "事件边界注释",
+                        "this_dispatch_intentionally_keeps_a_small_api": "`this.dispatch()` 特意保留了一个小的 API：",
+                        "if_you_need_custom_event_options_such_as_bubbles_composed_or_cancelable_use_the_native_api_direc": "如果您需要自定义事件选项，例如 `bubbles`、`composed` 或 `cancelable`，请直接使用本机 API："
+                    }
+                },
+                "lifecycle": {
+                    "meta": {
+                        "lifecycle": "生命周期",
+                        "lifecycle_webcomponent_by_before_semicolon": "生命周期 - WebComponent by Before Semicolon",
+                        "learn_how_to_hook_into_key_execution_stages_of_your_webcomponent_using_onmount_ondestroy_onupdat": "了解如何使用 onMount、onDestroy、onUpdate、onAdoption、onError 和 Markup 效果挂钩 WebComponent 的关键执行阶段。"
+                    },
+                    "content": {
+                        "lifecycle": "生命周期",
+                        "every_beforesemicolon_web_component_instance_transitions_through_a_series_of_lifecycle_phases_st": "每个 `@beforesemicolon/web-component` 实例都会经历一系列生命周期阶段，从构建到销毁，再从 DOM 中删除。",
+                        "instead_of_dealing_with_native_custom_element_callback_names_beforesemicolon_web_component_provi": "`@beforesemicolon/web-component` 不处理本机自定义元素回调名称，而是提供干净的高级挂钩来处理设置、副作用、更新、清理、采用和运行时错误。",
+                        "lifecycle_hook_methods": "生命周期钩子方法",
+                        "onmount": "`onMount()`",
+                        "called_when_the_element_is_first_connected_to_the_dom_this_is_the_ideal_place_to_run_setups_such": "当元素首次连接到 DOM 时调用。这是运行设置（例如设置计时器、获取远程数据或添加事件侦听器）的理想位置。",
+                        "cleanup_function_the_onmount_method_can_optionally_return_a_cleanup_function_if_provided_this_fu": "**清理函数**：`onMount()` 方法可以选择返回清理函数。如果提供，则当组件与 DOM 断开连接时（调用 `onDestroy()` 之前），会自动执行此函数。",
+                        "ondestroy": "`onDestroy()`",
+                        "called_when_the_element_is_disconnected_and_removed_from_the_dom_use_this_hook_for_final_cleanup": "当元素断开连接并从 DOM 中删除时调用。如果 `onMount()` 返回的清理回调中尚未处理这些清理，请使用此挂钩进行最终清理。",
+                        "onupdate_name_newvalue_oldvalue": "`onUpdate(name, newValue, oldValue)`",
+                        "called_when_an_observed_attribute_declared_in_static_observedattributes_changes_value_this_hook": "当观察到的属性（在 `static observedAttributes` 中声明）更改值时调用。该钩子仅在组件完全安装后运行。",
+                        "onadoption": "`onAdoption()`",
+                        "called_when_the_browser_s_native_adoptedcallback_fires_which_happens_when_the_custom_element_is": "当浏览器的本机 `adoptedCallback()` 触发时调用，当自定义元素移动到新文档时会发生这种情况。这在大多数应用程序中并不常见，但对于 iframe、门户、文档迁移和测试场景很有用。",
+                        "onerror_error": "`onError(error)`",
+                        "called_when_webcomponent_catches_an_error_from_rendering_state_updates_stylesheet_updates_lifecy": "当 WebComponent 捕获来自渲染、状态更新、样式表更新、生命周期执行、采用或清理的错误时调用。默认实现使用 `console.error` 记录错误。",
+                        "use_onerror_for_component_local_error_reporting_or_fallback_state_avoid_throwing_inside_onerror": "使用 `onError()` 进行组件本地错误报告或回退状态。避免在 `onError()` 内部抛出错误，除非您故意希望错误逃逸组件边界。",
+                        "side_effects_with_effect": "`effect()` 的副作用",
+                        "because_webcomponent_is_powered_by_markup_you_can_use_markup_s_effect_helper_for_reactive_side_e": "由于 WebComponent 由 Markup 提供支持，因此您可以使用 Markup 的 `effect()` 帮助程序来实现反应性副作用。效果会立即运行，跟踪它同步读取的任何反应式 getter，并在这些值发生变化时再次运行。",
+                        "use_effect_when_the_side_effect_should_follow_reactive_props_or_state_keep_it_out_of_render_so_r": "当副作用应遵循反应性props或状态时，请使用 `effect()`。将其排除在 `render()` 之外，以便渲染保持声明性。",
+                        "the_function_returned_by_effect_unsubscribes_the_effect_returning_it_from_onmount_ties_the_effec": "`effect()` 返回的函数取消订阅效果。从 `onMount()` 返回它会将效果与组件生命周期联系起来，因此 WebComponent 在元素断开连接时调用它。",
+                        "checking_mount_status": "检查挂载状态",
+                        "you_can_check_whether_the_component_is_currently_connected_to_the_dom_using_the_this_mounted_boo": "您可以使用 `this.mounted` 布尔 getter 检查组件当前是否连接到 DOM。",
+                        "this_is_particularly_useful_when_performing_asynchronous_tasks_like_fetching_data_to_prevent_upd": "这在执行异步任务（例如获取数据）时特别有用，以防止更新已卸载组件上的状态，否则会引发错误。",
+                        "lifecycle_order_of_execution": "生命周期执行顺序",
+                        "understanding_the_exact_sequence_in_which_callbacks_are_invoked_helps_in_structuring_components": "了解调用回调的确切顺序有助于正确构建组件。生命周期按以下顺序运行：",
+                        "constructor": "**`constructor`**",
+                        "the_browser_instantiates_the_element_beforesemicolon_web_component_maps_static_observedattribute": "浏览器实例化该元素。 `@beforesemicolon/web-component` 将 `static observedAttributes` 映射到内部反应式 props getter 和 setter，如果任何 props 与保留关键字冲突，则会抛出错误。",
+                        "render": "**`render`**",
+                        "called_during_the_connection_phase_the_component_renders_its_template_and_appends_it_to_its_cont": "在连接阶段调用。该组件呈现其模板并将其附加到其内容根。",
+                        "stylesheet_configuration": "**`stylesheet configuration`**",
+                        "initializes_and_applies_stylesheets_e_g_from_the_stylesheet_property_or_the_css_tagged_template": "初始化并应用样式表（例如，来自 `stylesheet` 属性或 `css` 标记模板）。",
+                        "onmount_2": "**`onMount`**",
+                        "triggered_immediately_after_rendering_is_complete_and_stylesheets_are_attached_the_return_value": "渲染完成并附加样式表后立即触发。返回值（如果它是一个函数）被缓存为安装清理回调。",
+                        "effect_callbacks": "**`effect` 回调**",
+                        "markup_effects_created_during_onmount_run_immediately_and_re_run_later_when_their_tracked_reacti": "在 `onMount()` 期间创建的 Markup 效果会立即运行，并在其跟踪的反应getter发生变化时重新运行。如果从 `onMount()` 返回效果取消订阅，它将成为组件的挂载清理回调。",
+                        "onupdate": "**`onUpdate`**",
+                        "runs_every_time_an_observed_attribute_changes_only_while_the_component_is_mounted": "每次观察到的属性更改时运行（仅在安装组件时）。",
+                        "adoptedcallback_onadoption": "**`adoptedCallback` / `onAdoption`**",
+                        "runs_when_the_browser_adopts_the_element_into_a_different_document": "当浏览器将元素采用到不同的文档中时运行。",
+                        "mount_cleanup": "**`Mount Cleanup`**",
+                        "runs_the_cleanup_function_returned_by_onmount_if_any_when_the_element_disconnects": "当元素断开连接时，运行 `onMount()` 返回的清理函数（如果有）。",
+                        "ondestroy_2": "**`onDestroy`**",
+                        "runs_immediately_after_the_mount_cleanup_function_finishes": "安装清理功能完成后立即运行。",
+                        "onerror": "**`onError`**",
+                        "runs_whenever_webcomponent_catches_an_error_from_one_of_its_guarded_rendering_update_stylesheet_lifec": "每当 WebComponent 从其受保护的渲染、更新、样式表、生命周期、采用或清理路径之一捕获错误时运行。"
+                    }
+                }
+            },
+            "fundamentals": {
+                "config": {
+                    "meta": {
+                        "config": "配置",
+                        "config_webcomponent_by_before_semicolon": "配置 - WebComponent by Before Semicolon",
+                        "configure_shadow_dom_shadow_root_options_on_your_components": "在组件上配置 Shadow DOM 影子根选项。"
+                    },
+                    "content": {
+                        "config": "配置",
+                        "by_default_beforesemicolon_web_component_creates_an_encapsulated_shadow_dom_for_each_component_y": "默认情况下，`@beforesemicolon/web-component` 为每个组件创建一个封装的 Shadow DOM。您可以自定义 Shadow DOM 配置或使用 `config` 类属性完全选择退出它。",
+                        "default_configuration": "默认配置",
+                        "if_you_do_not_define_a_custom_config_property_the_component_defaults_to_the_following_settings": "如果您未定义自定义 `config` 属性，则组件默认采用以下设置：",
+                        "disabling_shadow_dom": "禁用阴影 DOM",
+                        "in_some_scenarios_you_might_want_a_component_to_render_directly_into_the_light_dom_e_g_to_inheri": "在某些情况下，您可能希望组件直接渲染到 Light DOM 中（例如，轻松继承所有全局 CSS 样式表或构造无头组件）。您可以通过在 `config` 对象上设置 `shadow: false` 来完成此操作。",
+                        "when_shadow_false_is_configured_this_contentroot_will_reference_the_component_element_itself_rat": "配置 `shadow: false` 时，`this.contentRoot` 将引用组件元素本身，而不是 `ShadowRoot`。通过 `stylesheet` 属性定义的动态样式表不会限定作用域，并且可能全局应用。",
+                        "shadow_dom_configuration_options": "影子 DOM 配置选项",
+                        "when_shadow_is_set_to_true_the_rest_of_the_configuration_properties_are_passed_directly_to_the_n": "当 `shadow` 设置为 `true` 时，其余配置属性将直接传递到本机 `Element.attachShadow()` 方法。",
+                        "option_type_default_description": "|选项 |类型 |默认 |描述 |",
+                        "shadow_boolean_true_enables_or_disables_shadow_dom_rendering": "| `shadow` | `boolean` | `true` |启用或禁用阴影 DOM 渲染。                                                                                                                           |",
+                        "mode_open_closed_open_defines_accessibility_to_the_shadow_root_from_outside_javascript_if_open_t": "| `mode` | `'open' \\| 'closed'` | `'open'` |定义从外部 JavaScript 对影子根的可访问性。如果是 `'open'`，则可以通过 `element.shadowRoot` 访问影子根。                              |",
+                        "delegatesfocus_boolean_false_when_set_to_true_clicking_a_non_focusable_part_of_the_shadow_dom_de": "| `delegatesFocus` | `boolean` | `false` |当设置为 `true` 时，单击阴影 DOM 的不可聚焦部分会将焦点委托给阴影根内的第一个可聚焦元素。                          |",
+                        "clonable_boolean_false_if_set_to_true_the_shadow_root_can_be_cloned_using_clonenode_supported_in": "| `clonable` | `boolean` | `false` |如果设置为 `true`，则可以使用 `cloneNode()` 克隆影子根（在较新的规范中支持）。                                                            |",
+                        "serializable_boolean_false_if_set_to_true_the_shadow_root_will_be_serialized_when_using_apis_lik": "| `serializable` | `boolean` | `false` |如果设置为 `true`，则在使用 `getHTML()` 等 API 来声明性影子 DOM 时，影子根将被序列化。                                                   |",
+                        "slotassignment_named_manual_named_controls_how_nodes_are_assigned_to_slots_named_assigns_element": "| `slotAssignment` | `'named' \\| 'manual'` | `'named'` |控制如何将节点分配给槽。 `'named'` 根据元素的槽属性自动分配元素。 `'manual'` 需要以编程方式分配节点。 |",
+                        "example_focus_delegation_closed_shadow_root": "示例：焦点委派和封闭影子根",
+                        "here_is_an_example_of_configuring_a_closed_shadow_root_with_focus_delegation_enabled": "以下是配置启用焦点委托的封闭影子根的示例："
+                    }
+                },
+                "creating_components": {
+                    "meta": {
+                        "creating_components": "创建组件",
+                        "creating_components_webcomponent_by_before_semicolon": "创建组件 - WebComponent by Before Semicolon",
+                        "learn_how_to_subclass_webcomponent_and_register_your_custom_elements": "了解如何子类化 WebComponent 并注册您的自定义元素。"
+                    },
+                    "content": {
+                        "creating_components": "创建组件",
+                        "to_create_a_new_custom_element_with_beforesemicolon_web_component_you_subclass_the_webcomponent": "要使用 `@beforesemicolon/web-component` 创建新的自定义元素，您需要对 `WebComponent` 基类进行子类化，并使用 `customElements.define()` 将其注册到浏览器。",
+                        "here_is_a_basic_example_of_a_component": "这是一个组件的基本示例：",
+                        "tag_naming_requirements": "标签命名要求",
+                        "custom_element_tag_names_must_adhere_to_the_standard_html_specification": "自定义元素标签名称必须遵守标准 HTML 规范：",
+                        "must_contain_at_least_one_hyphen_this_distinguishes_custom_elements_from_standard_html_elements": "**必须包含至少一个连字符 (`-`)**：这将自定义元素与标准 HTML 元素区分开来。例如，`my-element`、`todo-list` 和`fancy-btn` 有效，而`myelement` 或`button` 无效。",
+                        "must_start_with_a_lowercase_ascii_letter_e_g_a_z": "**必须以小写 ASCII 字母开头**（例如 `a-z`）。",
+                        "cannot_contain_uppercase_letters_standard_html_parsers_treat_tag_names_as_case_insensitive_so_cu": "**不能包含大写字母**：标准 HTML 解析器将标签名称视为不区分大小写，因此自定义元素标签全部以小写形式定义。",
+                        "subclassing_webcomponent": "子类化 WebComponent",
+                        "the_webcomponent_class_inherits_from_the_native_htmlelement_this_means_your_component_is_a_nativ": "`WebComponent` 类继承自本机 `HTMLElement`。这意味着您的组件是本机自定义元素，可以访问所有标准 DOM 属性、方法和生命周期回调，同时添加反应性和便利功能。",
+                        "reserved_properties": "保留属性",
+                        "because_webcomponent_and_the_native_htmlelement_define_essential_properties_and_methods_for_life": "由于 `WebComponent` 和本机 `HTMLElement` 定义了生命周期管理、渲染、状态和样式的基本属性和方法，因此您**不能**使用这些名称作为反应式组件属性 (props)。",
+                        "below_is_the_complete_list_of_reserved_property_names_that_cannot_be_overridden_or_declared_in_o": "以下是无法在 `observedAttributes` 中覆盖或声明用于 props 映射的保留属性名称的完整列表：",
+                        "base_configuration_styling": "基本配置和造型",
+                        "config_used_to_define_shadow_dom_configuration": "`config`：用于定义影子 DOM 配置。",
+                        "stylesheet_used_to_define_scoped_stylesheets_e_g_via_css_tagged_templates": "`stylesheet`：用于定义范围样式表（例如，通过 `css` 标记模板）。",
+                        "updatestylesheet_sheet_method_to_dynamically_update_replace_the_stylesheet": "`updateStylesheet(sheet)`：动态更新/替换样式表的方法。",
+                        "reactivity_internal_refs": "反应性和内部参考",
+                        "props_object_containing_reactive_prop_getters": "`props`：包含反应式 prop getter 的对象。",
+                        "initialstate_object_containing_initial_values_for_internal_state": "`initialState`：包含内部状态初始值的对象。",
+                        "state_object_containing_reactive_state_getters": "`state`：包含反应状态getter的对象。",
+                        "setstate_newstate_callback_method_used_to_reactively_update_the_internal_state": "`setState(newState | callback)`：用于被动更新内部状态的方法。",
+                        "refs_object_containing_references_to_elements_marked_with_the_ref_attribute_in_the_template": "`refs`：包含对模板中标有 `ref` 属性的元素的引用的对象。",
+                        "dom_shadow_roots": "DOM 和影子根",
+                        "mounted_boolean_getter_indicating_if_the_component_is_currently_connected_to_the_dom": "`mounted`：布尔值 getter，指示组件当前是否连接到 DOM。",
+                        "contentroot_getter_returning_the_render_target_shadowroot_or_the_element_itself_if_shadow_dom_is": "`contentRoot`：返回渲染目标的 Getter（如果禁用阴影 DOM，则返回 `ShadowRoot` 或元素本身）。",
+                        "root_getter_returning_the_ancestor_shadow_root_or_document_of_the_element": "`root`：返回元素的祖先影子根或文档的 Getter。",
+                        "internals_getter_returning_the_elementinternals_instance_via_attachinternals_useful_for_form_ass": "`internals`：返回 `ElementInternals` 实例的 Getter（通过 `attachInternals()`），对于表单关联和可访问性很有用。",
+                        "render_method_that_returns_the_html_template_or_node_to_be_rendered": "`render()`：返回要渲染的 HTML 模板或节点的方法。",
+                        "dispatch_name_detail_method_to_fire_custom_dom_events_easily": "`dispatch(name, detail)`：轻松触发自定义 DOM 事件的方法。",
+                        "lifecycle_methods": "生命周期方法",
+                        "connectedcallback_native_element_connection_handler_use_onmount_instead_for_custom_behavior": "`connectedCallback()`：本机元素连接处理程序。使用 `onMount()` 代替自定义行为。",
+                        "attributechangedcallback_name_oldvalue_newvalue_native_attribute_change_handler_use_onupdate_ins": "`attributeChangedCallback(name, oldValue, newValue)`：本机属性更改处理程序。使用 `onUpdate()` 代替自定义行为。",
+                        "disconnectedcallback_native_element_disconnection_handler_use_ondestroy_instead_for_custom_behav": "`disconnectedCallback()`：本机元素断开处理程序。使用 `onDestroy()` 代替自定义行为。",
+                        "adoptedcallback_native_adoption_handler_use_onadoption_instead_for_custom_behavior": "`adoptedCallback()`：本机采用处理程序。使用 `onAdoption()` 代替自定义行为。",
+                        "onerror_error_callback_executed_when_errors_occur_within_lifecycles_or_rendering": "`onError(error)`：生命周期或渲染中发生错误时执行的回调。",
+                        "native_htmlelement_properties": "本机 HTMLElement 属性",
+                        "style_standard_css_declaration_block": "`style`：标准 CSS 声明块。",
+                        "classname_standard_class_name_string": "`className`：标准类名字符串。",
+                        "classlist_standard_class_token_list": "`classList`：标准类代币列表。",
+                        "warning": "[！警告]",
+                        "attempting_to_define_any_of_these_reserved_names_as_custom_props_or_mapping_them_via_observedatt": "尝试将任何这些保留名称定义为自定义 props 或通过 `observedAttributes` 映射它们将导致与核心运行时行为发生冲突，并可能会破坏组件的反应性或生命周期。"
+                    }
+                },
+                "rendering": {
+                    "meta": {
+                        "rendering": "渲染",
+                        "rendering_webcomponent_by_before_semicolon": "渲染 - WebComponent by Before Semicolon",
+                        "learn_about_the_render_method_and_how_content_slots_work": "了解 render() 方法以及内容槽的工作原理。"
+                    },
+                    "content": {
+                        "rendering": "渲染",
+                        "the_primary_way_to_define_a_component_s_visual_interface_is_by_implementing_the_render_method_th": "定义组件可视化界面的主要方法是实现 `render()` 方法。该方法在组件初始化期间被调用一次。返回的内容将渲染到组件的 `contentRoot` 中（如果禁用影子 DOM，则为影子根或元素本身）。",
+                        "the_render_method": "render() 方法",
+                        "the_render_method_has_the_following_signature": "`render()` 方法具有以下签名：",
+                        "supported_return_types": "支持的返回类型",
+                        "htmltemplate_the_recommended_return_type_built_using_the_html_tagged_template_from_beforesemicol": "**`HtmlTemplate`**：推荐的返回类型。使用 `@beforesemicolon/web-component` 的 `html` 标记模板构建。它编译成高效的 DOM 更新，仅刷新模板中的特定动态值。",
+                        "string_a_raw_html_string_can_be_returned_note_that_returning_raw_strings_does_not_benefit_from_t": "**`string`**：可以返回原始 HTML 字符串。请注意，返回原始字符串不会受益于 `HtmlTemplate` 提供的手术反应更新。",
+                        "native_node_you_can_return_standard_dom_nodes_created_programmatically": "**本机 `Node`**：您可以返回以编程方式创建的标准 DOM 节点。",
+                        "null_or_void_headless_or_logic_only_components_that_do_not_render_any_markup_can_return_null_or": "**`null` 或 `void`**：不呈现任何标记的无头或纯逻辑组件可以返回 `null` 或省略返回值。",
+                        "slot_projections": "槽位投影",
+                        "web_components_support_content_projection_via_the_element_allowing_users_to_pass_markup_down_int": "Web Components 通过 `<slot>` 元素支持内容投影，允许用户将标记传递到您的组件中。默认情况下，`@beforesemicolon/web-component` 同时支持默认插槽和命名插槽。",
+                        "default_slots": "默认插槽",
+                        "an_unnamed_acts_as_the_default_catch_all_container_for_any_children_passed_inside_your_custom_el": "未命名的 `<slot>` 充当自定义元素内传递的任何子元素的默认捕获所有容器。",
+                        "component_definition": "**组件定义：**",
+                        "usage_in_html": "**HTML 中的用法：**",
+                        "named_slots": "命名插槽",
+                        "to_project_content_into_specific_locations_use_named_slots_you_specify_the_name_using_the_name_a": "要将内容投影到特定位置，请使用命名槽。您可以使用 `<slot>` 上的 `name` 属性指定名称，并使用要投影的元素上的 `slot` 属性进行匹配。"
+                    }
+                },
+                "typescript": {
+                    "meta": {
+                        "typescript": "TypeScript",
+                        "typescript_webcomponent_by_before_semicolon": "TypeScript - Before Semicolon 的 WebComponent",
+                        "complete_type_safety_and_generics_integration_in_webcomponent": "WebComponent 中完整的类型安全和泛型集成。"
+                    },
+                    "content": {
+                        "typescript": "TypeScript",
+                        "beforesemicolon_web_component_is_designed_with_first_class_typescript_support_offering_complete": "`@beforesemicolon/web-component` 的设计具有一流的 TypeScript 支持，为属性、内部状态、引用绑定和自定义元素接口提供完整的类型安全。",
+                        "subclassing_with_generics": "使用泛型进行子类化",
+                        "the_webcomponent_base_class_accepts_two_optional_generic_parameters_props_and_state": "`WebComponent` 基类接受两个可选通用参数：`Props` 和 `State`。",
+                        "custom_element_references": "自定义元素参考",
+                        "when_working_with_dom_apis_or_template_references_you_often_need_a_reference_type_that_contains": "使用 DOM API 或模板引用时，您通常需要一个引用类型，其中包含元素的自定义属性和标准 `WebComponent` / `HTMLElement` API。",
+                        "the_htmlcomponentelement_utility_type_provides_this_capability_it_combines_the_webcomponent_clas": "`HTMLComponentElement<Props>` 实用程序类型提供此功能。它将 `WebComponent` 类与您的自定义属性签名（无需 getter）相结合，以便您可以直接读取或写入值。",
+                        "exported_utility_types": "导出的实用程序类型",
+                        "the_following_typescript_utility_types_are_exported_from_the_library_to_help_build_typed_compone": "从库中导出以下 TypeScript 实用程序类型，以帮助构建基于类型化组件的架构：",
+                        "objectinterface": "`ObjectInterface<P>`",
+                        "constraints_checking_helper_representing_an_object_containing_key_value_pairs_where_keys_must_be": "约束检查帮助程序表示包含键值对的对象，其中键必须是 `string`、`number` 或 `symbol`。",
+                        "props": "`Props<P>`",
+                        "maps_each_key_in_a_properties_interface_p_to_a_reactive_stategetter_from_beforesemicolon_markup": "将属性接口 `P` 中的每个键映射到 `@beforesemicolon/markup` 的反应式 `StateGetter`。这与 `this.props` 的类型匹配。",
+                        "propssetters": "`PropsSetters<P>`",
+                        "maps_each_key_in_a_properties_interface_p_to_a_reactive_statesetter_from_beforesemicolon_markup": "将属性接口 `P` 中的每个键映射到 `@beforesemicolon/markup` 的反应式 `StateSetter`。",
+                        "state": "`State<S>`",
+                        "maps_each_key_in_a_state_interface_s_to_a_reactive_stategetter_from_beforesemicolon_markup_this": "将状态接口 `S` 中的每个键映射到来自 `@beforesemicolon/markup` 的反应式 `StateGetter`。这与 `this.state` 的类型匹配。",
+                        "statesetters": "`StateSetters<S>`",
+                        "maps_each_key_in_a_state_interface_s_to_a_reactive_statesetter_from_beforesemicolon_markup": "将状态接口 `S` 中的每个键映射到来自 `@beforesemicolon/markup` 的反应式 `StateSetter`。"
+                    }
+                }
+            },
+            "get_started": {
+                "meta": {
+                    "get_started_webcomponent_by_before_semicolon": "开始使用 - WebComponent by Before Semicolon",
+                    "learn_how_to_build_your_first_reactive_web_component_using_the_webcomponent_class": "了解如何使用 WebComponent 类构建您的第一个反应式 Web Component。"
+                },
+                "content": {
+                    "this_tutorial_will_guide_you_step_by_step_through_creating_registering_templating_and_using_your": "本教程将指导您使用 `@beforesemicolon/web-component` 逐步创建、注册、模板化和使用第一个反应式自定义元素。",
+                    "step_1_declaring_the_component_class": "第 1 步：声明组件类",
+                    "to_create_a_new_component_declare_a_class_that_extends_webcomponent": "要创建新组件，请声明一个扩展 `WebComponent` 的类。",
+                    "step_2_defining_the_custom_element_tag": "步骤 2：定义自定义元素标签",
+                    "register_the_component_class_in_the_global_customelementregistry_using_the_standard_customelemen": "使用标准 `customElements.define` 方法在全局 `CustomElementRegistry` 中注册组件类。",
+                    "custom_element_names_must_contain_at_least_one_hyphen_and_should_be_written_in_lowercase_kebab_c": "自定义元素名称必须包含至少一个连字符 (`-`)，并且应以小写形式（短横线大小写）书写，以防止与标准 HTML 元素发生冲突。",
+                    "step_3_adding_a_template": "第 3 步：添加模板",
+                    "to_render_content_define_a_render_method_in_your_class_the_method_should_return_an_htmltemplate": "要呈现内容，请在类中定义 `render()` 方法。该方法应返回 `HtmlTemplate`（使用 `html` 标记模板文字创建）、纯 HTML 字符串、本机 DOM `Node` 或 `void`。",
+                    "step_4_using_the_custom_element_in_html": "步骤 4：在 HTML 中使用自定义元素",
+                    "once_the_custom_element_is_registered_you_can_place_the_tag_anywhere_in_your_html_document": "注册自定义元素后，您可以将 `<my-button>` 标签放置在 HTML 文档中的任何位置。",
+                    "next_steps": "下一步",
+                    "now_that_you_have_built_your_first_web_component_explore_the_core_features_that_make_beforesemic": "现在您已经构建了第一个 Web 组件，接下来探索使 `@beforesemicolon/web-component` 强大的核心功能：",
+                    "reactive_props_props_and_state_props_md_pass_data_into_your_components_and_handle_attribute_upda": "**[Reactive Props](./props-and-state/props.md)**：将数据传递到组件并处理属性更新。",
+                    "reactive_state_props_and_state_state_md_manage_internal_state_and_automatically_trigger_surgical": "**[Reactive State](./props-and-state/state.md)**：管理内部状态并自动触发外科手术 DOM 更新。",
+                    "lifecycle_hooks_events_and_lifecycle_lifecycle_md_run_setup_and_cleanup_code_with_onmount_and_on": "**[Lifecycle Hooks](./events-and-lifecycle/lifecycle.md)**：使用 `onMount` 和 `onDestroy` 运行设置和清理代码。"
+                }
+            },
+            "guide": {
+                "meta": {
+                    "guide_best_practices": "指南和最佳实践",
+                    "webcomponent_guide_and_best_practices_before_semicolon": "WebComponent 指南和最佳实践 - Before Semicolon",
+                    "practical_conventions_for_building_reactive_custom_elements_with_beforesemicolon_web_component": "使用 @beforesemicolon/web-component. 构建反应式自定义元素的实用约定"
+                },
+                "content": {
+                    "guide_best_practices": "指南和最佳实践",
+                    "use_beforesemicolon_web_component_when_you_want_native_custom_elements_with_a_small_reactive_lay": "当您希望本机自定义元素具有用于模板、props、状态、作用域样式、生命周期挂钩和表单集成的小型反应层时，请使用 `@beforesemicolon/web-component`。",
+                    "core_rules": "核心规则",
+                    "keep_render_declarative_return_html_a_node_a_string_or_nothing_do_not_start_timers_fetch_data_su": "**保持 `render()` 声明性**：返回 `html`、`Node`、字符串或不返回任何内容。不要启动计时器、获取数据、订阅全局事件或改变 `render()` 内的状态。",
+                    "use_observed_attributes_for_public_inputs_put_external_inputs_in_static_observedattributes_provi": "**将观察到的属性用于公共输入**：将外部输入放入 `static observedAttributes`，提供默认值作为类字段，并从 `this.props` 读取它们。",
+                    "use_state_for_owned_ui_data_put_private_component_data_in_initialstate_and_update_it_with_this_s": "**对拥有的 UI 数据使用状态**：将私有组件数据放入 `initialState` 中，并使用 `this.setState()` 更新它。",
+                    "pass_reactive_getters_directly_when_possible_use_this_state_count_or_this_props_label_in_templat": "**尽可能直接传递反应式getter**：在模板中使用 `${this.state.count}` 或 `${this.props.label}`。在计算、条件或事件处理程序中调用 getter。",
+                    "use_lifecycle_hooks_for_side_effects_start_work_in_onmount_return_cleanup_from_onmount_or_use_on": "**使用生命周期挂钩产生副作用**：在 `onMount()` 中开始工作，从 `onMount()` 返回清理或使用 `onDestroy()`，并响应 `onUpdate()` 中的 prop 更改。",
+                    "prefer_ref_before_queryselector_use_ref_for_template_owned_elements_and_reach_for_contentroot_on": "**在 `querySelector` 之前优先选择 `ref`**：将 `ref` 用于模板拥有的元素，并仅在动态查询真正更清晰时才使用 `contentRoot`。",
+                    "dispatch_public_events_use_this_dispatch_name_detail_for_component_outputs_consumers_listen_with": "**调度公共事件**：使用 `this.dispatch(name, detail)` 进行组件输出。消费者使用普通的 DOM API 或 Markup `on...` 处理程序进行监听。",
+                    "component_shape": "元件形状",
+                    "attribute_formatting": "属性格式化",
+                    "break_long_custom_element_usage_across_lines_it_keeps_examples_readable_and_avoids_horizontal_sc": "打破跨行的长自定义元素使用。它保持示例的可读性并避免水平滚动。",
+                    "props_vs_state": "props与状态",
+                    "use_props_for_values_controlled_by_the_outside_page_use_state_for_values_the_component_owns": "对外部页面控制的值使用 props。使用组件拥有的值的状态。",
+                    "side_effects": "副作用",
+                    "use_onmount_for_browser_subscriptions_and_return_a_cleanup_function": "使用 `onMount()` 进行浏览器订阅并返回清理函数。",
+                    "styling": "造型",
+                    "use_stylesheet_for_static_css_and_css_when_styles_depend_on_props_or_state": "当样式依赖于 props 或状态时，将 `stylesheet` 用于静态 CSS 和 `css`。",
+                    "form_controls": "表单控件",
+                    "use_static_formassociated_true_only_for_controls_that_should_participate_in_native_form_submissi": "仅将 `static formAssociated = true` 用于应参与本机表单提交或验证的控件。"
+                }
+            },
+            "index": {
+                "meta": {
+                    "what_is_webcomponent": "什么是 WebComponent？",
+                    "what_is_webcomponent_webcomponent_by_before_semicolon": "什么是Web组件？ - Before Semicolon 的 WebComponent",
+                    "webcomponent_is_a_reactive_layer_on_top_of_native_web_components_api_powered_by_markup_it_adds_s": "WebComponent 是本机 Web Components API 之上的反应层，由 Markup 提供支持。它添加了状态、props、范围样式和生命周期。"
+                },
+                "content": {
+                    "what_is_webcomponent": "什么是 WebComponent？",
+                    "beforesemicolon_web_component_is_a_lightweight_compiler_free_reactive_layer_built_on_top_of_the": "`@beforesemicolon/web-component` 是一个轻量级、免编译器的反应层，构建在本机 Web Components API 之上。它由 [@beforesemicolon/markup](https://markup.beforesemicolon.com) 模板引擎提供支持，可为标准自定义元素带来反应性、状态管理和范围样式。",
+                    "by_design_the_native_web_components_apis_are_low_level_and_verbose_writing_raw_custom_elements_o": "根据设计，本机 Web Components API 是低级且冗长的。编写原始自定义元素通常会导致 DOM 操作、属性跟踪、事件处理和手动 UI 更新产生冗余样板。 `WebComponent` 基类简化了此过程，让您可以使用标准浏览器 API 构建独立的反应式组件。",
+                    "key_enhancements": "主要增强功能",
+                    "webcomponent_wraps_native_custom_elements_with_several_major_enhancements": "WebComponent 包装了本机自定义元素，并进行了几项主要增强：",
+                    "state_management_reactive_internal_state_that_triggers_targeted_dom_updates_when_mutated_via_set": "**状态管理**：反应式内部状态，通过 `setState` 突变时触发目标 DOM 更新。",
+                    "props_management_maps_observed_attributes_directly_to_reactive_properties_handling_automatic_cam": "**Props 管理**：将 observed attributes 直接映射到响应式属性，并自动处理 camelCase 转换和反序列化。",
+                    "component_styling_first_class_support_for_cssstylesheet_objects_css_import_assertions_and_reacti": "**组件样式**：通过 `css` 标记模板对 `CSSStyleSheet` 对象、CSS 导入断言和反应式样式表提供一流支持。",
+                    "form_integration_out_of_the_box_support_for_form_associated_custom_elements_exposing_standard_fo": "**表单集成**：对表单相关自定义元素的开箱即用支持，公开标准表单验证和值设置 API。",
+                    "lifecycles_predictable_wrappers_around_native_element_connection_callbacks_supporting_cleanup_fu": "**生命周期**：围绕本机元素连接回调的可预测包装器，支持清理函数返回。",
+                    "template_refs_easily_reference_and_query_rendered_dom_elements_without_using_verbose_queryselect": "**模板参考**：轻松引用和查询渲染的 DOM 元素，无需使用详细的 `querySelector` 或 `shadowRoot` 调用。",
+                    "error_handling_a_centralized_onerror_hook_to_catch_and_process_runtime_rendering_or_lifecycle_er": "**错误处理**：集中式 `onError` 挂钩，用于捕获和处理运行时渲染或生命周期错误。",
+                    "event_dispatching_a_clean_dispatch_helper_to_fire_standard_customevent_instances_with_typed_deta": "**事件调度**：一个干净的 `dispatch` 帮助程序，用于触发具有类型化详细负载的标准 `CustomEvent` 实例。",
+                    "start_here": "从这里开始",
+                    "ai_guide_ai_md": "[人工智能指南](./ai.md)",
+                    "full_example": "完整示例",
+                    "here_is_a_complete_reactive_counter_component_implemented_in_typescript_showcasing_props_state_e": "这是在 TypeScript 中实现的完整反应式计数器组件，展示了 props、状态、事件调度、样式表和模板渲染：",
+                    "in_your_html_you_can_simply_use_the_tag_normally": "在 HTML 中，您可以正常使用该标签。"
+                }
+            },
+            "installation": {
+                "meta": {
+                    "installation": "安装",
+                    "installation_webcomponent_by_before_semicolon": "安装 - WebComponent by Before Semicolon",
+                    "install_webcomponent_via_npm_yarn_pnpm_or_include_it_via_cdn": "通过 npm、yarn、pnpm 安装 WebComponent 或通过 CDN 包含它。"
+                },
+                "content": {
+                    "installation": "安装",
+                    "beforesemicolon_web_component_is_a_plug_and_play_library_it_does_not_require_complex_build_steps": "`@beforesemicolon/web-component` 是一个即插即用库。它不需要复杂的构建步骤、编译器配置或捆绑器。您可以通过包管理器安装它或直接将其从 CDN 包含在标准浏览器脚本标记中来使用它。",
+                    "via_package_managers": "通过包管理器",
+                    "install_the_package_using_your_package_manager_of_choice": "使用您选择的包管理器安装包：",
+                    "npm": "npm",
+                    "yarn": "yarn",
+                    "pnpm": "pnpm",
+                    "once_installed_you_can_import_webcomponent_styling_utilities_and_markup_templating_functions_dir": "安装后，您可以将 `WebComponent`、样式实用程序和 Markup 模板函数直接导入到 JavaScript 或 TypeScript 文件中：",
+                    "via_cdn": "通过CDN",
+                    "for_rapid_prototyping_or_zero_build_environments_you_can_include_the_script_from_a_cdn_such_as_u": "对于快速原型设计或零构建环境，您可以将来自 CDN 的脚本（例如 **unpkg** 或 **jsDelivr**）包含在文档的 `<head>` 中。",
+                    "latest_version": "最新版本",
+                    "specific_version": "具体版本",
+                    "cdn_global_namespaces": "CDN 全局命名空间",
+                    "when_using_the_client_cdn_build_beforesemicolon_web_component_exposes_a_global_variable_bfs_unde": "使用客户端 CDN 构建时，`@beforesemicolon/web-component` 公开全局变量 `BFS`。在此命名空间下，您可以访问核心元素：",
+                    "bfs_webcomponent_the_base_class_for_building_custom_elements": "**`BFS.WebComponent`**：用于构建自定义元素的基类。",
+                    "bfs_css_the_tagged_template_styling_helper": "**`BFS.css`**：标记的模板样式助手。",
+                    "bfs_markup_the_underlying_markup_library_namespace_containing_html_state_effect_and_other_templa": "**`BFS.MARKUP`**：底层 Markup 库命名空间，包含 `html`、`state`、`effect` 和其他模板实用程序。",
+                    "here_is_an_example_of_accessing_these_apis_from_browser_native_scripts": "以下是从浏览器本机脚本访问这些 API 的示例："
+                }
+            },
+            "props_and_state": {
+                "props": {
+                    "meta": {
+                        "props": "Props",
+                        "props_webcomponent_by_before_semicolon": "props - WebComponent by Before Semicolon",
+                        "define_and_read_reactive_external_properties_mapped_to_observed_attributes": "定义并读取映射到观察到的属性的反应性外部属性。"
+                    },
+                    "content": {
+                        "props": "Props",
+                        "props_are_the_external_inputs_to_your_component_in_webcomponent_props_are_bound_to_html_attribut": "Props 是组件的外部输入。在 WebComponent 中，props 绑定到 HTML 属性，提供一种反应式且无缝的方式来从父级或外部消费者接收数据。",
+                        "declaring_props": "声明props",
+                        "to_declare_reactive_props_add_their_attribute_names_to_the_static_observedattributes_array_webco": "要声明反应式 props，请将其属性名称添加到 `static observedAttributes` 数组中。 WebComponent 自动监视这些属性并在元素实例上设置响应式 getter/setter。",
+                        "case_conversion": "大小写转换",
+                        "html_attributes_are_case_insensitive_and_conventionally_written_in_kebab_case_e_g_card_title_web": "HTML 属性不区分大小写，通常使用 kebab-case（例如 `card-title`）。WebComponent 会自动将这些属性转换为类实例上的 camelCase 属性（例如 `cardTitle`）。",
+                        "for_example": "例如：",
+                        "card_title_becomes_cardtitle": "`card-title` 变为 `cardTitle`",
+                        "is_open_becomes_isopen": "`is-open` 变为 `isOpen`",
+                        "disabled_remains_disabled": "`disabled` 仍为 `disabled`",
+                        "default_values": "默认值",
+                        "you_can_specify_default_values_for_your_props_by_defining_them_as_class_fields_if_the_correspond": "您可以通过将 props 定义为类字段来指定它们的默认值。如果安装时元素上不存在相应的属性，则将使用默认值。",
+                        "reading_props_in_templates": "读取模板中的 Props",
+                        "inside_the_component_class_you_can_access_the_reactive_getter_functions_via_this_props": "在组件类中，您可以通过 `this.props` 访问反应式 getter 函数。",
+                        "since_these_props_are_reactive_signal_getters_they_should_be_invoked_as_functions_to_read_their": "由于这些 props 是反应性信号getter，因此应将它们作为函数调用以读取其当前值（例如 `this.props.cardTitle()`）。在 Markup 模板中使用时，直接传递 getter 函数可以让模板自动订阅更新：",
+                        "passing_this_props_cardtitle_directly_as_an_expression_in_the_template_without_calling_it_works": "直接将 `this.props.cardTitle` 作为模板中的表达式传递（不调用它）是可行的，因为 Markup 旨在响应式解析 getter。如果您在函数回调内进行计算或条件渲染，请确保将其作为函数调用：`this.props.isOpen()`。",
+                        "attribute_parsing_serialization": "属性解析和序列化",
+                        "webcomponent_does_not_serialize_and_deserialize_prop_values_as_a_component_data_protocol": "WebComponent 不会将 prop 值作为组件数据协议进行序列化和反序列化。",
+                        "there_are_two_different_paths": "有两种不同的路径：",
+                        "string_attributes_literal_html_attributes_and_setattribute_values_are_browser_strings_webcompone": "**字符串属性**：文字 HTML 属性和 `setAttribute()` 值是浏览器字符串。 WebComponent 通过其内部 JSON 解析器传递这些字符串，因此看起来原始的值可以变成原始值，而看起来 JSON 的值可以变成数组或对象。",
+                        "property_reference_values_values_assigned_through_the_component_property_including_values_passed": "**属性/参考值**：通过组件属性分配的值（包括从 Markup 表达式传递的值）保留为 JavaScript 值。对象、数组、函数和其他非基元通过引用传递，不会写回 HTML 属性。",
+                        "primitive_property_values_when_you_assign_a_primitive_value_directly_to_the_component_property_w": "**原始属性值**：当您将原始值直接分配给组件属性时，WebComponent 会将其镜像回匹配的 kebab-case 属性。",
+                        "in_this_html_only_example_webcomponent_receives_strings_from_the_browser_and_parses_json_compati": "在这个仅 HTML 的示例中，WebComponent 从浏览器接收字符串并在更新 `this.props` 之前解析 JSON 兼容值：",
+                        "card_title_remains_the_string_my_project": "`card-title` 保留字符串 `\"My Project\"`。",
+                        "count_becomes_the_number_3": "`count` 变为编号 `3`。",
+                        "enabled_becomes_the_boolean_true": "`enabled` 变为布尔值 `true`。",
+                        "tags_becomes_the_array_ui_release": "`tags` 变为阵列 `[\"ui\", \"release\"]`。",
+                        "when_a_parent_template_passes_a_non_primitive_value_keep_it_as_a_reference_instead_of_stringifyi": "当父模板传递非原始值时，将其保留为引用而不是将其字符串化：",
+                        "the_project_prop_is_the_original_object_reference_it_is_not_converted_to_json_placed_in_the_dom": "`project` 属性是原始对象引用。不转换为JSON，作为属性字符串放在DOM中，稍后再次解析。",
+                        "imperative_updates": "当务之急的更新",
+                        "you_can_also_read_and_write_props_imperatively_directly_on_the_element_instance_primitive_values": "您还可以直接在元素实例上强制读取和写入 props。原始值同步回 HTML 属性。非原始值直接更新反应性props并保留作为参考。",
+                        "practical_component_example": "实际组件示例"
+                    }
+                },
+                "refs": {
+                    "meta": {
+                        "refs": "参考文献",
+                        "refs_webcomponent_by_before_semicolon": "参考资料 - WebComponent by Before Semicolon",
+                        "safely_reference_and_interact_with_rendered_dom_elements_inside_your_templates": "安全地引用模板内渲染的 DOM 元素并与之交互。"
+                    },
+                    "content": {
+                        "refs": "参考文献",
+                        "while_declarative_programming_is_preferred_there_are_times_when_you_need_to_access_dom_elements": "虽然声明式编程是首选，但有时您需要直接访问 DOM 元素来执行命令式操作（例如，聚焦输入、播放视频、初始化第三方库或测量元素尺寸）。 WebComponent 集成了 Markup 的 `ref` 系统，让您轻松引用元素。",
+                        "binding_refs_in_templates": "绑定模板中的引用",
+                        "to_bind_a_dom_element_add_a_ref_attribute_with_a_unique_name_to_any_element_in_your_template": "要绑定 DOM 元素，请将具有唯一名称的 `ref` 属性添加到模板中的任何元素。",
+                        "accessing_refs_via_this_refs": "通过 `this.refs` 访问参考",
+                        "you_can_access_all_bound_elements_using_the_this_refs_getter": "您可以使用 `this.refs` getter 访问所有绑定元素。",
+                        "since_multiple_elements_can_share_the_same_ref_name_each_key_in_this_refs_returns_an_array_of_el": "由于多个元素可以共享相同的引用名称，因此 `this.refs` 中的每个键都会返回与该引用名称匹配的元素的**数组**。如果只有一个元素具有该引用，它仍然会在数组中返回（例如，作为第一个元素：`this.refs.textInput[0]`）。",
+                        "refs_and_lifecycle": "引用和生命周期",
+                        "references_are_only_populated_after_the_component_is_rendered_and_mounted_they_are_not_available": "仅在渲染和安装组件后才会填充引用。它们在 `constructor` 内不可用。",
+                        "if_you_need_to_perform_imperative_operations_immediately_when_the_element_appears_use_the_onmoun": "如果需要在元素出现时立即执行命令式操作，请使用 `onMount` 生命周期挂钩。",
+                        "multiple_elements_dynamic_refs": "多个元素/动态参考",
+                        "you_can_use_the_same_ref_name_on_multiple_elements_to_group_them_webcomponent_will_return_all_re": "您可以对多个元素使用相同的引用名称来对它们进行分组。 WebComponent 将按照出现的顺序返回共享该引用名称的所有渲染元素。",
+                        "refs_are_dynamic_if_elements_are_conditionally_rendered_e_g_using_helper_functions_like_when_the": "参考是动态的。如果元素是有条件渲染的（例如，使用辅助函数，如`when`），它们将被添加到或删除`this.refs`相应的数组。在访问 ref 数组及其元素之前始终检查它们是否存在。"
+                    }
+                },
+                "state": {
+                    "meta": {
+                        "state": "State",
+                        "state_webcomponent_by_before_semicolon": "状态 - WebComponent by Before Semicolon",
+                        "manage_reactive_local_component_state_using_initialstate_and_setstate": "使用initialState 和setState 管理反应式本地组件状态。"
+                    },
+                    "content": {
+                        "state": "State",
+                        "state_is_the_internal_reactive_data_owned_and_managed_exclusively_by_the_component_unlike_props": "状态是组件专有拥有和管理的内部反应数据。与 props 不同，状态不会公开或映射到 HTML 属性，它旨在存储在组件生命周期中发生变化的数据（例如，UI 切换状态、输入值、API 获取结果）。",
+                        "declaring_initial_state": "声明初始状态",
+                        "to_define_a_component_s_internal_state_assign_an_object_to_the_initialstate_class_property_each": "要定义组件的内部状态，请将对象分配给 `initialState` 类属性。该对象中的每个键都将被初始化为反应式状态getter。",
+                        "reading_state_in_templates": "模板中的阅读状态",
+                        "like_props_the_properties_of_this_state_are_reactive_getter_functions_you_can_access_the_values": "与 props 一样，`this.state` 的属性是反应式 getter 函数。您可以通过直接传递 getter 或调用它来访问模板内的值。",
+                        "pass_the_getter_directly_to_let_the_template_handle_reactive_bindings_this_state_count": "直接传递 getter 让模板处理反应式绑定：`this.state.count`",
+                        "invoke_it_as_a_function_when_executing_calculations_or_inside_conditional_blocks_this_state_coun": "在执行计算时或在条件块内将其作为函数调用：`this.state.count()`",
+                        "modifying_state_via_setstate": "通过 `setState` 修改状态",
+                        "to_update_state_reactively_call_this_setstate_this_method_accepts_either_a_partial_state_object": "要响应式更新状态，请调用 `this.setState()`。此方法接受部分状态对象或回调函数。",
+                        "object_merge_format": "对象合并格式",
+                        "you_can_pass_a_partial_object_containing_the_fields_you_want_to_update_webcomponent_will_merge_t": "您可以传递包含要更新的字段的部分对象。 WebComponent 会自动将更新合并到状态中，因此您无需手动传播其余的状态。",
+                        "callback_format": "回调格式",
+                        "if_your_new_state_depends_on_the_previous_state_pass_a_callback_function_the_callback_receives_t": "如果您的新状态取决于先前的状态，请传递回调函数。回调接收当前状态对象及其评估值（不是 getter），并且必须返回部分状态对象。",
+                        "lifecycle_restrictions": "生命周期限制",
+                        "state_updates_trigger_dom_updates_because_of_this_calling_this_setstate_before_the_component_is": "状态更新触发 DOM 更新。因此，在安装组件之前（即当 `this.mounted` 为 `false` 时）或卸载组件之后调用 `this.setState()` 将导致错误。",
+                        "if_you_need_to_fetch_data_or_trigger_state_updates_as_soon_as_the_component_loads_do_so_in_the_o": "如果您需要在组件加载后立即获取数据或触发状态更新，请在 `onMount` 生命周期挂钩中执行此操作：",
+                        "derived_ui_example": "派生的 UI 示例",
+                        "keep_the_source_state_intact_and_derive_display_values_inside_functions": "保持源状态完整并在函数内导出显示值。"
+                    }
+                }
+            },
+            "styling": {
+                "css_utility": {
+                    "meta": {
+                        "css_utility": "CSS实用程序",
+                        "css_utility_webcomponent_by_before_semicolon": "css 实用程序 - WebComponent by Before Semicolon",
+                        "use_the_css_tagged_template_literal_to_build_highly_reactive_and_dynamic_component_styles": "使用 css 标记模板文字来构建高度反应性和动态的组件样式。"
+                    },
+                    "content": {
+                        "css_utility": "CSS实用程序",
+                        "for_stylesheets_that_need_to_change_dynamically_in_response_to_state_or_property_updates_webcomp": "对于需要动态更改以响应状态或属性更新的样式表，WebComponent 提供了 `css` 标记的模板文字。该实用程序可让您将反应函数和 Markup 帮助程序直接注入到 CSS 代码中。",
+                        "how_it_works": "它是如何运作的",
+                        "the_css_tag_returns_an_instance_of_the_cssstyle_class_under_the_hood_any_function_interpolated_i": "`css` 标签返回 `CSSStyle` 类的实例。在幕后，模板文字内插值的任何函数都会自动包装在 Markup `effect` 中。",
+                        "when_any_reactive_prop_or_state_getter_is_called_inside_these_functions_it_registers_as_a_depend": "当在这些函数内调用任何反应式 prop 或状态 getter 时，它会注册为依赖项。每当这些依赖项发生变化时，效果就会重新运行，并且 WebComponent 会动态更新组件采用的样式表，而无需重新创建样式表元素。",
+                        "practical_example": "实际例子",
+                        "in_the_following_example_the_background_and_text_color_of_the_badge_change_reactively_based_on_t": "在以下示例中，徽章的背景和文本颜色根据 `status` 属性的值进行反应式更改。",
+                        "using_markup_helpers_when_is": "使用 Markup 帮助程序（`when` 和 `is`）",
+                        "to_make_dynamic_styling_cleaner_you_can_use_beforesemicolon_markup_s_reactive_helpers_like_when": "为了使动态样式更清晰，您可以直接在样式字符串中使用 `@beforesemicolon/markup` 的反应式助手，例如 `when()` 和 `is()` 。它们返回动态解析值的反应函数。",
+                        "is_getter_expectedvalue_checks_if_a_getter_returns_a_matching_value": "`is(getter, expectedValue)`：检查 getter 是否返回匹配的值。",
+                        "when_condition_thenvalue_otherwisevalue_evaluates_a_condition_can_be_a_getter_or_a_function_and": "`when(condition, thenValue, otherwiseValue)`：评估条件（可以是 getter 或函数）并返回相应的值。",
+                        "here_is_the_same_example_using_these_helpers": "这是使用这些助手的相同示例：",
+                        "the_cssstyle_class": "`CSSStyle` 级",
+                        "the_css_function_parses_the_strings_and_values_into_a_cssstyle_instance_the_class_has_the_follow": "`css` 函数将字符串和值解析为 `CSSStyle` 实例。该类具有以下公共 API：",
+                        "tostring_evaluates_and_returns_the_stylesheet_as_a_plain_css_string": "**`toString()`**：评估样式表并将其作为纯 CSS 字符串返回。",
+                        "onupdate_callback_registers_a_callback_function_that_is_invoked_with_the_updated_css_string_when": "**`onUpdate(callback)`**：注册一个回调函数，每当任何插值无功值发生变化时，都会使用更新的 CSS 字符串调用该回调函数。",
+                        "webcomponent_hooks_into_the_onupdate_method_automatically_meaning_you_rarely_need_to_call_onupda": "WebComponent 自动挂钩 `onUpdate` 方法，这意味着您很少需要在应用程序中手动调用 `onUpdate`。"
+                    }
+                },
+                "stylesheet": {
+                    "meta": {
+                        "stylesheet": "样式表",
+                        "stylesheet_webcomponent_by_before_semicolon": "样式表 - WebComponent by Before Semicolon",
+                        "learn_how_to_load_assign_and_manage_component_styles_using_the_stylesheet_property": "了解如何使用样式表属性加载、分配和管理组件样式。"
+                    },
+                    "content": {
+                        "stylesheet": "样式表",
+                        "the_stylesheet_class_property_is_the_primary_way_to_define_styling_for_your_component_webcompone": "`stylesheet` 类属性是定义组件样式的主要方式。 WebComponent 接受各种样式表格式，并根据您的 Shadow DOM 配置自动处理它们。",
+                        "supported_stylesheet_formats": "支持的样式表格式",
+                        "you_can_assign_a_css_string_a_native_cssstylesheet_instance_or_a_css_import_assertion_to_the_sty": "您可以将 CSS 字符串、本机 `CSSStyleSheet` 实例或 CSS 导入断言分配给 `stylesheet` 属性。",
+                        "text_1_css_strings": "1.CSS琴弦",
+                        "the_simplest_way_is_to_define_your_stylesheet_as_a_plain_css_string": "最简单的方法是将样式表定义为纯 CSS 字符串：",
+                        "text_2_css_import_assertions": "2. CSS 导入断言",
+                        "if_your_build_environment_or_browser_supports_css_module_imports_you_can_import_a_css_file_direc": "如果您的构建环境或浏览器支持 CSS 模块导入，您可以直接导入 `.css` 文件并指定样式表导出：",
+                        "text_3_native_cssstylesheet": "3.原生`CSSStyleSheet`",
+                        "you_can_also_construct_stylesheets_imperatively": "您还可以强制构建样式表：",
+                        "shadow_dom_vs_light_dom_behavior": "阴影 DOM 与光 DOM 行为",
+                        "behind_the_scenes_webcomponent_uses_adopted_stylesheets_to_inject_your_styles_where_those_styles": "在幕后，WebComponent 使用**采用的样式表**来注入您的样式。在哪里采用这些样式表取决于您的组件配置。",
+                        "under_shadow_dom_default": "阴影下 DOM（默认）",
+                        "if_shadow_dom_is_active_the_style_is_adopted_by_the_shadow_root_of_the_component_it_keeps_styles": "如果 Shadow DOM 处于活动状态，则组件的 Shadow Root 采用该样式。它保持样式隔离并允许使用 `:host` 选择器。",
+                        "under_light_dom": "灯光下 DOM",
+                        "if_you_disable_shadow_dom_by_setting_config_shadow_false_the_component_cannot_adopt_styles_local": "如果通过设置 `config.shadow = false` 来禁用 Shadow DOM，则组件无法在本地采用样式，因为没有 Shadow Root。 WebComponent 通过采用文档上的样式（或最接近的包含祖先影子根）来处理此问题。",
+                        "because_global_styles_can_leak_webcomponent_automatically_parses_and_rewrites_specific_selectors": "由于全局样式可能泄漏，WebComponent 会自动解析并重写特定选择器：",
+                        "host_is_rewritten_to_the_custom_element_s_tag_name_e_g_my_element": "`:host` 被重写为自定义元素的标签名称（例如 `my-element`）。",
+                        "host_context_selector_is_rewritten_to_match_the_target_context_e_g_selector_my_element": "`:host-context(selector)` 被重写以匹配目标上下文（例如 `selector my-element`）。",
+                        "this_ensures_your_styling_rules_continue_to_work_as_expected_even_if_you_decide_to_toggle_the_sh": "这可以确保您的样式规则继续按预期工作，即使您决定切换 Shadow DOM 配置也是如此。"
+                    }
+                },
+                "update_stylesheet": {
+                    "meta": {
+                        "updatestylesheet": "updateStylesheet",
+                        "updatestylesheet_webcomponent_by_before_semicolon": "updateStylesheet - WebComponent by Before Semicolon",
+                        "swap_stylesheets_dynamically_at_runtime_using_updatestylesheet": "使用 updateStylesheet 在运行时动态交换样式表。"
+                    },
+                    "content": {
+                        "updatestylesheet": "updateStylesheet",
+                        "while_the_css_tagged_template_is_perfect_for_fine_grained_style_changes_there_are_times_when_you": "虽然 `css` 标记模板非常适合细粒度样式更改，但有时您需要完全替换或分离样式表（例如，交换全局主题、在浅色和深色模式样式表之间切换或处理第三方样式表）。您可以使用 `this.updateStylesheet()` 执行这些动态更新。",
+                        "method_signature": "方法签名",
+                        "parameters": "参数",
+                        "sheet": "**`sheet`**：",
+                        "cssstylesheet_adopts_the_new_stylesheet_object_directly": "`CSSStyleSheet`：直接采用新的样式表对象。",
+                        "string_parses_the_css_string_into_a_stylesheet_rewrites_host_selectors_if_shadow_dom_is_disabled": "`string`：将 CSS 字符串解析为样式表，如果禁用 Shadow DOM，则重写 `:host` 选择器，并采用它。",
+                        "null_detaches_and_removes_the_current_stylesheet_from_the_element_s_content_root_or_document": "`null`：从元素的内容根（或文档）中分离并删除当前样式表。",
+                        "dynamic_theme_swapping_example": "动态主题交换示例",
+                        "in_this_example_we_define_two_themes_and_swap_the_stylesheet_dynamically_when_a_user_clicks_a_bu": "在此示例中，我们定义两个主题并在用户单击按钮时动态交换样式表：",
+                        "detaching_stylesheets": "分离样式表",
+                        "to_remove_all_styling_applied_via_the_component_s_stylesheet_property_call_this_updatestylesheet": "要删除通过组件的样式表属性应用的所有样式，请调用 `this.updateStylesheet(null)`：",
+                        "how_webcomponent_handles_swapping": "WebComponent 如何处理交换",
+                        "when_you_call_updatestylesheet_sheet_webcomponent_will": "当您调用 `updateStylesheet(sheet)` 时，WebComponent 将：",
+                        "locate_the_currently_active_stylesheet_and_filter_it_out_of_the_container_s_adoptedstylesheets_a": "找到当前活动的样式表并将其从容器的 `adoptedStyleSheets` 数组中过滤出来。",
+                        "convert_the_new_stylesheet_parameter_into_a_native_cssstylesheet_if_it_is_a_string": "如果新样式表参数是字符串，则将其转换为本机 `CSSStyleSheet`。",
+                        "apply_light_dom_selector_rewriting_e_g_converting_host_to_the_element_s_tag_name_if_config_shado": "如果 `config.shadow` 是 `false`，则应用 Light DOM 选择器重写（例如，将 `:host` 转换为元素的标签名称）。",
+                        "append_the_new_stylesheet_to_adoptedstylesheets_on_either": "将新样式表附加到以下任一位置的 `adoptedStyleSheets`：",
+                        "the_element_s_shadowroot_if_shadow_dom_is_enabled": "元素的 `ShadowRoot`（如果启用了 Shadow DOM）。",
+                        "the_document_or_parent_shadow_root_if_shadow_dom_is_disabled": "`document` 或父影子根（如果影子 DOM 已禁用）。"
+                    }
+                }
+            }
+        },
+        "home": {
+            "meta": {
+                "webcomponent": "WebComponent",
+                "webcomponent_by_before_semicolon": "WebComponent by Before Semicolon",
+                "build_reactive_web_components_enhanced_with_state_props_scoped_styles_lifecycles_and_form_integr": "构建通过状态、props、范围样式、生命周期和表单集成增强的反应式 Web Components — 由 Markup 提供支持。"
+            },
+            "content": {
+                "web_components": "Web Components。",
+                "now_reactive": "现在是反应式的。",
+                "a_tiny_reactive_layer_over_the_native_web_components_api_props_state_scoped_styles_and_lifecycle": "原生 Web Components API 上的微小反应层。props、状态、范围样式和生命周期 - 全部构建在 [Markup](https://markup.beforesemicolon.com/) 上。",
+                "native": "本地人",
+                "custom_elements": "定制元素",
+                "dependencies": "依赖关系",
+                "framework_friendly": "框架友好",
+                "the_ecosystem": "`// the ecosystem`",
+                "built_on_web_component": "基于 Web Component 构建。",
+                "production_ready_libraries_built_on_top_of_web_component_same_custom_element_foundation_modular": "构建在 Web Component 之上的生产就绪库 — 相同的自定义元素基础、模块化软件包。",
+                "declarative_routing_as_web_component_tags_built_on_top_of_web_component_nested_routes_params_404": "作为 Web 组件标签的声明式路由 - 构建在 Web Component 之上。嵌套路由、参数、404。",
+                "localization_for_component_first_interfaces_built_on_top_of_web_component_locale_scopes_messages": "组件优先接口的本地化 - 构建在 Web Component 之上。区域设置范围、消息、格式化程序。",
+                "why_web_component": "`// why web-component`",
+                "custom_elements_supercharged": "自定义元素，增压。",
+                "everything_you_love_about_native_web_components_plus_the_reactivity_ergonomics_and_tiny_footprin": "原生 Web Components 拥有您喜爱的一切 — 加上 Markup 的反应性、人体工程学设计和微小的占地面积。",
+                "reactive_props_state": "反应式 props 和状态",
+                "observed_attributes_become_reactive_props_updating_state_updates_only_the_dom_that_depends_on_it": "观察到的属性变成反应性props。更新状态仅更新依赖于它的 DOM。",
+                "tiny": "微小的",
+                "a_thin_layer_over_the_native_web_components_api_built_on_markup_no_extra_dependencies": "原生 Web Components API 上的薄层。基于 Markup 构建 - 没有额外的依赖项。",
+                "scoped_styles": "范围样式",
+                "per_component_stylesheets_that_ship_with_the_element_no_leaks_no_conflicts_no_css_in_js_runtime": "元素附带的每个组件的样式表。无泄漏、无冲突、无 CSS-in-JS 运行时。",
+                "native_lifecycles": "原生生命周期",
+                "onmount_onupdate_ondestroy_onadoption_first_class_hooks_for_everything_custom_elements_expose": "onMount、onUpdate、onDestroy、onAdoption — 自定义元素公开的所有内容的一流挂钩。",
+                "works_everywhere": "随处可用",
+                "custom_elements_run_in_any_framework_in_plain_html_or_in_any_tool_that_renders_dom": "自定义元素可以在任何框架中运行，以普通 HTML 或呈现 DOM 的任何工具。",
+                "built_on_markup": "基于 Markup 构建",
+                "same_reactive_engine_same_templating_same_0_build_philosophy_drop_in_a_script_tag_and_ship": "相同的反应式引擎、相同的模板、相同的 0 构建理念。放入脚本标签并发货。",
+                "see_it_in_action": "`// see it in action`",
+                "real_components_native_tags": "真实的组件。原生标签。",
+                "build_focused_elements_that_own_their_props_state_styles_lifecycle_work_and_public_events": "构建拥有其 props、状态、样式、生命周期工作和公共事件的重点元素。",
+                "quantity_stepper": "数量步进器",
+                "todo_list": "待办事项列表",
+                "pricing_toggle": "定价切换",
+                "validated_field": "验证字段",
+                "reactive_stylesheet": "反应式样式表",
+                "quick_start": "`// quick start`",
+                "install_in_seconds": "只需几秒钟即可安装。",
+                "choose_your_preferred_installation_method_works_everywhere_javascript_runs": "选择您喜欢的安装方法。适用于 JavaScript 运行的任何地方。",
+                "build_reactive_web_components": "构建反应式 Web Components，",
+                "your_way": "你的方式。",
+                "combine_the_simplicity_of_vanilla_web_standards_with_the_power_of_modern_reactivity": "将普通 Web 标准的简单性与现代反应性的强大功能相结合。"
+            }
+        }
+    }
+}
