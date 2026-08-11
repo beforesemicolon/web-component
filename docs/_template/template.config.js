@@ -1,14 +1,3 @@
-const renderGoogleAnalyticsScript = () => `
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-MMBMGFEBY6"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-MMBMGFEBY6');
-</script>`
-
 export default {
     meta: {
         siteName: 'WebComponent',
@@ -99,9 +88,6 @@ export default {
             },
         ],
         copyright: `Copyright &copy; ${new Date().getFullYear()} Before Semicolon. All rights reserved.`,
-    },
-    headScripts: {
-        analytics: renderGoogleAnalyticsScript,
     },
     theme: {
         light: {
