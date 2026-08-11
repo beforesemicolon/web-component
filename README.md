@@ -86,3 +86,10 @@ In the browser
     const { html, state, effect } = BFS.MARKUP
 </script>
 ```
+
+## Community
+
+- [Contributing guidelines](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Security policy](SECURITY.md)
+- [BSD 3-Clause License](LICENSE)
