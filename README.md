@@ -78,7 +78,7 @@ In the browser
 <script src="https://unpkg.com/@beforesemicolon/web-component/dist/client.js"></script>
 
 <!-- use a specific version -->
-<script src="https://unpkg.com/@beforesemicolon/web-component@1.21.0/dist/client.js"></script>
+<script src="https://unpkg.com/@beforesemicolon/web-component@1.21.0-next/dist/client.js"></script>
 
 <!-- link you app script after -->
 <script>
