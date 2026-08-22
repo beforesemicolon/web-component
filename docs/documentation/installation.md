@@ -51,7 +51,7 @@ import { WebComponent, html, css } from '@beforesemicolon/web-component'
 #### {{t.pages.documentation.installation.content.specific_version}}
 
 ```html
-<script src="https://unpkg.com/@beforesemicolon/web-component@1.19.2/dist/client.js"></script>
+<script src="https://unpkg.com/@beforesemicolon/web-component@1.21.0-next/dist/client.js"></script>
 ```
 
 ### {{t.pages.documentation.installation.content.cdn_global_namespaces}}

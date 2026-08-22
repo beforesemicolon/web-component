@@ -1,6 +1,6 @@
 # Web Component
 
-[![Static Badge](https://img.shields.io/badge/documentation-blue)](https://markup.beforesemicolon.com/documentation/capabilities/web-component)
+[![Static Badge](https://img.shields.io/badge/documentation-blue)](https://web-component.beforesemicolon.com/)
 [![Test](https://github.com/beforesemicolon/web-component/actions/workflows/test.yml/badge.svg)](https://github.com/beforesemicolon/web-component/actions/workflows/test.yml)
 [![npm](https://img.shields.io/npm/v/%40beforesemicolon%2Fweb-component)](https://www.npmjs.com/package/@beforesemicolon/web-component)
 ![npm](https://img.shields.io/npm/l/%40beforesemicolon%2Fweb-component)
@@ -78,7 +78,7 @@ In the browser
 <script src="https://unpkg.com/@beforesemicolon/web-component/dist/client.js"></script>
 
 <!-- use a specific version -->
-<script src="https://unpkg.com/@beforesemicolon/web-component@0.0.4/dist/client.js"></script>
+<script src="https://unpkg.com/@beforesemicolon/web-component@1.21.0-next/dist/client.js"></script>
 
 <!-- link you app script after -->
 <script>
@@ -86,6 +86,16 @@ In the browser
     const { html, state, effect } = BFS.MARKUP
 </script>
 ```
+
+## AI and ecosystem context
+
+- [`llms.txt`](https://web-component.beforesemicolon.com/llms.txt) is the concise,
+  package-owned API and ecosystem contract for AI tools.
+- [`llms-full.txt`](https://web-component.beforesemicolon.com/llms-full.txt)
+  contains the complete resolved documentation and examples.
+
+Web Component re-exports Markup. Router and Intl build on Web Component and can
+be composed together without changing its component model.
 
 ## Community
 
