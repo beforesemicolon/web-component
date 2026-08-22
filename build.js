@@ -1,3 +1,15 @@
 import { buildModules, buildBrowser } from '@beforesemicolon/builder'
 
-Promise.all([buildBrowser(), buildModules()]).catch(console.error)
+await Promise.all([
+    buildBrowser({
+        esbuildOptions: {
+            keepNames: false,
+            sourcemap: false,
+        },
+    }),
+    buildModules({
+        esbuildOptions: {
+            keepNames: false,
+        },
+    }),
+])
