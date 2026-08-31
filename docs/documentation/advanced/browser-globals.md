@@ -21,7 +21,7 @@ layout: document
 <script src="https://unpkg.com/@beforesemicolon/web-component/dist/client.js"></script>
 
 <!-- Or pin a specific version (recommended for production) -->
-<script src="https://unpkg.com/@beforesemicolon/web-component@1.19.2/dist/client.js"></script>
+<script src="https://unpkg.com/@beforesemicolon/web-component@1.21.0/dist/client.js"></script>
 ```
 
 {{t.pages.documentation.advanced.browser_globals.content.once_loaded_the_library_attaches_a_single_global_variable_bfs_to_the_browser_s_window_object}}

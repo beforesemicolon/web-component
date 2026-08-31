@@ -290,7 +290,10 @@ export abstract class WebComponent<
                         )[propName]
 
                     const value = this.hasAttribute(name)
-                        ? jsonParse(this.getAttribute(name))
+                        ? this.getAttribute(name) === '' &&
+                          booleanAttributes[name]
+                            ? true
+                            : jsonParse(this.getAttribute(name))
                         : null
 
                     this.#propsSetters[propName](
@@ -376,17 +379,21 @@ export abstract class WebComponent<
     ) {
         try {
             const propName = turnKebabToCamelCasing(name as string) as keyof P
-            const newPropVal = jsonParse(newVal)
+            const newPropVal =
+                newVal === '' && booleanAttributes[name as string]
+                    ? true
+                    : jsonParse(newVal)
+            const parsedPropVal = newPropVal as P[keyof P] | null
             const oldPropValue = this.#props[propName]()
 
-            if (newPropVal !== oldPropValue) {
+            if (parsedPropVal !== oldPropValue) {
                 // prevent typescript infinity loop when parsing this code
                 ;(this.#propsSetters[propName] as (v: unknown) => void)(
-                    newPropVal
+                    parsedPropVal
                 )
 
                 if (this.mounted) {
-                    this.onUpdate(propName, newPropVal, oldPropValue)
+                    this.onUpdate(propName, parsedPropVal, oldPropValue)
                 }
             }
         } catch (e) {
