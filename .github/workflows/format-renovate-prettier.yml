@@ -1,0 +1,33 @@
+name: Format Renovate Prettier update
+
+on:
+  push:
+    branches:
+      - renovate/prettier-3.x
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: renovate/prettier-3.x
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20.x
+          cache: npm
+      - run: npm ci
+      - run: npx prettier --write docs/documentation/events-and-lifecycle/lifecycle.md
+      - name: Commit formatting if needed
+        run: |
+          if ! git diff --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add docs/documentation/events-and-lifecycle/lifecycle.md
+            git commit -m "style: format lifecycle docs with Prettier 3.9.9"
+            git push
+          fi
