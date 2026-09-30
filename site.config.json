@@ -2,13 +2,66 @@
     "schemaVersion": "1.0",
     "mode": "static",
     "siteUrl": "https://web-component.beforesemicolon.com",
+    "deployment": {
+        "targets": {
+            "netlify": true,
+            "cloudflareWorkers": {
+                "name": "web-component",
+                "compatibilityDate": "2026-08-11"
+            }
+        }
+    },
+    "document": {
+        "csp": {
+            "script-src": ["'self'", "https://static.cloudflareinsights.com"],
+            "style-src": ["'self'", "https://fonts.googleapis.com"],
+            "font-src": ["'self'", "data:", "https://fonts.gstatic.com"]
+        },
+        "analytics": {
+            "providers": [
+                {
+                    "type": "google-analytics",
+                    "tagId": "G-MMBMGFEBY6",
+                    "enabled": true,
+                    "config": {
+                        "send_page_view": true
+                    }
+                }
+            ]
+        }
+    },
     "defaultLocale": "en",
     "locales": ["en", "zh", "es", "pt", "fr"],
+    "localeDetails": {
+        "en": {
+            "label": "English",
+            "icon": "🇺🇸",
+            "selectorLabel": "Choose language"
+        },
+        "zh": { "label": "中文", "icon": "🇨🇳", "selectorLabel": "选择语言" },
+        "es": {
+            "label": "Español",
+            "icon": "🇪🇸",
+            "selectorLabel": "Elegir idioma"
+        },
+        "pt": {
+            "label": "Português",
+            "icon": "🇵🇹",
+            "selectorLabel": "Escolher idioma"
+        },
+        "fr": {
+            "label": "Français",
+            "icon": "🇫🇷",
+            "selectorLabel": "Choisir la langue"
+        }
+    },
     "docs": {
         "sourceDir": "docs",
         "outputDir": "website",
         "template": "fading-citrus",
         "generatedFiles": {
+            "llms": true,
+            "llmsFull": true,
             "netlify": true
         }
     }

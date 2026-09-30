@@ -1,0 +1,245 @@
+# {{project.name}}
+
+> Reactive, compiler-free Custom Elements powered by `@beforesemicolon/markup` and native Web Component standards.
+
+Package: `{{project.name}}`
+Version: `{{project.version}}`
+Documentation: https://web-component.beforesemicolon.com/documentation/
+Complete context: https://web-component.beforesemicolon.com/llms-full.txt
+
+Use this file as the authoritative compact contract when generating code with `@beforesemicolon/web-component`. Do not substitute React component conventions, JSX, decorators, or framework-specific lifecycle APIs.
+
+## Before Semicolon ecosystem
+
+The packages form one composable browser ecosystem:
+
+1. `@beforesemicolon/markup` owns reactive `html` templates, `state`, `effect`, refs, and helpers.
+2. `@beforesemicolon/web-component` owns Custom Elements, reactive props and component state, lifecycle hooks, styles, events, refs, and form integration. It re-exports all Markup APIs.
+3. `@beforesemicolon/router` owns URL routing, navigation, route guards, route data, and route-aware Custom Elements.
+4. `@beforesemicolon/intl` owns locale scopes, message loading, translations, and internationalized formatting.
+
+When an application already imports `@beforesemicolon/web-component`, import `html`, `state`, `effect`, and Markup helpers from that package. A separate direct Markup dependency is normally unnecessary.
+
+Router and Intl are complementary packages built on Web Component. They do not replace component state or Markup rendering, and they may be installed together.
+
+Canonical ecosystem documentation:
+
+- https://markup.beforesemicolon.com/llms.txt
+- https://router.beforesemicolon.com/llms.txt
+- https://intl.beforesemicolon.com/llms.txt
+
+## Installation and exports
+
+```bash
+npm install @beforesemicolon/web-component
+```
+
+```javascript
+import {
+    WebComponent,
+    html,
+    css,
+    state,
+    effect,
+    when,
+    repeat,
+} from '@beforesemicolon/web-component'
+```
+
+`WebComponent`, `HTMLComponentElement`, `css`, and component types are owned here. The templating APIs are re-exported from `@beforesemicolon/markup`.
+
+Direct browser usage:
+
+```html
+<script src="https://unpkg.com/@beforesemicolon/web-component/dist/client.js"></script>
+<script>
+    const { WebComponent, css } = BFS
+    const { html, state, effect, when, repeat } = BFS.MARKUP
+</script>
+```
+
+## Component shape
+
+```typescript
+import { WebComponent, html, css } from '@beforesemicolon/web-component'
+
+interface CounterProps {
+    label: string
+}
+
+interface CounterState {
+    count: number
+}
+
+class CounterButton extends WebComponent<CounterProps, CounterState> {
+    static observedAttributes = ['label']
+
+    label = 'Count'
+    initialState = { count: 0 }
+
+    stylesheet = css`
+        :host {
+            display: inline-block;
+        }
+    `
+
+    increment = () => {
+        const count = this.state.count() + 1
+        this.setState({ count })
+        this.dispatch('count-change', { count })
+    }
+
+    render() {
+        return html`
+            <button type="button" onclick="${this.increment}">
+                ${this.props.label}: ${this.state.count}
+            </button>
+        `
+    }
+}
+
+customElements.define('counter-button', CounterButton)
+```
+
+Use a hyphenated Custom Element name. `render` may return a Markup `HtmlTemplate`, a string, a DOM node, or nothing.
+
+## Props and state
+
+- Put public attributes in `static observedAttributes` using kebab-case.
+- Define each prop's default as a camel-case class field.
+- Read reactive props through `this.props.name`, which is a Markup state getter.
+- Put component-owned values in `initialState`.
+- Read reactive state through `this.state.name`.
+- Call `this.setState(partial)` or `this.setState(previous => partial)` only after mounting.
+- Return new object and array references rather than mutating state in place.
+
+```javascript
+class UserPanel extends WebComponent {
+    static observedAttributes = ['display-name']
+    displayName = 'Guest'
+    initialState = { expanded: false }
+
+    toggle = () => {
+        this.setState(({ expanded }) => ({ expanded: !expanded }))
+    }
+
+    render() {
+        return html`
+            <button aria-expanded="${this.state.expanded}" onclick="${this.toggle}">
+                ${this.props.displayName}
+            </button>
+        `
+    }
+}
+```
+
+Pass getters directly to template interpolation to keep them reactive. Calling `this.state.expanded()` before interpolation creates a snapshot.
+
+## Lifecycle contract
+
+- `onMount()` runs after the initial render and may return one cleanup function.
+- `onUpdate(name, newValue, oldValue)` responds to observed prop changes.
+- `onDestroy()` runs when the element disconnects, after the mount cleanup.
+- `onAdoption()` runs when the element moves to another document.
+- `onError(error)` receives rendering and lifecycle errors; the default logs them.
+
+```javascript
+onMount() {
+    const onResize = () => this.setState({ width: window.innerWidth })
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+}
+```
+
+Do not call native lifecycle callbacks directly or override them as public extension points.
+
+## Refs and DOM roots
+
+Use `ref` for elements owned by the component template:
+
+```javascript
+render() {
+    return html`<input ref="search" type="search" />`
+}
+
+onMount() {
+    const [input] = this.refs.search ?? []
+    input?.focus()
+}
+```
+
+- `this.refs` is the rendered Markup template's live ref map.
+- `this.contentRoot` is the Shadow Root by default, or the host when shadow DOM is disabled.
+- `this.root` is the closest document or Shadow Root containing the component.
+- Refs exist only while their elements are mounted.
+
+## Events
+
+`this.dispatch(name, detail)` creates a `CustomEvent` whose payload is available at `event.detail`.
+
+```javascript
+this.dispatch('save', { id: '42' })
+```
+
+Consumers use native event listeners. Do not assume events bubble or cross a shadow boundary unless the component implements those options itself.
+
+## Styling
+
+Assign `stylesheet` a CSS string, `CSSStyleSheet`, or reactive `css` result:
+
+```javascript
+stylesheet = css`
+    :host {
+        color: ${() => (this.props.tone() === 'danger' ? 'crimson' : 'inherit')};
+    }
+`
+```
+
+Shadow DOM is enabled by default. Set `config = { ...this.config, shadow: false }` only when the component intentionally renders into its host.
+
+## Router and Intl composition
+
+Install only the capabilities the application needs:
+
+```bash
+npm install @beforesemicolon/web-component @beforesemicolon/router @beforesemicolon/intl
+```
+
+```javascript
+import { WebComponent, html } from '@beforesemicolon/web-component'
+import '@beforesemicolon/router'
+import '@beforesemicolon/intl'
+```
+
+```html
+<page-route path="/orders/:orderId">
+    <intl-locale locale="en-US" src-dir="/locales">
+        <h1><intl-msg key="orders.title">Orders</intl-msg></h1>
+        <intl-number type="currency" currency="USD">129.99</intl-number>
+    </intl-locale>
+</page-route>
+```
+
+In direct browser mode, load Web Component before Router or Intl because both require `BFS.MARKUP` and `BFS.WebComponent`.
+
+## Rules for generated code
+
+- Use standard HTML attributes and lowercase event attributes, not JSX syntax.
+- Import Markup APIs from Web Component when Web Component is already the app foundation.
+- Keep `render` declarative and put subscriptions, timers, and DOM side effects in lifecycle hooks.
+- Use props for externally controlled inputs and state for component-owned values.
+- Use native Custom Elements registration and native event consumption.
+- Read the Router contract before generating routes and the Intl contract before generating localization code.
+
+## Canonical pages
+
+- https://web-component.beforesemicolon.com/documentation/get-started
+- https://web-component.beforesemicolon.com/documentation/guide
+- https://web-component.beforesemicolon.com/documentation/ai
+- https://web-component.beforesemicolon.com/documentation/fundamentals/creating-components
+- https://web-component.beforesemicolon.com/documentation/props-and-state/props
+- https://web-component.beforesemicolon.com/documentation/props-and-state/state
+- https://web-component.beforesemicolon.com/documentation/props-and-state/refs
+- https://web-component.beforesemicolon.com/documentation/events-and-lifecycle/lifecycle
+- https://web-component.beforesemicolon.com/documentation/styling/stylesheet
+- https://web-component.beforesemicolon.com/documentation/advanced/form-integration

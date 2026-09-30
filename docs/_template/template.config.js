@@ -1,15 +1,20 @@
-const renderGoogleAnalyticsScript = () => `
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-MMBMGFEBY6"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+import { readFileSync } from 'node:fs'
 
-  gtag('config', 'G-MMBMGFEBY6');
-</script>`
+const { version } = JSON.parse(
+    readFileSync(new URL('../../package.json', import.meta.url), 'utf8')
+)
 
 export default {
+    markedOptions: {
+        walkTokens(token) {
+            if (
+                token.type === 'markdownLayout' &&
+                token.layoutType === 'landing-hero'
+            ) {
+                token.options.version = `v${version}`
+            }
+        },
+    },
     meta: {
         siteName: 'WebComponent',
         title: 'WebComponent by Before Semicolon',
@@ -99,9 +104,6 @@ export default {
             },
         ],
         copyright: `Copyright &copy; ${new Date().getFullYear()} Before Semicolon. All rights reserved.`,
-    },
-    headScripts: {
-        analytics: renderGoogleAnalyticsScript,
     },
     theme: {
         light: {

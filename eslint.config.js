@@ -3,6 +3,7 @@ import eslintConfigPrettier from 'eslint-config-prettier'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
+    { ignores: ['src/**/*.spec.ts'] },
     js.configs.recommended,
     ...tseslint.configs.recommended,
     eslintConfigPrettier,
@@ -10,5 +11,5 @@ export default tseslint.config(
         rules: {
             'no-prototype-builtins': 'off',
         },
-    },
+    }
 )

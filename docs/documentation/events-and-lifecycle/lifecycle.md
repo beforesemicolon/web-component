@@ -146,22 +146,22 @@ async fetchData() {
 {{t.pages.documentation.events_and_lifecycle.lifecycle.content.understanding_the_exact_sequence_in_which_callbacks_are_invoked_helps_in_structuring_components}}
 
 1. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.constructor}}
-   {{t.pages.documentation.events_and_lifecycle.lifecycle.content.the_browser_instantiates_the_element_beforesemicolon_web_component_maps_static_observedattribute}}
+    {{t.pages.documentation.events_and_lifecycle.lifecycle.content.the_browser_instantiates_the_element_beforesemicolon_web_component_maps_static_observedattribute}}
 2. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.render}}
-   {{t.pages.documentation.events_and_lifecycle.lifecycle.content.called_during_the_connection_phase_the_component_renders_its_template_and_appends_it_to_its_cont}}
+    {{t.pages.documentation.events_and_lifecycle.lifecycle.content.called_during_the_connection_phase_the_component_renders_its_template_and_appends_it_to_its_cont}}
 3. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.stylesheet_configuration}}
-   {{t.pages.documentation.events_and_lifecycle.lifecycle.content.initializes_and_applies_stylesheets_e_g_from_the_stylesheet_property_or_the_css_tagged_template}}
+    {{t.pages.documentation.events_and_lifecycle.lifecycle.content.initializes_and_applies_stylesheets_e_g_from_the_stylesheet_property_or_the_css_tagged_template}}
 4. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.onmount_2}}
-   {{t.pages.documentation.events_and_lifecycle.lifecycle.content.triggered_immediately_after_rendering_is_complete_and_stylesheets_are_attached_the_return_value}}
+    {{t.pages.documentation.events_and_lifecycle.lifecycle.content.triggered_immediately_after_rendering_is_complete_and_stylesheets_are_attached_the_return_value}}
 5. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.effect_callbacks}}
-   {{t.pages.documentation.events_and_lifecycle.lifecycle.content.markup_effects_created_during_onmount_run_immediately_and_re_run_later_when_their_tracked_reacti}}
+    {{t.pages.documentation.events_and_lifecycle.lifecycle.content.markup_effects_created_during_onmount_run_immediately_and_re_run_later_when_their_tracked_reacti}}
 6. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.onupdate}}
-   {{t.pages.documentation.events_and_lifecycle.lifecycle.content.runs_every_time_an_observed_attribute_changes_only_while_the_component_is_mounted}}
+    {{t.pages.documentation.events_and_lifecycle.lifecycle.content.runs_every_time_an_observed_attribute_changes_only_while_the_component_is_mounted}}
 7. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.adoptedcallback_onadoption}}
-   {{t.pages.documentation.events_and_lifecycle.lifecycle.content.runs_when_the_browser_adopts_the_element_into_a_different_document}}
+    {{t.pages.documentation.events_and_lifecycle.lifecycle.content.runs_when_the_browser_adopts_the_element_into_a_different_document}}
 8. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.mount_cleanup}}
-   {{t.pages.documentation.events_and_lifecycle.lifecycle.content.runs_the_cleanup_function_returned_by_onmount_if_any_when_the_element_disconnects}}
+    {{t.pages.documentation.events_and_lifecycle.lifecycle.content.runs_the_cleanup_function_returned_by_onmount_if_any_when_the_element_disconnects}}
 9. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.ondestroy_2}}
-   {{t.pages.documentation.events_and_lifecycle.lifecycle.content.runs_immediately_after_the_mount_cleanup_function_finishes}}
+    {{t.pages.documentation.events_and_lifecycle.lifecycle.content.runs_immediately_after_the_mount_cleanup_function_finishes}}
 10. {{t.pages.documentation.events_and_lifecycle.lifecycle.content.onerror}}
     {{t.pages.documentation.events_and_lifecycle.lifecycle.content.runs_whenever_webcomponent_catches_an_error_from_one_of_its_guarded_rendering_update_stylesheet_lifec}}
