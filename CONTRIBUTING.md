@@ -13,7 +13,9 @@ tests, and focused feature proposals are welcome.
 
 ## Development
 
-Use a Node.js and npm version supported by `package.json` and CI.
+Use npm 10 or later and Node.js 22.x (22.22.2+), 24.x (24.15.0+), or 26+ for development,
+as required by the jsdom test tooling. The published package retains its
+Node.js 22.13.0+ runtime requirement.
 
 ```sh
 npm ci
