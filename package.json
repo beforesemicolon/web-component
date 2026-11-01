@@ -1,6 +1,6 @@
 {
     "name": "@beforesemicolon/web-component",
-    "version": "1.21.2-next",
+    "version": "1.21.1",
     "description": "Enhanced Markup with ability to create native Web Components",
     "engines": {
         "node": ">=22.13.0",
@@ -67,7 +67,7 @@
         "typescript-eslint": "^8.65.0"
     },
     "dependencies": {
-        "@beforesemicolon/markup": "^1.21.0-next"
+        "@beforesemicolon/markup": "^1.21.0"
     },
     "overrides": {
         "html-minifier": "npm:@keep-lts/html-minifier@4.0.1"
