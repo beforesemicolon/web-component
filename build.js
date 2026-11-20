@@ -19,3 +19,6 @@ await writeFile(
     new URL('./dist/cjs/package.json', import.meta.url),
     `${JSON.stringify({ type: 'commonjs' }, null, 4)}\n`
 )
+
+// Read the built entries so the reference tracks the actual packed API.
+await import('./scripts/ai-reference.mjs')

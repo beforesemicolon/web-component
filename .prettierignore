@@ -2,3 +2,6 @@ src/**/*.spec.ts
 dist/
 website/
 .netlify/
+
+# Built static AI reference
+ai/

@@ -1,6 +1,6 @@
 {
     "name": "@beforesemicolon/web-component",
-    "version": "1.21.1",
+    "version": "1.22.0",
     "description": "Enhanced Markup with ability to create native Web Components",
     "engines": {
         "node": ">=22.13.0",
@@ -29,7 +29,8 @@
         "local:serve:zh": "npx http-server ./website/zh -p 8081",
         "local:serve:es": "npx http-server ./website/es -p 8082",
         "local:serve:pt": "npx http-server ./website/pt -p 8083",
-        "local:serve:fr": "npx http-server ./website/fr -p 8084"
+        "local:serve:fr": "npx http-server ./website/fr -p 8084",
+        "test:ai-reference": "node --test scripts/ai-reference.test.mjs"
     },
     "keywords": [
         "web-component",

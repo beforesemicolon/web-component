@@ -7,3 +7,6 @@ node_modules
 coverage
 website
 .netlify/
+
+# Built static AI reference (included by npm pack)
+/ai/

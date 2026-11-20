@@ -89,6 +89,9 @@ In the browser
 
 ## AI and ecosystem context
 
+- [Versioned AI lookup index](https://cdn.jsdelivr.net/npm/@beforesemicolon/web-component@1.22.0/ai/index.json) for 1.22.0.
+  For another release, replace the version in the URL with the installed version.
+
 - [`llms.txt`](https://web-component.beforesemicolon.com/llms.txt) is the concise,
   package-owned API and ecosystem contract for AI tools.
 - [`llms-full.txt`](https://web-component.beforesemicolon.com/llms-full.txt)
