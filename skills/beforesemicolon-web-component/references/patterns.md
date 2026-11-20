@@ -5,6 +5,10 @@ including all named Markup re-exports. The [maintainer guide](./maintainer-guide
 covers installation, lifecycle, state, rendering, form integration, and
 composition with Router and Intl. Use the [local example runner](../examples/README.md)
 to check an observed attribute, input action, event payload, and cleanup.
+Read the [review guide](./component-review.md) before replacing component
+contracts or writing tests. The [status picker](../examples/status-picker.html)
+shows direct reactive bindings, a custom filter selector, a slot, and a
+payload event in one local example.
 
 ## Define values, events, and style contracts together
 

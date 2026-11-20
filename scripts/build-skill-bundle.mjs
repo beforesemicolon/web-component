@@ -157,9 +157,60 @@ export async function buildSkillBundle({ skill, pkg, out, index, pinned }) {
                 : input
         )
     }
+    const picker = await readFile(
+        'scripts/skill-examples/status-picker.js',
+        'utf8'
+    )
+    const pickerMarkup = await readFile(
+        'scripts/skill-examples/status-picker-markup.html',
+        'utf8'
+    )
+    const pickerClassic = picker.replace(
+        /^import \{([\s\S]*?)\} from '@beforesemicolon\/web-component'/,
+        (_import, specifiers) => {
+            const names = specifiers
+                .split(',')
+                .map((name) => name.trim())
+                .filter(Boolean)
+            assert(
+                names.includes('WebComponent'),
+                'Missing WebComponent import'
+            )
+            const helpers = names.filter((name) => name !== 'WebComponent')
+            assert(helpers.every((name) => index.runtimeExports.includes(name)))
+            return (
+                'const { WebComponent } = window.BFS\nconst { ' +
+                helpers.join(', ') +
+                ' } = window.BFS.MARKUP'
+            )
+        }
+    )
+    assert.notEqual(
+        pickerClassic,
+        picker,
+        'Unable to adapt npm imports for classic HTML'
+    )
+    const pickerBrowser = pickerMarkup.replace(
+        '    </body>',
+        '        <script src="./client.js"></script>\n        <script>\n' +
+            pickerClassic
+                .trim()
+                .split('\n')
+                .map((line) => '            ' + line)
+                .join('\n') +
+            '\n        </script>\n    </body>'
+    )
+    await writeFile(join(examples, 'status-picker.js'), picker)
+    await writeFile(join(examples, 'status-picker-markup.html'), pickerMarkup)
+    await writeFile(join(examples, 'status-picker.html'), pickerBrowser)
+    examplePaths.push(
+        'status-picker.js',
+        'status-picker-markup.html',
+        'status-picker.html'
+    )
     await writeFile(
         join(examples, 'README.md'),
-        `# Run these examples without documentation access\n\n${pkg.name} ${pkg.version}\n\nFor browser-only HTML, copy the example and the installed package's \`dist/client.js\` to the same folder. If you maintain a private mirror of the package, use its exact version. Serve the folder using a static server, e.g. \`python3 -m http.server 8000\`, and open its example HTML file. No external script is referenced by this copy.\n\nFor npm, copy the JavaScript file into the project, include the matching example markup described in its API record, and use the project's existing module loader or bundler. Read the package from local installation, not a CDN.\n\n` +
+        `# Run these examples without documentation access\n\n${pkg.name} ${pkg.version}\n\nFor browser-only HTML, copy the example and the installed package's \`dist/client.js\` to the same folder. If you maintain a private mirror of the package, use its exact version. Serve the folder using a static server, e.g. \`python3 -m http.server 8000\`, and open its example HTML file. No external script is referenced by this copy.\n\nFor npm, copy the JavaScript file into the project, include the matching example markup described in its API record, and use the project's existing module loader or bundler. Read the package from local installation, not a CDN. The status picker provides \`status-picker-markup.html\` (the HTML shell) and \`status-picker.js\` (the module); add a module script for the latter through the existing npm project entry point. The standalone \`status-picker.html\` is the same implementation using the bundled classic runtime.\n\n` +
             examplePaths.map((file) => `- [${file}](./${file})`).join('\n') +
             '\n'
     )

@@ -13,11 +13,43 @@ not need the package website or a network connection to read them.
 - [Offline guide and API index](./references/index.md): one documented page and concrete example for every public runtime and TypeScript export.
 - [Full package maintainer guide](./references/maintainer-guide.md): the extended reference from this release's package source.
 - [Worked patterns and tests](./references/patterns.md): compose realistic interfaces and verify their behavior.
+- [Implementation and review guide](./references/component-review.md): before/after examples, lifecycle ownership, instance boundaries, and focused tests.
 - [Local npm and browser examples](./examples/README.md): copy the installed runtime into the example folder for completely local browser tests.
 
 Read the smallest relevant guide or API page. Prefer the facts in this bundle
 when it matches the project version. If the app uses a different version,
 install the matching skill bundle before depending on a behavior.
+
+## Required workflow: inspect APIs before writing code
+
+Follow these steps before you propose or edit a component:
+
+1. **Name the behavior and owner.** Search the project for an existing component,
+   public property, event, or utility that owns it. Reuse the native control or
+   the existing Cube component when it already provides the interaction. Do
+   not build a local wrapper just to rename supported props or duplicate
+   keyboard, focus, disclosure, selection, or form behavior.
+2. **Inspect the installed API.** Identify the resolved package version and
+   setup, then open the relevant [offline API pages](./references/index.md).
+   Check the public Web Component member and the actual re-exported Markup
+   helpers before inventing a getter, directive, DOM helper, or lifecycle
+   convention. If a re-export's version differs, read the installed declaration.
+3. **Use supported helpers first.** Bind a reactive getter directly when no
+   transformation is needed. Use `when` for conditional output, `repeat`
+   for reactive collections, `pick` for reactive nested reads, and
+   `is` / `isNot` / `and` / `or` / `oneOf` for their documented predicate
+   contracts. Keep data transformations in named selectors and side effects
+   in the owning action or lifecycle, not template interpolation.
+4. **When no helper fits, say why.** Use the smallest native platform API or
+   focused plain function that satisfies the missing behavior. Do not invent
+   an undocumented package API or introduce a second dependency for a one-line
+   transformation. Name what the function owns and test the behavior the
+   existing APIs cannot express. Do not wrap a helper solely to rename it.
+5. **State the contract and verify it.** List the tag, lowercase observed
+   attributes and defaults, slots, events and payloads, and any intentionally
+   public CSS parts. For a migration, list old APIs to remove and find their
+   callers. Use the [implementation and review guide](./references/component-review.md)
+   to check behavior and teardown; run the available checker and focused tests.
 
 ## Find the matching release
 
@@ -70,8 +102,14 @@ before the code that defines elements. Use only one runtime:
 2. Declare reactive attribute names in `static observedAttributes` and default values in camelCase instance fields. Read `this.props.name()` in logic and bind `this.props.name` directly in a template. Use `initialState` and `setState` for reactive internals; do not mutate state from `render` or call `setState` while detached.
 3. Use a default slot for one consumer-supplied area and named slots for distinct additional areas. Use native controls for their keyboard and focus behavior. Attach handlers directly to concrete controls, not slots. Use a stable arrow method when passing a handler.
 4. Use `this.dispatch(name, detail)` for one documented event per action. Provide a complete payload from the source data. The helper dispatches at the custom element without bubbling or composing. Listen on that host; use a deliberate native `CustomEvent` contract if propagation is required. Do not impose callback props or require callers to reach into another element's state or methods.
-5. Use the default shadow root unless the consumer requires otherwise. Put local styles in `stylesheet` with `css` for inline CSS, and style the host with `:host`. Expose a CSS part only for a supported customization contract. Do not shadow native attributes such as `class`, `id`, or `style` as component inputs.
-6. Use `onMount` for subscriptions and listeners. Return cleanup to run when the element is removed. `onMount` runs again on reconnection. Use `onUpdate` for prop-driven effects and `refs` for owned nodes. Keep `render` declarative.
+5. Treat custom elements as native elements across instance boundaries. Use
+   documented domain properties or events to coordinate with another instance.
+   Do not read or invoke another instance's `props`, `state`, `setState`,
+   lifecycle, `dispatch`, `refs`, `internals`, `root`, or `contentRoot`.
+   In tests, `contentRoot` is appropriate for examining the component under
+   test; it is not a production integration API for its consumers.
+6. Use the default shadow root unless the consumer requires otherwise. Put local styles in `stylesheet` with `css` for inline CSS, and style the host with `:host`. Expose a CSS part only for a supported customization contract. Do not shadow native attributes such as `class`, `id`, or `style` as component inputs.
+7. Use `onMount` for subscriptions and listeners. Return cleanup to run when the element is removed. `onMount` runs again on reconnection. Use `onUpdate` for prop-driven effects and `refs` for owned nodes. Keep `render` declarative.
 
 ## Runnable pattern
 

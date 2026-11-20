@@ -145,3 +145,38 @@ test('classic HTML uses exact globals and does not load a second runtime', async
         )
     }
 })
+
+test('the offline status picker pairs the npm and classic demos', async () => {
+    const { skill, runtimeExports } = await json('ai/index.json')
+    const root = dirname(skill.path)
+    const manifest = await json(skill.manifest)
+    for (const path of [
+        'references/component-review.md',
+        'examples/status-picker-markup.html',
+        'examples/status-picker.html',
+        'examples/status-picker.js',
+    ]) {
+        assert(
+            manifest.files.includes(path),
+            `Missing installed skill path: ${path}`
+        )
+    }
+    const npm = await read(`${root}/examples/status-picker.js`)
+    const classic = await read(`${root}/examples/status-picker.html`)
+    const imports = /^import\s+\{([^}]+)\}/.exec(npm)?.[1]
+    assert(imports)
+    for (const name of imports
+        .split(',')
+        .map((value) => value.trim())
+        .filter(Boolean)) {
+        assert(
+            runtimeExports.includes(name),
+            `Missing public runtime import: ${name}`
+        )
+    }
+    assert.match(classic, /<script src="\.\/client\.js"><\/script>/)
+    assert.doesNotMatch(classic, /<script src="https?:/)
+    assert.match(classic, /window\.BFS\.MARKUP/)
+    assert.match(classic, /removeEventListener\('reset-status-picker', reset\)/)
+    assert.match(npm, /removeEventListener\('reset-status-picker', reset\)/)
+})
