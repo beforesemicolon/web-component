@@ -6,6 +6,11 @@ description: '{{t.pages.documentation.ai.meta.ai_first_guide_to_beforesemicolon_
 layout: document
 ---
 
+## Dedicated agent skill
+
+Read or install [the web-component skill](https://cdn.jsdelivr.net/npm/@beforesemicolon/web-component@1.22.0/skills/beforesemicolon-web-component/SKILL.md)
+from the installed npm package. Its path is also in the versioned lookup index.
+
 ## Version-specific lookup
 
 Use the [AI reference index](https://cdn.jsdelivr.net/npm/@beforesemicolon/web-component@1.22.0/ai/index.json) for version 1.22.0.

@@ -89,6 +89,7 @@ In the browser
 
 ## AI and ecosystem context
 
+- [Dedicated web-component skill](./skills/beforesemicolon-web-component/SKILL.md) for coding agents. It is included in the npm package.
 - [Versioned AI lookup index](https://cdn.jsdelivr.net/npm/@beforesemicolon/web-component@1.22.0/ai/index.json) for 1.22.0.
   For another release, replace the version in the URL with the installed version.
 

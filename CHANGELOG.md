@@ -7,3 +7,4 @@
   runtime bundles.
 - Add runnable npm and classic browser examples with the same implementation.
 - Document the difference between npm re-exports and the classic browser globals.
+- Ship one dedicated agent skill with the package, linked in the AI index.

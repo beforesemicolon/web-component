@@ -1,0 +1,63 @@
+---
+name: beforesemicolon-web-component
+description: Define, register, consume, or review native custom elements with @beforesemicolon/web-component. Use for reactive props and internal state, slots, events, styles, and component lifecycle in npm and classic browser projects.
+---
+
+# Build with Web Component
+
+## Find the matching release
+
+- Read the resolved @beforesemicolon/web-component version from installed metadata, the lockfile, or the actual classic script URL. Read its `ai/index.json`, or replace `VERSION` in `https://cdn.jsdelivr.net/npm/@beforesemicolon/web-component@VERSION/ai/index.json`. Select `web-component/WebComponent` and any applicable records. For older releases without an index, use their matching declarations and source.
+- npm exports `WebComponent`, `css`, and Markup APIs such as `html` as named exports. For nested Markup behavior in an npm project, use the Markup dependency version actually resolved for Web Component. The classic bundle provides `window.BFS.WebComponent`, `window.BFS.css`, and `window.BFS.MARKUP.html`; it does not provide `BFS.html`. Load Web Component before classic libraries that depend on its runtime, and do not install another classic Markup runtime on top of it.
+- Keep the project's entry style. For a prebuilt Cube control, load the component's verified registration entry, not a new custom element with an invented public API. Use the Markup skill for template reactivity when it is available.
+
+## Define a small native contract
+
+1. Define a hyphenated tag once with `customElements.define`. State which lowercase attributes, slots, events, and CSS parts you intend to support before adding an element.
+2. Declare reactive attribute names in `static observedAttributes` and default values in camelCase instance fields. Read `this.props.name()` in logic and bind `this.props.name` directly in a template. Use `initialState` and `setState` for reactive internals; do not mutate state from `render` or call `setState` while detached.
+3. Use a default slot for one consumer-supplied area and named slots for distinct additional areas. Use native controls for their keyboard and focus behavior. Attach handlers directly to concrete controls, not slots. Use a stable arrow method when passing a handler.
+4. Use `this.dispatch(name, detail)` for one documented event per action. Provide a complete payload from the source data. The helper dispatches at the custom element without bubbling or composing. Listen on that host; use a deliberate native `CustomEvent` contract if propagation is required. Do not impose callback props or require callers to reach into another element's state or methods.
+5. Use the default shadow root unless the consumer requires otherwise. Put local styles in `stylesheet` with `css` for inline CSS, and style the host with `:host`. Expose a CSS part only for a supported customization contract. Do not shadow native attributes such as `class`, `id`, or `style` as component inputs.
+6. Use `onMount` for subscriptions and listeners. Return cleanup to run when the element is removed. `onMount` runs again on reconnection. Use `onUpdate` for prop-driven effects and `refs` for owned nodes. Keep `render` declarative.
+
+## Runnable pattern
+
+```js
+import { WebComponent, html } from '@beforesemicolon/web-component'
+
+class StatusButton extends WebComponent {
+    static observedAttributes = ['message']
+    message = 'Ready'
+    initialState = { count: 0 }
+
+    onMount() {
+        const reset = () => this.setState({ count: 0 })
+        window.addEventListener('reset-status', reset)
+        return () => window.removeEventListener('reset-status', reset)
+    }
+
+    confirm = () => {
+        const count = this.state.count() + 1
+        this.setState({ count })
+        this.dispatch('status-confirm', {
+            message: this.props.message(),
+            count,
+        })
+    }
+
+    render() {
+        return html`
+            <button type="button" onclick="${this.confirm}">
+                <slot>Confirm status</slot>
+            </button>
+            <output>${this.props.message}: ${this.state.count}</output>
+        `
+    }
+}
+
+customElements.define('status-button', StatusButton)
+```
+
+Use `<status-button message="Ready">Confirm status</status-button>`. For classic HTML, load the exact Web Component client first and replace the import with `const { WebComponent } = window.BFS` and `const { html } = window.BFS.MARKUP`.
+
+Verify that an attribute update changes rendered text, activating the named button emits one event with the documented detail, and removal cleans up the subscription. Test reconnecting if reconnection matters. Run the project's checker if available.

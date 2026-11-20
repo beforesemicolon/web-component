@@ -7,6 +7,7 @@ Version: `{{project.version}}`
 Documentation: https://web-component.beforesemicolon.com/documentation/
 Complete context: https://web-component.beforesemicolon.com/llms-full.txt
 Versioned AI lookup index: https://cdn.jsdelivr.net/npm/@beforesemicolon/web-component@{{project.version}}/ai/index.json
+Dedicated agent skill: https://cdn.jsdelivr.net/npm/@beforesemicolon/web-component@{{project.version}}/skills/beforesemicolon-web-component/SKILL.md
 
 Use this file as the authoritative compact contract when generating code with `@beforesemicolon/web-component`. Do not substitute React component conventions, JSX, decorators, or framework-specific lifecycle APIs.
 
