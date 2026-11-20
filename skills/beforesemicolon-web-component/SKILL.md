@@ -5,6 +5,20 @@ description: Define, register, consume, or review native custom elements with @b
 
 # Build with Web Component
 
+## Read the complete offline skill
+
+This installed skill includes all of its guides and runnable examples. You do
+not need the package website or a network connection to read them.
+
+- [Offline guide and API index](./references/index.md): one documented page and concrete example for every public runtime and TypeScript export.
+- [Full package maintainer guide](./references/maintainer-guide.md): the extended reference from this release's package source.
+- [Worked patterns and tests](./references/patterns.md): compose realistic interfaces and verify their behavior.
+- [Local npm and browser examples](./examples/README.md): copy the installed runtime into the example folder for completely local browser tests.
+
+Read the smallest relevant guide or API page. Prefer the facts in this bundle
+when it matches the project version. If the app uses a different version,
+install the matching skill bundle before depending on a behavior.
+
 ## Find the matching release
 
 - Read the resolved @beforesemicolon/web-component version from installed metadata, the lockfile, or the actual classic script URL. Read its `ai/index.json`, or replace `VERSION` in `https://cdn.jsdelivr.net/npm/@beforesemicolon/web-component@VERSION/ai/index.json`. Select `web-component/WebComponent` and any applicable records. For older releases without an index, use their matching declarations and source.

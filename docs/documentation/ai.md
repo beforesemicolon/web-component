@@ -9,7 +9,9 @@ layout: document
 ## Dedicated agent skill
 
 Read or install [the web-component skill](https://cdn.jsdelivr.net/npm/@beforesemicolon/web-component@1.22.0/skills/beforesemicolon-web-component/SKILL.md)
-from the installed npm package. Its path is also in the versioned lookup index.
+from the installed npm package. Its path and resource manifest are in the
+versioned lookup index. Install the complete folder for offline access to
+the maintainer guide, all public APIs, and runnable examples.
 
 ## Version-specific lookup
 
