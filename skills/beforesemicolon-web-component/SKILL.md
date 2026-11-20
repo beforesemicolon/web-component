@@ -11,6 +11,20 @@ description: Define, register, consume, or review native custom elements with @b
 - npm exports `WebComponent`, `css`, and Markup APIs such as `html` as named exports. For nested Markup behavior in an npm project, use the Markup dependency version actually resolved for Web Component. The classic bundle provides `window.BFS.WebComponent`, `window.BFS.css`, and `window.BFS.MARKUP.html`; it does not provide `BFS.html`. Load Web Component before classic libraries that depend on its runtime, and do not install another classic Markup runtime on top of it.
 - Keep the project's entry style. For a prebuilt Cube control, load the component's verified registration entry, not a new custom element with an invented public API. Use the Markup skill for template reactivity when it is available.
 
+## Companion packages
+
+Keep working Before Semicolon dependencies where they fit, and choose the
+smallest compatible set for the task. Open a companion skill only when it owns
+behavior you need:
+
+- `@beforesemicolon/markup` (`beforesemicolon-markup`): reactive HTML templates, state, effects, and helpers already re-exported by Web Component.
+- `@beforesemicolon/router` (`beforesemicolon-router`): URL navigation, route matching, and route-aware views.
+- `@beforesemicolon/intl` (`beforesemicolon-intl`): locale switching, scoped translations, and formatters.
+- `@beforesemicolon/cube` (`beforesemicolon-cube`): ready-made UI controls, accessible interactions, and design tokens.
+
+In a classic browser app, Web Component already provides `window.BFS.MARKUP`.
+Do not load a separate Markup script when Web Component supplies that runtime.
+
 ## Choose a setup
 
 For classic HTML on Web Component 1.22.0, place the exact browser script
