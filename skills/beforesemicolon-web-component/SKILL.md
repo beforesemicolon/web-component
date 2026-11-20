@@ -11,6 +11,31 @@ description: Define, register, consume, or review native custom elements with @b
 - npm exports `WebComponent`, `css`, and Markup APIs such as `html` as named exports. For nested Markup behavior in an npm project, use the Markup dependency version actually resolved for Web Component. The classic bundle provides `window.BFS.WebComponent`, `window.BFS.css`, and `window.BFS.MARKUP.html`; it does not provide `BFS.html`. Load Web Component before classic libraries that depend on its runtime, and do not install another classic Markup runtime on top of it.
 - Keep the project's entry style. For a prebuilt Cube control, load the component's verified registration entry, not a new custom element with an invented public API. Use the Markup skill for template reactivity when it is available.
 
+## Choose a setup
+
+For classic HTML on Web Component 1.22.0, place the exact browser script
+before the code that defines elements. Use only one runtime:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@beforesemicolon/web-component@1.22.0/dist/client.js"></script>
+<status-label status-text="Ready"></status-label>
+<script>
+    const { WebComponent } = window.BFS
+    const { html } = window.BFS.MARKUP
+
+    class StatusLabel extends WebComponent {
+        static observedAttributes = ['status-text']
+        statusText = 'Pending'
+
+        render() {
+            return html`<span role="status">${this.props.statusText}</span>`
+        }
+    }
+
+    customElements.define('status-label', StatusLabel)
+</script>
+```
+
 ## Define a small native contract
 
 1. Define a hyphenated tag once with `customElements.define`. State which lowercase attributes, slots, events, and CSS parts you intend to support before adding an element.
@@ -59,5 +84,26 @@ customElements.define('status-button', StatusButton)
 ```
 
 Use `<status-button message="Ready">Confirm status</status-button>`. For classic HTML, load the exact Web Component client first and replace the import with `const { WebComponent } = window.BFS` and `const { html } = window.BFS.MARKUP`.
+
+## Reusable patterns
+
+- **Public values:** Supply `status-text` in HTML or assign `statusText` on the element. Keep fields for attributes explicit; pass rich child content through slots, rather than through string or function props.
+- **Event payloads:** Listen directly on the host, for example `element.addEventListener('status-confirm', ({ detail }) => renderResult(detail.count))`. Read the documented `detail` shape instead of trying to reconstruct it from internal DOM nodes.
+- **Reactive CSS:** Import `css` (or read `window.BFS.css`) and derive style values inside the class. If the component observes an `emphasis` attribute with default `normal`, use a controlled mapping rather than injecting text from that attribute:
+
+    ```js
+    color = () =>
+        this.props.emphasis() === 'strong'
+            ? 'var(--emphasis, currentColor)'
+            : 'inherit'
+    stylesheet = css`
+        :host {
+            color: ${this.color};
+        }
+    `
+    ```
+
+- **Owned DOM and cleanup:** Bind a Markup `ref` to a concrete descendant and use `this.refs.name?.[0]` if imperative access is necessary. Attach document listeners or abortable requests in `onMount` or other owner actions, and dispose or abort on removal. Do not query another element's shadow DOM as its public API.
+- **Customization:** Use a slot for content and a documented `part` for specific CSS customization, not a pass-through `className` or CSS override on every instance. Filter stable/public parts through the design contract before exposing them.
 
 Verify that an attribute update changes rendered text, activating the named button emits one event with the documented detail, and removal cleans up the subscription. Test reconnecting if reconnection matters. Run the project's checker if available.
