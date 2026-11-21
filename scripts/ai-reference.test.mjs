@@ -180,3 +180,32 @@ test('the offline status picker pairs the npm and classic demos', async () => {
     assert.match(classic, /removeEventListener\('reset-status-picker', reset\)/)
     assert.match(npm, /removeEventListener\('reset-status-picker', reset\)/)
 })
+
+test('the offline contact form provides equivalent local setup variants', async () => {
+    const { skill } = await json('ai/index.json')
+    const root = dirname(skill.path)
+    const manifest = await json(skill.manifest)
+    for (const path of [
+        'references/forms-and-localization.md',
+        'examples/contact-request-markup.html',
+        'examples/contact-request.html',
+        'examples/contact-request.js',
+    ]) {
+        assert(
+            manifest.files.includes(path),
+            `Missing installed skill path: ${path}`
+        )
+    }
+    const npm = await read(`${root}/examples/contact-request.js`)
+    const classic = await read(`${root}/examples/contact-request.html`)
+    assert.match(classic, /<script src="\.\/client\.js"><\/script>/)
+    assert.doesNotMatch(classic, /<script src="https?:/)
+    for (const variant of [npm, classic]) {
+        assert.match(
+            variant,
+            /this\.dispatch\('contact-request', \{ email \}\)/
+        )
+        assert.match(variant, /type="email"/)
+        assert.match(variant, /<slot name="help">/)
+    }
+})

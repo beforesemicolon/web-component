@@ -14,6 +14,7 @@ not need the package website or a network connection to read them.
 - [Full package maintainer guide](./references/maintainer-guide.md): the extended reference from this release's package source.
 - [Worked patterns and tests](./references/patterns.md): compose realistic interfaces and verify their behavior.
 - [Implementation and review guide](./references/component-review.md): before/after examples, lifecycle ownership, instance boundaries, and focused tests.
+- [Native forms and locale ownership](./references/forms-and-localization.md): build a reusable form, preserve native validation, and localize its public labels.
 - [Local npm and browser examples](./examples/README.md): copy the installed runtime into the example folder for completely local browser tests.
 
 Read the smallest relevant guide or API page. Prefer the facts in this bundle

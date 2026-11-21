@@ -157,60 +157,60 @@ export async function buildSkillBundle({ skill, pkg, out, index, pinned }) {
                 : input
         )
     }
-    const picker = await readFile(
-        'scripts/skill-examples/status-picker.js',
-        'utf8'
-    )
-    const pickerMarkup = await readFile(
-        'scripts/skill-examples/status-picker-markup.html',
-        'utf8'
-    )
-    const pickerClassic = picker.replace(
-        /^import \{([\s\S]*?)\} from '@beforesemicolon\/web-component'/,
-        (_import, specifiers) => {
-            const names = specifiers
-                .split(',')
-                .map((name) => name.trim())
-                .filter(Boolean)
-            assert(
-                names.includes('WebComponent'),
-                'Missing WebComponent import'
-            )
-            const helpers = names.filter((name) => name !== 'WebComponent')
-            assert(helpers.every((name) => index.runtimeExports.includes(name)))
-            return (
-                'const { WebComponent } = window.BFS\nconst { ' +
-                helpers.join(', ') +
-                ' } = window.BFS.MARKUP'
-            )
-        }
-    )
-    assert.notEqual(
-        pickerClassic,
-        picker,
-        'Unable to adapt npm imports for classic HTML'
-    )
-    const pickerBrowser = pickerMarkup.replace(
-        '    </body>',
-        '        <script src="./client.js"></script>\n        <script>\n' +
-            pickerClassic
-                .trim()
-                .split('\n')
-                .map((line) => '            ' + line)
-                .join('\n') +
-            '\n        </script>\n    </body>'
-    )
-    await writeFile(join(examples, 'status-picker.js'), picker)
-    await writeFile(join(examples, 'status-picker-markup.html'), pickerMarkup)
-    await writeFile(join(examples, 'status-picker.html'), pickerBrowser)
-    examplePaths.push(
-        'status-picker.js',
-        'status-picker-markup.html',
-        'status-picker.html'
-    )
+    for (const name of ['status-picker', 'contact-request']) {
+        const moduleSource = await readFile(
+            `scripts/skill-examples/${name}.js`,
+            'utf8'
+        )
+        const markup = await readFile(
+            `scripts/skill-examples/${name}-markup.html`,
+            'utf8'
+        )
+        const classicSource = moduleSource.replace(
+            /^import \{([\s\S]*?)\} from '@beforesemicolon\/web-component'/,
+            (_import, specifiers) => {
+                const names = specifiers
+                    .split(',')
+                    .map((name) => name.trim())
+                    .filter(Boolean)
+                assert(
+                    names.includes('WebComponent'),
+                    'Missing WebComponent import'
+                )
+                const helpers = names.filter((name) => name !== 'WebComponent')
+                assert(
+                    helpers.every((name) => index.runtimeExports.includes(name))
+                )
+                return (
+                    'const { WebComponent } = window.BFS\nconst { ' +
+                    helpers.join(', ') +
+                    ' } = window.BFS.MARKUP'
+                )
+            }
+        )
+        assert.notEqual(
+            classicSource,
+            moduleSource,
+            'Unable to adapt npm imports for classic HTML'
+        )
+        const classicHtml = markup.replace(
+            '    </body>',
+            '        <script src="./client.js"></script>\n        <script>\n' +
+                classicSource
+                    .trim()
+                    .split('\n')
+                    .map((line) => '            ' + line)
+                    .join('\n') +
+                '\n        </script>\n    </body>'
+        )
+        await writeFile(join(examples, `${name}.js`), moduleSource)
+        await writeFile(join(examples, `${name}-markup.html`), markup)
+        await writeFile(join(examples, `${name}.html`), classicHtml)
+        examplePaths.push(`${name}.js`, `${name}-markup.html`, `${name}.html`)
+    }
     await writeFile(
         join(examples, 'README.md'),
-        `# Run these examples without documentation access\n\n${pkg.name} ${pkg.version}\n\nFor browser-only HTML, copy the example and the installed package's \`dist/client.js\` to the same folder. If you maintain a private mirror of the package, use its exact version. Serve the folder using a static server, e.g. \`python3 -m http.server 8000\`, and open its example HTML file. No external script is referenced by this copy.\n\nFor npm, copy the JavaScript file into the project, include the matching example markup described in its API record, and use the project's existing module loader or bundler. Read the package from local installation, not a CDN. The status picker provides \`status-picker-markup.html\` (the HTML shell) and \`status-picker.js\` (the module); add a module script for the latter through the existing npm project entry point. The standalone \`status-picker.html\` is the same implementation using the bundled classic runtime.\n\n` +
+        `# Run these examples without documentation access\n\n${pkg.name} ${pkg.version}\n\nFor browser-only HTML, copy the example and the installed package's \`dist/client.js\` to the same folder. If you maintain a private mirror of the package, use its exact version. Serve the folder using a static server, e.g. \`python3 -m http.server 8000\`, and open its example HTML file. No external script is referenced by this copy.\n\nFor npm, copy the JavaScript file into the project, include the matching example markup described in its API record, and use the project's existing module loader or bundler. Read the package from local installation, not a CDN. The status picker and contact request each provide an HTML shell (\`*-markup.html\`), an npm source module (\`*.js\`), and standalone classic HTML (\`*.html\`). Add the npm module through the existing project entry point.\n\n` +
             examplePaths.map((file) => `- [${file}](./${file})`).join('\n') +
             '\n'
     )
@@ -225,7 +225,7 @@ export async function buildSkillBundle({ skill, pkg, out, index, pinned }) {
             .join('\n')
     await writeFile(
         join(root, 'references', 'index.md'),
-        `# Offline guide and reference\n\nThese documents describe ${pkg.name} **${pkg.version}**. The public API index below has one page and example per export. Do not substitute these facts for another installed release.\n\n- [Package maintainer guide](./maintainer-guide.md): setup, API behavior, and end-to-end examples.\n- [Worked patterns](./patterns.md): composition, ownership, and test cases.\n- [Run the offline examples](../examples/README.md): do not fetch browser runtimes during verification.\n\n## Runtime APIs\n\n${group(false)}\n\n## TypeScript APIs\n\n${group(true)}\n`
+        `# Offline guide and reference\n\nThese documents describe ${pkg.name} **${pkg.version}**. The public API index below has one page and example per export. Do not substitute these facts for another installed release.\n\n- [Package maintainer guide](./maintainer-guide.md): setup, API behavior, and end-to-end examples.\n- [Worked patterns](./patterns.md): composition, ownership, and test cases.\n- [Forms and locale ownership](./forms-and-localization.md): compose a native form, test its public contract, and connect it to the app language.\n- [Run the offline examples](../examples/README.md): do not fetch browser runtimes during verification.\n\n## Runtime APIs\n\n${group(false)}\n\n## TypeScript APIs\n\n${group(true)}\n`
     )
 
     const files = (await listFiles(root))
