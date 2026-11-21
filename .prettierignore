@@ -2,3 +2,13 @@ src/**/*.spec.ts
 dist/
 website/
 .netlify/
+
+# Built static AI reference
+ai/
+
+# Generated offline skill resources (included in npm pack)
+skills/beforesemicolon-web-component/references/api/
+skills/beforesemicolon-web-component/references/index.md
+skills/beforesemicolon-web-component/references/maintainer-guide.md
+skills/beforesemicolon-web-component/examples/
+skills/beforesemicolon-web-component/manifest.json

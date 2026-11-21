@@ -27,3 +27,5 @@ netlify.toml
 build-docs.js
 site.config.json
 build.js
+
+scripts
